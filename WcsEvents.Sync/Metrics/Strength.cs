@@ -110,7 +110,7 @@ public sealed class Strength(AppDbContext db, IMemoryCache cache)
             {
                 var first = g.First();
                 List<double> held = [.. g.Select(e => e.Wscid is { } id ? history.AsOf(id, first.EventDate) : 0).Order()];
-                return (first.ScoringEventId, first.RoundName, Size: held.Count, Average: held.Average(), Median: Ranking.Median(held), Top: TopQuartileAverage(held));
+                return (first.ScoringEventId, first.RoundName, Size: held.Count, Average: held.Average(), Median: Ranking.Median(TopQuartile(held)), Top: TopQuartileAverage(held));
             })
             .GroupBy(r => r.ScoringEventId)
             .Select(g => g.MaxBy(r => r.Size))
@@ -124,7 +124,13 @@ public sealed class Strength(AppDbContext db, IMemoryCache cache)
 
     /// <summary>Mean of the highest quarter of an ascending list, at least one value.</summary>
     internal static double TopQuartileAverage(IReadOnlyList<double> sortedAscending) =>
-        sortedAscending.TakeLast(Math.Max(1, (int)Math.Ceiling(sortedAscending.Count / 4.0))).Average();
+        TopQuartile(sortedAscending).Average();
+
+    /// <summary>The strongest quarter of an ascending list, at least one value, still ascending.
+    /// Its median is what the median column shows: the whole field's is 0 wherever most entrants
+    /// have no points yet, which says nothing about who reaches the final.</summary>
+    internal static List<double> TopQuartile(IReadOnlyList<double> sortedAscending) =>
+        [.. sortedAscending.TakeLast(Math.Max(1, (int)Math.Ceiling(sortedAscending.Count / 4.0)))];
 
     /// <summary>Which third of <paramref name="sorted"/> a value falls in; null when there are too few events to say.</summary>
     internal static Difficulty? Classify(double value, IReadOnlyList<double> sorted)

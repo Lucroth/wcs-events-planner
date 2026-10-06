@@ -132,9 +132,9 @@ function strengthCard(e: ScrapedEvent): Raw {
     <section class="card">
       <h2>Competition level</h2>
       ${e.strengthsFrom ? html`<p class="muted">Based on the previous edition: <a href="#/event/${e.strengthsFrom.id}">${e.strengthsFrom.name} (${date(e.strengthsFrom.dateFrom)})</a>.</p>` : ""}
-      <p class="muted small">WSDC points competitors held in the division when they danced. <strong>Top 25%</strong> is the average of the strongest quarter of the field, roughly who you have to beat to make the final; the level is ranked by it ("hard" = top third of all events in that division). <strong>Avg</strong> covers everyone, so it mostly shows how many entrants have no points yet.</p>
+      <p class="muted small">WSDC points competitors held in the division when they danced. <strong>Top 25%</strong> is the average of the strongest quarter of the field, roughly who you have to beat to make the final; the level is ranked by it ("hard" = top third of all events in that division). <strong>Top 25% median</strong> is the middle of that quarter, less swayed by one very experienced dancer. <strong>Avg (all)</strong> covers everyone, so it mostly shows how many entrants have no points yet.</p>
       <table>
-        <thead><tr><th>Division</th><th></th><th class="num">Dancers</th><th>Tier</th><th class="num">Top 25% avg</th><th class="num">Avg</th><th class="num">Median</th><th>Level</th></tr></thead>
+        <thead><tr><th>Division</th><th></th><th class="num">Dancers</th><th>Tier</th><th class="num">Top 25% avg</th><th class="num">Top 25% median</th><th class="num">Avg (all)</th><th>Level</th></tr></thead>
         <tbody>
           ${e.strengths.map((s) => html`
             <tr>
@@ -143,8 +143,8 @@ function strengthCard(e: ScrapedEvent): Raw {
               <td class="num">${s.fieldSize}</td>
               <td>${tierCell(s.fieldSize)}</td>
               <td class="num" ${s.europeTopQuartileAverage != null ? html`title="Average across European events: ${s.europeTopQuartileAverage.toFixed(1)}"` : ""}><strong>${s.topQuartileAverage != null ? s.topQuartileAverage.toFixed(1) : "—"}</strong></td>
-              <td class="num">${s.averagePoints.toFixed(1)}</td>
               <td class="num">${s.medianPoints}</td>
+              <td class="num">${s.averagePoints.toFixed(1)}</td>
               <td>${s.difficulty ? html`<span class="chip diff-${level(s.difficulty)}">${level(s.difficulty)}</span>` : ""}</td>
             </tr>`)}
         </tbody>
