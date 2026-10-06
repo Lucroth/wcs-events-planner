@@ -76,20 +76,26 @@ public sealed partial class EventPublisher(
             }, ct);
         }
 
-        foreach (var year in all.GroupBy(f => f.Event.DateFrom!.Value.Year))
+        // Each series' next edition is listed a year ahead until organisers create it; a summary is
+        // rewritten on every publish, so an expected row disappears once the real edition is listed.
+        var rows = all.Select(f => (Facts: f, Expected: false))
+            .Concat(ExpectedEditions(all, today).Select(f => (Facts: f, Expected: true)));
+
+        foreach (var year in rows.GroupBy(r => Shift(r.Facts.Event.DateFrom, r.Expected)!.Value.Year))
         {
             await store.SetIfChangedAsync($"years/{year.Key}", new
             {
-                Events = year.Select(f => new
+                Events = year.OrderBy(r => Shift(r.Facts.Event.DateFrom, r.Expected)).Select(r => new
                 {
-                    id = f.Event.Id.ToString(),
-                    f.Event.Name,
-                    DateFrom = Iso(f.Event.DateFrom),
-                    DateTo = Iso(f.Event.DateTo ?? f.Event.DateFrom),
-                    f.Event.City,
-                    f.Event.Country,
-                    f.IsWsdc,
-                    Chips = Chips(f.Strengths),
+                    id = r.Facts.Event.Id.ToString(),
+                    r.Facts.Event.Name,
+                    DateFrom = Iso(Shift(r.Facts.Event.DateFrom, r.Expected)),
+                    DateTo = Iso(Shift(r.Facts.Event.DateTo ?? r.Facts.Event.DateFrom, r.Expected)),
+                    r.Facts.Event.City,
+                    r.Facts.Event.Country,
+                    r.Facts.IsWsdc,
+                    Chips = Chips(r.Facts.Strengths),
+                    Expected = r.Expected ? true : (bool?)null,
                 }),
             }, ct);
         }
@@ -159,6 +165,17 @@ public sealed partial class EventPublisher(
         division.FirstOrDefault(s => s.Role == role) is { } s
             ? new { level = s.Difficulty?.ToString(), top = Math.Round(s.TopQuartileAverage, 1) }
             : null;
+
+    /// <summary>
+    /// The latest edition of each series whose anniversary is still ahead and that has no later
+    /// edition listed: the series is expected back a year on, on roughly the same dates.
+    /// </summary>
+    internal static IEnumerable<EventFacts> ExpectedEditions(IReadOnlyList<EventFacts> all, DateOnly today) =>
+        all.Where(f => f.Event.DateFrom is { } d
+            && d.AddYears(1) >= today
+            && !Editions(f.Event, all).Any(o => o.DateFrom > d));
+
+    private static DateOnly? Shift(DateOnly? date, bool expected) => expected ? date?.AddYears(1) : date;
 
     /// <summary>The other published editions of an event's series, oldest first.</summary>
     internal static IEnumerable<ScoringEvent> Editions(ScoringEvent e, IEnumerable<EventFacts> all) =>

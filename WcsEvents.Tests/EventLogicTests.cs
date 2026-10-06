@@ -1,4 +1,6 @@
+using WcsEvents.Sync.Data;
 using WcsEvents.Sync.Metrics;
+using WcsEvents.Sync.Publish;
 
 namespace WcsEvents.Tests;
 
@@ -38,4 +40,17 @@ public sealed class EventLogicTests
         Assert.Equal(0, history.AsOf(2, new DateOnly(2026, 4, 1)));
     }
 
+
+    [Fact]
+    public void ExpectedEditions_ProjectsOnlyTheLatestEditionStillToRecur()
+    {
+        static EventFacts Facts(int id, string name, int year, int month) =>
+            new(new ScoringEvent { Id = id, Name = name, DateFrom = new DateOnly(year, month, 10) }, true, [], null, []);
+
+        List<EventFacts> all = [Facts(1, "Budafest 2025", 2025, 1), Facts(2, "Budafest 2026", 2026, 1), Facts(3, "Swiss Open 2026", 2026, 12), Facts(4, "Old Fest 2024", 2024, 5), Facts(5, "Cologne Calling 2027", 2027, 1)];
+
+        var expected = EventPublisher.ExpectedEditions(all, new DateOnly(2026, 10, 6)).Select(f => f.Event.Id).ToList();
+
+        Assert.Equal([2, 3, 5], expected);
+    }
 }

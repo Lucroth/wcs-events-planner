@@ -202,15 +202,17 @@ function trainsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: strin
   if (s.name.toLowerCase().startsWith(city.name.toLowerCase())) {
     return html``;
   }
-  const out = [addDays(e.dateFrom, -1), e.dateFrom];
-  const back = [e.dateTo, addDays(e.dateTo, 1)];
+  // Any day of the event works for a trip there or back: some come for the weekend only.
+  const out = days(addDays(e.dateFrom, -1), addDays(e.dateTo, -1));
+  const back = days(addDays(e.dateFrom, 1), addDays(e.dateTo, 1));
   return html`
     <h3>Train</h3>
     <p>${city.name} → ${s.name}</p>
     <p class="buttons">
-      ${out.map((d) => html`<a class="button" target="_blank" rel="noopener" href="${koleoUrl(city.koleoSlug, s.slug, d)}">There: ${short(d)}</a> `)}
-      <a class="button" target="_blank" rel="noopener" href="${koleoUrl(s.slug, city.koleoSlug, back[0], 12)}">Back: ${short(back[0])}</a>
-      <a class="button" target="_blank" rel="noopener" href="${koleoUrl(s.slug, city.koleoSlug, back[1])}">Back: ${short(back[1])}</a>
+      ${out.map((d) => html`<a class="button" target="_blank" rel="noopener" href="${koleoUrl(city.koleoSlug, s.slug, d)}">There: ${short(d)}</a>`)}
+    </p>
+    <p class="buttons">
+      ${back.map((d) => html`<a class="button" target="_blank" rel="noopener" href="${koleoUrl(s.slug, city.koleoSlug, d, d === e.dateTo ? 12 : 6)}">Back: ${short(d)}</a>`)}
     </p>
     ${fares ? trainFares(fares, people, city, s.slug) : html`<p class="muted small">Fares appear here about a month before the event, when PKP Intercity starts selling. Until then, check koleo.pl.</p>`}`;
 }
@@ -339,4 +341,11 @@ export function wireEvent(id: string): void {
 /** Each dancer's scoring.dance registry page, for those with a WSDC id (given with their first points). */
 function couple(dancers: { name: string; wscid: number | null }[]): Raw {
   return html`${dancers.map((d, i) => html`${i ? " & " : ""}${d.wscid ? html`<a href="https://scoring.dance/enUS/wsdc/registry/${d.wscid}.html" target="_blank" rel="noopener">${d.name}</a>` : d.name}`)}`;
+}
+
+/** Every day from `from` to `to` inclusive, at most a week. */
+function days(from: string, to: string): string[] {
+  const all: string[] = [];
+  for (let d = from; d <= to && all.length < 7; d = addDays(d, 1)) all.push(d);
+  return all;
 }

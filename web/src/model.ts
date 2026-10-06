@@ -61,6 +61,8 @@ export interface YearSummary {
     country: string | null;
     isWsdc: boolean;
     chips: Chip[];
+    /** Not listed yet: the series' latest edition (whose id this is) moved a year on. */
+    expected?: boolean | null;
   }[];
 }
 
