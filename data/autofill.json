@@ -1847,5 +1847,51 @@
       "websiteUrl": "https://www.riverswingnights.com/",
       "instagramUrl": "https://www.instagram.com/riverswingnights/"
     }
+  },
+  "439": {
+    "source": "https://www.santaswing.pl/prices/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.santaswing.pl/",
+      "instagramUrl": "https://www.instagram.com/santa_swing/",
+      "registrationOpens": "2026-07-13T17:00",
+      "eventSchedule": "https://www.santaswing.pl/schedule/",
+      "staff": [
+        "Maxence Martin & Virginie Grondin",
+        "Keerigan Rudd & Mia Primavera",
+        "Miguel Ortega & Maïna Vila Cobarsi",
+        "Wee Tze Yi (Zee) & Dalena Lee"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early bird",
+          "price": 790,
+          "currency": "PLN",
+          "until": "2026-07-27"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal bird",
+          "price": 860,
+          "currency": "PLN",
+          "until": "2026-08-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late bird",
+          "price": 930,
+          "currency": "PLN",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party pass",
+          "price": 500,
+          "currency": "PLN",
+          "until": null
+        }
+      ]
+    }
   }
 }
