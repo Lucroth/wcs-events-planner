@@ -51,7 +51,9 @@ export const getEvent = (id: string) => read<ScrapedEvent>(C.events, id);
 
 export const getInfo = (id: string) => read<Info>(C.info, id);
 
-export const getFlights = (eventId: string, key: string) => read<Flights>(C.flights, `${eventId}_${key}`);
+/** Fares for an event from every Polish airport the sync searched, one document per home city. */
+export const getAllFlights = async (eventId: string) =>
+  (await getDocs(query(collection(db, C.flights), where("eventId", "==", eventId)))).docs.map((d) => d.data() as Flights);
 
 export const getTrains = (eventId: string, citySlug: string) => read<Trains>(C.trains, `${eventId}_${citySlug}`);
 

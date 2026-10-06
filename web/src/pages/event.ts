@@ -1,4 +1,4 @@
-import { getEvent, getFlights, getInfo, getScheduleImage, getTrains } from "../firebase";
+import { getAllFlights, getEvent, getInfo, getScheduleImage, getTrains } from "../firebase";
 import { isImageDataUrl } from "../image";
 import { date, duration, level, localDateTime, money, range, short, today } from "../format";
 import { html, safeUrl, type Raw } from "../html";
@@ -8,7 +8,6 @@ import {
   airbnbUrl,
   bookingUrl,
   findCity,
-  flightKey,
   flightOrigins,
   googleFlightsUrl,
   googleTransitUrl,
@@ -32,7 +31,7 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
   const people = Math.min(12, Math.max(1, Number(params.get("people")) || 1));
   const upcoming = e.dateTo >= now;
   const [flights, trains, eventImage, compImage] = await Promise.all([
-    upcoming && e.country !== "Poland" ? getFlights(id, flightKey(city)) : undefined,
+    upcoming && e.country !== "Poland" ? getAllFlights(id).then(mergeFlights) : undefined,
     upcoming && e.country === "Poland" ? getTrains(id, city.koleoSlug) : undefined,
     info?.eventScheduleImage ? getScheduleImage(id, "event") : undefined,
     info?.compScheduleImage ? getScheduleImage(id, "comp") : undefined,
@@ -184,7 +183,7 @@ function travelCard(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string
       </form>
 
       <h3>Accommodation</h3>
-      <p class="muted small">${date(e.dateFrom)} – ${date(checkOut)}, ${people} ${people === 1 ? "person" : "people"}. ${coords && info?.lat != null ? "Sorted by distance from the venue." : "Venue not set: searching around the city."}</p>
+      <p class="muted small">${date(e.dateFrom)} – ${date(checkOut)}, ${people} ${people === 1 ? "person" : "people"}. ${info?.lat != null || (info?.venueAddress && scraped.coords) ? "Sorted by distance from the venue." : info?.venueAddress ? "Venue address could not be placed on a map yet: searching around the city." : "Venue not set: searching around the city."}</p>
       <p class="buttons">
         <a class="button" target="_blank" rel="noopener" href="${bookingUrl(place, coords, e.dateFrom, checkOut, people)}">Booking.com</a>
         <a class="button" target="_blank" rel="noopener" href="${airbnbUrl(place, coords, e.dateFrom, checkOut, people)}">Airbnb</a>
@@ -216,10 +215,27 @@ function trainsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: strin
     ${fares ? trainFares(fares, people, city, s.slug) : html`<p class="muted small">Fares appear here about a month before the event, when PKP Intercity starts selling. Until then, check koleo.pl.</p>`}`;
 }
 
-function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string }, city: HomeCity, people: number, flights: Flights | undefined): Raw {
-  const origins = flightOrigins(city);
+/** One view over every home city's fares: combos and legs pooled, duplicates dropped, cheapest first. */
+function mergeFlights(all: Flights[]): Flights | undefined {
+  if (!all.length) return undefined;
+  const legKey = (l: Leg) => `${l.airline}|${l.from}|${l.to}|${l.date}|${l.times.join(",")}`;
+  const unique = <T,>(items: T[], key: (t: T) => string) => [...new Map(items.map((i) => [key(i), i])).values()];
+  return {
+    origins: unique(all.flatMap((f) => f.origins), (o) => o),
+    destinations: unique(all.flatMap((f) => f.destinations), (d) => d),
+    currency: all[0].currency,
+    combos: unique(all.flatMap((f) => f.combos), (c) => `${legKey(c.out)}>${legKey(c.back)}`).sort((a, b) => a.perPerson - b.perPerson).slice(0, 20),
+    out: unique(all.flatMap((f) => f.out), legKey).sort((a, b) => a.price - b.price),
+    back: unique(all.flatMap((f) => f.back), legKey).sort((a, b) => a.price - b.price),
+    fetchedOn: all.map((f) => f.fetchedOn).sort().at(-1)!,
+  };
+}
+
+function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string; city: string | null }, city: HomeCity, people: number, flights: Flights | undefined): Raw {
+  const home = new Set(flightOrigins(city));
+  const origins = flights?.origins.length ? flights.origins : [...home];
   const destinations = scraped.airports ?? [];
-  const google = googleFlightsUrl(origins, destinations.map((a) => a.iata), addDays(e.dateFrom, -1), e.dateTo);
+  const google = googleFlightsUrl(city.airports.length ? city.name : "Warsaw", e.city ?? destinations[0]?.name ?? "", addDays(e.dateFrom, -1), e.dateTo);
 
   if (!destinations.length) {
     return html`<h3>Flights</h3><p class="muted">No nearby airports known${scraped.city ? "" : " (the event has no city)"}. An admin can add them.</p>`;
@@ -230,7 +246,7 @@ function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: stri
     <p class="muted small">
       From ${origins.join(", ")} to ${destinations.map((a) => `${a.iata} (${a.name})`).join(", ")} ·
       out ${short(addDays(e.dateFrom, -1))}–${short(e.dateFrom)}, back ${short(e.dateTo)}–${short(addDays(e.dateTo, 1))}.
-      Direct Ryanair and Wizz Air fares per person, cabin bag only${flights ? `, checked ${date(flights.fetchedOn)}` : ""}.
+      Direct Ryanair and Wizz Air fares per person, cabin bag only${flights ? `, checked ${date(flights.fetchedOn)}` : ""}. Flights from ${city.name}${city.airports.length ? "" : " (Warsaw)"} are marked.
     </p>
     <p class="buttons"><a class="button" target="_blank" rel="noopener" href="${google}">Google Flights (all airlines, connections)</a></p>
     ${!flights
@@ -238,12 +254,12 @@ function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: stri
       : !flights.combos.length
         ? html`<p class="muted">No direct Ryanair or Wizz Air flights in this window. Try Google Flights.</p>`
         : html`
-          <h4>Cheapest return combinations</h4>
+          <h4>Cheapest return combinations, any Polish airport</h4>
           <table class="flights">
             <thead><tr><th>Out</th><th>Back</th><th class="num">Per person</th>${people > 1 ? html`<th class="num">Total (${people})</th>` : ""}</tr></thead>
             <tbody>
               ${flights.combos.map((c) => html`
-                <tr>
+                <tr class="${home.has(c.out.from) ? "mine" : ""}">
                   <td>${leg(c.out, people, false)}</td>
                   <td>${leg(c.back, people, false)}</td>
                   <td class="num"><strong>${money(c.perPerson, flights.currency)}</strong></td>

@@ -103,6 +103,7 @@ h4 { font-size: .95rem; margin: 1rem 0 .5rem; }
     cursor: pointer;
     margin: .15rem 0;
 }
+[hidden] { display: none !important; }
 .button:hover, button:hover { text-decoration: none; filter: brightness(1.1); }
 /* Rows of buttons wrap with an even gap instead of relying on the whitespace between them. */
 .buttons, .links { display: flex; flex-wrap: wrap; gap: .5rem; }
@@ -220,7 +221,9 @@ label.check { flex-direction: row; align-items: center; gap: .5rem; }
 .zoomed { position: fixed; inset: 0; z-index: 10; width: 100vw; height: 100vh; max-width: none; object-fit: contain; background: rgba(0, 0, 0, .9); margin: 0; border: none; border-radius: 0; cursor: zoom-out; }
 .image-field { display: flex; flex-direction: column; gap: .4rem; }
 .image-field .schedule-image { max-height: 320px; width: auto; }
-label.button.file { display: inline-block; flex-direction: row; font-size: .85rem; }
+label.button.file { display: inline-flex; flex-direction: row; align-items: center; margin: 0; }
+.image-field .buttons button { margin: 0; }
+tr.mine td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 
 .editions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; }
 .notice { border-left: 3px solid var(--accent, #e0a030); padding: .4rem .7rem; background: color-mix(in srgb, currentColor 6%, transparent); border-radius: 4px; }

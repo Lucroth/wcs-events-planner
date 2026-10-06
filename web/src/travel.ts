@@ -44,9 +44,10 @@ export const ryanairUrl = (from: string, to: string, date: string, adults: numbe
 export const wizzUrl = (from: string, to: string, date: string, adults: number) =>
   `https://www.wizzair.com/en-gb/booking/select-flight/${from}/${to}/${date}/null/${adults}/0/0/null`;
 
-export const googleFlightsUrl = (from: string[], to: string[], outDate: string, backDate: string) =>
+/** Google parses a query naming one place on each side; a list of airport codes leaves "to" empty. */
+export const googleFlightsUrl = (from: string, to: string, outDate: string, backDate: string) =>
   "https://www.google.com/travel/flights?hl=en&curr=PLN&q=" +
-  encodeURIComponent(`Flights from ${from.join(",")} to ${to.join(",")} on ${outDate} through ${backDate}`);
+  encodeURIComponent(`Flights from ${from} to ${to} on ${outDate} through ${backDate}`);
 
 /** koleo's timetable search; `hour` is the earliest departure. */
 export function koleoUrl(fromSlug: string, toSlug: string, date: string, hour = 6): string {
