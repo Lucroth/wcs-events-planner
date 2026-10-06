@@ -1,7 +1,8 @@
-import { getInfosForYear, getManualEvents, getYear } from "../firebase";
+import { getCheapestTravel, getInfosForYear, getManualEvents, getYear, plnRates } from "../firebase";
 import { date, level, money, month, range, today } from "../format";
 import { html, type Raw } from "../html";
-import { applyOverride, currentPass, isEurope, matchesLevel, type Difficulty, type YearSummary } from "../model";
+import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, type Chip, type Difficulty, type Info, type YearSummary } from "../model";
+import { findCity, flightKey, homeCities } from "../travel";
 
 type Row = YearSummary["events"][number];
 
@@ -18,11 +19,23 @@ const divisions: [string, string][] = [
 
 const levels: Difficulty[] = ["Easy", "Medium", "Hard"];
 
-/** What the list is narrowed to; kept in the URL so a filtered view can be shared. */
+const sorts = [
+  ["date", "by date"],
+  ["hard", "hardest first"],
+  ["easy", "easiest first"],
+  ["cost", "cheapest trip first"],
+] as const;
+
+export type SortBy = (typeof sorts)[number][0];
+
+/** What the list is narrowed to and how it is ordered; kept in the URL so a view can be shared. */
 export interface ListFilter {
   all: boolean;
   division: string | null;
   levels: Difficulty[];
+  sort: SortBy;
+  /** Home city for the cost sort. */
+  from: string | null;
 }
 
 export function readFilter(params: URLSearchParams): ListFilter {
@@ -31,6 +44,8 @@ export function readFilter(params: URLSearchParams): ListFilter {
     all: params.has("all"),
     division: divisions.some(([d]) => d === division) ? division : null,
     levels: (params.get("level") ?? "").split(",").filter((l): l is Difficulty => levels.includes(l as Difficulty)),
+    sort: sorts.find(([s]) => s === params.get("sort"))?.[0] ?? "date",
+    from: params.get("from"),
   };
 }
 
@@ -39,7 +54,16 @@ function query(f: ListFilter): string {
   if (f.all) parts.push("all");
   if (f.division) parts.push(`div=${f.division}`);
   if (f.levels.length) parts.push(`level=${f.levels.join(",")}`);
+  if (f.sort !== "date") parts.push(`sort=${f.sort}`);
+  if (f.sort === "cost" && f.from) parts.push(`from=${encodeURIComponent(f.from)}`);
   return parts.length ? `?${parts.join("&")}` : "";
+}
+
+interface Cost {
+  total: number;
+  travel: number;
+  /** Full pass in PLN; null when no price is known. */
+  pass: number | null;
 }
 
 export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
@@ -56,6 +80,8 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
     .sort((a, b) => a.dateFrom.localeCompare(b.dateFrom));
 
   const now = today();
+  const home = findCity(filter.from);
+  const costs = filter.sort === "cost" ? await tripCosts(rows, infos, filter.from, now) : new Map<string, Cost>();
   const thisYear = new Date().getFullYear();
   const years = Array.from({ length: thisYear + 2 - firstYear + 1 }, (_, i) => thisYear + 2 - i);
   const filtered = filter.division !== null || filter.levels.length > 0;
@@ -65,6 +91,17 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
     const m = Number(r.dateFrom.slice(5, 7));
     byMonth.set(m, [...(byMonth.get(m) ?? []), r]);
   }
+
+  const list =
+    rows.length === 0
+      ? html`<p class="muted">No ${filtered ? "matching " : ""}European events in ${year}.</p>`
+      : filter.sort === "date"
+        ? [...byMonth].map(
+            ([m, monthRows]) => html`
+              <h2 class="month">${month(m)}</h2>
+              <ul class="events">${monthRows.map((r) => card(r, infos.get(r.id), now, filter.division, undefined))}</ul>`,
+          )
+        : html`<ul class="events">${sortRows(rows, filter, costs).map((r) => card(r, infos.get(r.id), now, filter.division, costs.get(r.id)))}</ul>`;
 
   return html`
     <h1>WSDC events in Europe ${year}</h1>
@@ -84,37 +121,78 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
         <legend>Level</legend>
         ${levels.map((l) => html`<label class="chip diff-${level(l)} ${filter.levels.includes(l) ? "on-level" : ""}"><input type="checkbox" name="level" value="${l}" ${filter.levels.includes(l) ? "checked" : ""} /> ${level(l)}</label>`)}
       </fieldset>
+      <label>Sort
+        <select name="sort">${sorts.map(([v, label]) => html`<option value="${v}" ${filter.sort === v ? "selected" : ""}>${label}</option>`)}</select>
+      </label>
+      ${filter.sort === "cost"
+        ? html`<label>From
+            <select name="from">${homeCities.map((c) => html`<option value="${c.name}" ${c === home ? "selected" : ""}>${c.name}</option>`)}</select>
+          </label>`
+        : ""}
       <label><input type="checkbox" name="all" ${filter.all ? "checked" : ""} /> include events without WSDC points</label>
-      ${filtered ? html`<a href="#/year/${year}${filter.all ? "?all" : ""}">clear filter</a>` : ""}
+      ${filtered ? html`<a href="#/year/${year}${query({ ...filter, division: null, levels: [] })}">clear filter</a>` : ""}
     </form>
     ${filtered ? html`<p class="muted small">${filterNote(filter)} Events with no results yet, for this or an earlier edition, have no level and are hidden.</p>` : ""}
-    ${rows.length === 0
-      ? html`<p class="muted">No ${filtered ? "matching " : ""}European events in ${year}.</p>`
-      : [...byMonth].map(
-          ([m, list]) => html`
-            <h2 class="month">${month(m)}</h2>
-            <ul class="events">
-              ${list.map((r) => {
-                const info = infos.get(r.id);
-                const full = currentPass(info?.passes, "Full", now);
-                const party = currentPass(info?.passes, "Party", now);
-                return html`
-                  <li class="${r.dateTo < now ? "past" : ""}">
-                    <a href="#/event/${r.id}" class="event-card">
-                      <span class="dates">${range(r.dateFrom, r.dateTo)}</span>
-                      <span class="name">${r.name} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
-                      <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
-                      <span class="price">
-                        ${full ? html`<span>Full ${money(full.price, full.currency)}</span>` : ""}
-                        ${party ? html`<span>Party ${money(party.price, party.currency)}</span>` : ""}
-                      </span>
-                      ${chips(r.chips, filter.division)}
-                    </a>
-                  </li>`;
-              })}
-            </ul>`,
-        )}
+    ${filter.sort === "hard" || filter.sort === "easy"
+      ? html`<p class="muted small">Ordered by ${filter.division ? "your division's" : "the average"} level, using the strongest quarter of the field. Events without a level come last.</p>`
+      : ""}
+    ${filter.sort === "cost"
+      ? html`<p class="muted small">Trip cost per person from ${home.name}: the cheapest direct return flight or train, plus the full pass on sale today, converted to PLN at today's NBP rate (* = pass price unknown). Accommodation is not included: Booking and Airbnb publish no prices. Events without known fares (too far ahead, or no airport known) come last.</p>`
+      : ""}
+    ${list}
     <p class="muted small">Chips: how hard each division's field was (green easy, amber medium, red hard), ranked by the strongest quarter of the field at the latest edition with results. Updated ${date(now)}.</p>`;
+}
+
+/** Per person, in PLN: cheapest return travel from home plus the full pass on sale today. Only events with a known fare get one. */
+async function tripCosts(rows: Row[], infos: Map<string, Info>, from: string | null, now: string): Promise<Map<string, Cost>> {
+  const city = findCity(from);
+  const [travel, rates] = await Promise.all([getCheapestTravel(flightKey(city), city.koleoSlug), plnRates()]);
+  const costs = new Map<string, Cost>();
+
+  for (const r of rows) {
+    // An event in the reader's own city costs nothing to reach.
+    const local = r.country === "Poland" && !!r.city && r.city.toLowerCase().startsWith(city.name.toLowerCase());
+    const fare = local ? 0 : travel.get(r.id);
+    if (fare === undefined) continue;
+
+    const pass = currentPass(infos.get(r.id)?.passes, "Full", now);
+    const rate = pass ? rates.get(pass.currency) : undefined;
+    const passPln = pass && rate ? pass.price * rate : null;
+    costs.set(r.id, { total: fare + (passPln ?? 0), travel: fare, pass: passPln });
+  }
+
+  return costs;
+}
+
+function sortRows(rows: Row[], f: ListFilter, costs: Map<string, Cost>): Row[] {
+  const value = (r: Row): number | null => (f.sort === "cost" ? costs.get(r.id)?.total ?? null : levelScore(r.chips, f.division));
+  const dir = f.sort === "hard" ? -1 : 1;
+
+  return [...rows].sort((a, b) => {
+    const va = value(a);
+    const vb = value(b);
+    if (va === null || vb === null) return va === vb ? a.dateFrom.localeCompare(b.dateFrom) : va === null ? 1 : -1;
+    return (va - vb) * dir || a.dateFrom.localeCompare(b.dateFrom);
+  });
+}
+
+function card(r: Row, info: Info | undefined, now: string, mine: string | null, cost: Cost | undefined): Raw {
+  const full = currentPass(info?.passes, "Full", now);
+  const party = currentPass(info?.passes, "Party", now);
+  const price = cost
+    ? html`<span title="travel ${money(Math.round(cost.travel), "PLN")}${cost.pass != null ? ` + pass ${money(Math.round(cost.pass), "PLN")}` : ", pass price unknown"}">≈ <strong>${money(Math.round(cost.total), "PLN")}</strong>${cost.pass == null ? "*" : ""}</span>`
+    : html`${full ? html`<span>Full ${money(full.price, full.currency)}</span>` : ""}${party ? html`<span>Party ${money(party.price, party.currency)}</span>` : ""}`;
+
+  return html`
+    <li class="${r.dateTo < now ? "past" : ""}">
+      <a href="#/event/${r.id}" class="event-card">
+        <span class="dates">${range(r.dateFrom, r.dateTo)}</span>
+        <span class="name">${r.name} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
+        <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
+        <span class="price">${price}</span>
+        ${chips(r.chips, mine)}
+      </a>
+    </li>`;
 }
 
 function filterNote(f: ListFilter): string {
@@ -125,10 +203,10 @@ function filterNote(f: ListFilter): string {
   return `Showing events with at least one ${lv} division.`;
 }
 
-function chips(list: { division: string; level: Difficulty | null }[], mine: string | null): Raw {
+function chips(list: Chip[], mine: string | null): Raw {
   if (!list.length) return html``;
   return html`<span class="chips">${list.map(
-    (c) => html`<span class="chip diff-${c.level ? level(c.level) : "none"} ${c.division === mine ? "mine" : ""}" title="${c.level ? level(c.level) : "not enough data"}">${c.division}</span>`,
+    (c) => html`<span class="chip diff-${c.level ? level(c.level) : "none"} ${c.division === mine ? "mine" : ""}" title="${c.level ? level(c.level) : "not enough data"}${c.top != null ? `, top 25% avg ${c.top} pts` : ""}">${c.division}</span>`,
   )}</span>`;
 }
 
@@ -140,6 +218,8 @@ export function wireList(year: number): void {
       all: data.has("all"),
       division: String(data.get("div") ?? "") || null,
       levels: data.getAll("level").map(String) as Difficulty[],
+      sort: (String(data.get("sort") ?? "date") as SortBy) || "date",
+      from: data.has("from") ? String(data.get("from")) : null,
     };
     location.hash = `#/year/${year}${query(filter)}`;
   });

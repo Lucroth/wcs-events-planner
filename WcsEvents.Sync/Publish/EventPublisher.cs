@@ -131,7 +131,7 @@ public sealed partial class EventPublisher(
         return new TravelFacts(coords, airports, null);
     }
 
-    /// <summary>One chip per main-ladder division, leader and follower difficulty averaged.</summary>
+    /// <summary>One chip per main-ladder division, leader and follower difficulty and top-quartile points averaged.</summary>
     internal static IEnumerable<object> Chips(IReadOnlyList<DivisionStrength> strengths) =>
         strengths
             .Where(s => Strength.DivisionOrder(s.Division) < 10)
@@ -140,7 +140,7 @@ public sealed partial class EventPublisher(
             {
                 var known = g.Where(s => s.Difficulty is not null).Select(s => (int)s.Difficulty!.Value).ToList();
                 Difficulty? level = known.Count is 0 ? null : (Difficulty)(int)Math.Round(known.Average(), MidpointRounding.AwayFromZero);
-                return (object)new { division = g.Key, level = level?.ToString() };
+                return (object)new { division = g.Key, level = level?.ToString(), top = Math.Round(g.Average(s => s.TopQuartileAverage), 1) };
             });
 
     private static string? Iso(DateOnly? d) => d?.ToString("yyyy-MM-dd");

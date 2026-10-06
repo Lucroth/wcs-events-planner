@@ -1,0 +1,44 @@
+{
+ "connections": [
+  {
+   "id": 6688309098,
+   "purchasable": true,
+   "changes": 0,
+   "departure": "2026-10-28T06:09:00.000+01:00",
+   "arrival": "2026-10-28T08:44:00.000+01:00",
+   "travel_time": 155
+  },
+  {
+   "id": 6688309099,
+   "purchasable": false,
+   "changes": 0,
+   "departure": "2026-10-28T06:53:00.000+01:00",
+   "arrival": "2026-10-28T09:20:00.000+01:00",
+   "travel_time": 147
+  },
+  {
+   "id": 6688309100,
+   "purchasable": true,
+   "changes": 0,
+   "departure": "2026-10-28T07:30:00.000+01:00",
+   "arrival": "2026-10-28T10:36:00.000+01:00",
+   "travel_time": 186
+  },
+  {
+   "id": 6688309101,
+   "purchasable": true,
+   "changes": 0,
+   "departure": "2026-10-28T07:44:00.000+01:00",
+   "arrival": "2026-10-28T11:40:00.000+01:00",
+   "travel_time": 236
+  },
+  {
+   "id": 6688309103,
+   "purchasable": true,
+   "changes": 0,
+   "departure": "2026-10-28T07:56:00.000+01:00",
+   "arrival": "2026-10-28T10:20:00.000+01:00",
+   "travel_time": 144
+  }
+ ]
+}

@@ -18,6 +18,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /trains/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // Scraped events are the sync's; admins may only create and edit hand-made ones ("m-" ids).
     match /events/{id} {
       allow read: if true;

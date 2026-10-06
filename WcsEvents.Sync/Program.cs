@@ -10,19 +10,20 @@ using WcsEvents.Sync.Scoring;
 using WcsEvents.Sync.Travel;
 using WcsEvents.Sync.Wsdc;
 
-// Usage: wcs-sync <sweep|refresh|scoring|publish|flights> [--minutes N]
+// Usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains> [--minutes N]
 //   sweep / refresh  mirror the WSDC registry into the local SQLite file (resumable; stops after N minutes)
 //   scoring          mirror scoring.dance (run after the registry, or prelim roles stay unknown)
 //   publish          write events, strengths and results to Firestore
 //   flights          write Ryanair/Wizz fares for upcoming events abroad to Firestore
+//   trains           write koleo train fares for upcoming events in Poland to Firestore
 // Firestore needs FIREBASE_PROJECT_ID and GOOGLE_APPLICATION_CREDENTIALS (or FIRESTORE_EMULATOR_HOST).
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
-if (args.FirstOrDefault() is not ("sweep" or "refresh" or "scoring" or "publish" or "flights") || args.Length is not (1 or 3))
+if (args.FirstOrDefault() is not ("sweep" or "refresh" or "scoring" or "publish" or "flights" or "trains") || args.Length is not (1 or 3))
 {
-    Console.Error.WriteLine("usage: wcs-sync <sweep|refresh|scoring|publish|flights> [--minutes N]");
+    Console.Error.WriteLine("usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains> [--minutes N]");
     return 2;
 }
 
@@ -79,6 +80,18 @@ builder.Services.AddHttpClient<WizzClient>(http =>
     http.Timeout = TimeSpan.FromMinutes(5);
 }).AddHttpMessageHandler(sp => new PoliteHttpHandler(wizzGate, sp.GetRequiredService<ILogger<PoliteHttpHandler>>()));
 
+// koleo prices one connection per request; a gentle pace keeps a daily run under ten minutes.
+var koleoGate = new RateGate(new CrawlOptions { RequestsPerSecond = 1 });
+
+builder.Services.AddHttpClient<KoleoClient>(http =>
+{
+    http.BaseAddress = new Uri("https://koleo.pl/");
+    http.DefaultRequestHeaders.UserAgent.ParseAdd(BrowserAgent);
+    http.DefaultRequestHeaders.Add("X-KOLEO-Version", "1");
+    http.DefaultRequestHeaders.Add("X-KOLEO-Client", "Nuxt-1");
+    http.Timeout = TimeSpan.FromMinutes(2);
+}).AddHttpMessageHandler(sp => new PoliteHttpHandler(koleoGate, sp.GetRequiredService<ILogger<PoliteHttpHandler>>()));
+
 builder.Services.AddHttpClient("travel", http =>
 {
     http.DefaultRequestHeaders.UserAgent.ParseAdd(BrowserAgent);
@@ -100,6 +113,7 @@ builder.Services.AddScoped<Strength>();
 builder.Services.AddScoped<EventCatalog>();
 builder.Services.AddScoped<EventPublisher>();
 builder.Services.AddScoped<FlightPublisher>();
+builder.Services.AddScoped<TrainPublisher>();
 builder.Services.AddScoped<FirestoreStore>();
 builder.Services.AddSingleton(_ => new FirestoreDbBuilder
 {
@@ -142,6 +156,9 @@ switch (command)
         break;
     case "flights":
         await services.GetRequiredService<FlightPublisher>().PublishAsync(stop.Token);
+        break;
+    case "trains":
+        await services.GetRequiredService<TrainPublisher>().PublishAsync(stop.Token);
         break;
 }
 

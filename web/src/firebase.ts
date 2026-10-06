@@ -12,7 +12,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import type { Flights, Info, ScrapedEvent, YearSummary } from "./model";
+import type { Flights, Info, ScrapedEvent, Trains, YearSummary } from "./model";
 
 const app = initializeApp({
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -34,6 +34,7 @@ const C = {
   years: "years",
   info: "info",
   flights: "flights",
+  trains: "trains",
   admins: "admins",
 } as const;
 
@@ -49,6 +50,33 @@ export const getEvent = (id: string) => read<ScrapedEvent>(C.events, id);
 export const getInfo = (id: string) => read<Info>(C.info, id);
 
 export const getFlights = (eventId: string, key: string) => read<Flights>(C.flights, `${eventId}_${key}`);
+
+export const getTrains = (eventId: string, citySlug: string) => read<Trains>(C.trains, `${eventId}_${citySlug}`);
+
+/** Cheapest return fare per event for one home city, flights and trains together, keyed by event id. */
+export async function getCheapestTravel(flightKey: string, citySlug: string): Promise<Map<string, number>> {
+  const [flights, trains] = await Promise.all([
+    getDocs(query(collection(db, C.flights), where("key", "==", flightKey))),
+    getDocs(query(collection(db, C.trains), where("city", "==", citySlug))),
+  ]);
+  const cheapest = new Map<string, number>();
+  for (const d of [...flights.docs, ...trains.docs]) {
+    const data = d.data() as { eventId?: string; cheapest?: number | null };
+    if (data.eventId && data.cheapest != null) cheapest.set(data.eventId, data.cheapest);
+  }
+  return cheapest;
+}
+
+let rates: Promise<Map<string, number>> | undefined;
+
+/** PLN per unit of each currency, NBP table A; fetched once per page load. */
+export function plnRates(): Promise<Map<string, number>> {
+  rates ??= fetch("https://api.nbp.pl/api/exchangerates/tables/a/?format=json")
+    .then((r) => r.json() as Promise<{ rates: { code: string; mid: number }[] }[]>)
+    .then((t) => new Map([["PLN", 1], ...t[0].rates.map((r) => [r.code, r.mid] as [string, number])]))
+    .catch(() => new Map([["PLN", 1]]));
+  return rates;
+}
 
 /** Admin data for one year's events, keyed by event id. */
 export async function getInfosForYear(year: number): Promise<Map<string, Info>> {

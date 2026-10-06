@@ -1,5 +1,3 @@
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using WcsEvents.Sync.Data;
 using WcsEvents.Sync.Scoring;
 using WcsEvents.Sync.Travel;
@@ -20,20 +18,7 @@ public sealed partial class FlightPublisher(
     public async Task PublishAsync(CancellationToken ct)
     {
         var today = DateOnly.FromDateTime(time.GetUtcNow().UtcDateTime);
-        var infos = await EventPublisher.AdminInfosAsync(store, ct);
-
-        var scraped = await db.ScoringEvents.AsNoTracking()
-            .Where(e => e.DateFrom != null && e.Name != "")
-            .ToListAsync(ct);
-
-        // Hand-made events live only in Firestore; they need fares as much as scraped ones.
-        var manual = await store.ReadWhereAsync("events", "manual", true, ct);
-
-        List<Trip> trips =
-        [
-            .. scraped.Select(e => Trip.Of(e.Id.ToString(), e.DateFrom!.Value, e.DateTo ?? e.DateFrom!.Value, e.City, e.Country, infos)),
-            .. manual.Select(m => Trip.Of(m.Key, Date(m.Value, "dateFrom"), Date(m.Value, "dateTo"), Str(m.Value, "city"), Str(m.Value, "country"), infos)),
-        ];
+        var trips = await Trip.LoadAsync(db, store, ct);
 
         var upcoming = trips
             .Where(t => t.Start > today && t.Start <= today.AddDays(HorizonDays))
@@ -60,6 +45,9 @@ public sealed partial class FlightPublisher(
 
                 await store.SetIfChangedAsync($"flights/{id}_{HomeCities.Key(from)}", new
                 {
+                    EventId = id,
+                    Key = HomeCities.Key(from),
+                    Cheapest = results.Combos.Count > 0 ? results.Combos[0].PerPerson : (decimal?)null,
                     Origins = from,
                     Destinations = destinations,
                     Currency = FlightSearch.Currency,
@@ -73,22 +61,6 @@ public sealed partial class FlightPublisher(
 
         LogPublished(logger, upcoming.Count, searched, store.Written, store.Skipped);
     }
-
-    /// <summary>One event's dates and place with the admin's corrections applied.</summary>
-    private sealed record Trip(string Id, DateOnly Start, DateOnly End, string? City, string? Country, AdminInfo Info)
-    {
-        public static Trip Of(string id, DateOnly from, DateOnly to, string? city, string? country, IReadOnlyDictionary<string, AdminInfo> infos)
-        {
-            var info = infos.GetValueOrDefault(id) ?? AdminInfo.Empty;
-            return new Trip(id, info.DateFrom ?? from, info.DateTo ?? info.DateFrom ?? to, info.City ?? city, info.Country ?? country, info);
-        }
-    }
-
-    private static string? Str(JsonElement e, string name) =>
-        e.TryGetProperty(name, out var v) && v.ValueKind is JsonValueKind.String ? v.GetString() : null;
-
-    private static DateOnly Date(JsonElement e, string name) =>
-        DateOnly.TryParseExact(Str(e, name), "yyyy-MM-dd", out var d) ? d : DateOnly.MinValue;
 
     private static object Leg(FlightLeg l) => new
     {

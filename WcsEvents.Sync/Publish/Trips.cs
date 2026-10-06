@@ -1,0 +1,37 @@
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using WcsEvents.Sync.Data;
+
+namespace WcsEvents.Sync.Publish;
+
+/// <summary>One event's dates and place with the admin's corrections applied.</summary>
+public sealed record Trip(string Id, DateOnly Start, DateOnly End, string? City, string? Country, AdminInfo Info)
+{
+    private static Trip Of(string id, DateOnly from, DateOnly to, string? city, string? country, IReadOnlyDictionary<string, AdminInfo> infos)
+    {
+        var info = infos.GetValueOrDefault(id) ?? AdminInfo.Empty;
+        return new Trip(id, info.DateFrom ?? from, info.DateTo ?? info.DateFrom ?? to, info.City ?? city, info.Country ?? country, info);
+    }
+
+    /// <summary>Every event worth travelling to: the scraped ones, and the hand-made ones that live only in Firestore.</summary>
+    public static async Task<IReadOnlyList<Trip>> LoadAsync(AppDbContext db, FirestoreStore store, CancellationToken ct)
+    {
+        var infos = await EventPublisher.AdminInfosAsync(store, ct);
+        var manual = await store.ReadWhereAsync("events", "manual", true, ct);
+        var scraped = await db.ScoringEvents.AsNoTracking()
+            .Where(e => e.DateFrom != null && e.Name != "")
+            .ToListAsync(ct);
+
+        return
+        [
+            .. scraped.Select(e => Of(e.Id.ToString(), e.DateFrom!.Value, e.DateTo ?? e.DateFrom!.Value, e.City, e.Country, infos)),
+            .. manual.Select(m => Of(m.Key, Date(m.Value, "dateFrom"), Date(m.Value, "dateTo"), Str(m.Value, "city"), Str(m.Value, "country"), infos)),
+        ];
+    }
+
+    private static string? Str(JsonElement e, string name) =>
+        e.TryGetProperty(name, out var v) && v.ValueKind is JsonValueKind.String ? v.GetString() : null;
+
+    private static DateOnly Date(JsonElement e, string name) =>
+        DateOnly.TryParseExact(Str(e, name), "yyyy-MM-dd", out var d) ? d : DateOnly.MinValue;
+}

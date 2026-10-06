@@ -1,3 +1,4 @@
+using WcsEvents.Sync.Publish;
 using WcsEvents.Sync.Travel;
 
 namespace WcsEvents.Tests;
@@ -91,5 +92,33 @@ public sealed class TravelTests
         ];
 
         Assert.Equal("krakow-glowny", Geo.MainStation(stations, 50.049, 19.957)?.Slug);
+    }
+
+    [Fact]
+    public void Koleo_ReadsPurchasableConnectionsInDepartureOrder()
+    {
+        var connections = KoleoClient.ParseConnections(Fixture("koleo-connections.json"));
+
+        Assert.Equal(4, connections.Count);
+        Assert.Equal(new DateTime(2026, 10, 28, 6, 9, 0), connections[0].Departure);
+        Assert.True(connections.Zip(connections.Skip(1)).All(p => p.First.Departure <= p.Second.Departure));
+    }
+
+    [Fact]
+    public void Koleo_TakesTheCheapestValidFareAndIgnoresUnsoldOnes()
+    {
+        const string body = """{"prices":[{"value":"68.0","valid_price":true},{"value":"49.9","valid_price":true},{"value":"10.0","valid_price":false}]}""";
+
+        Assert.Equal(49.9m, KoleoClient.ParsePrice(body));
+        Assert.Null(KoleoClient.ParsePrice("""{"prices":[{"value":"0","valid_price":false}]}"""));
+    }
+
+    [Fact]
+    public void Trains_AreSkippedFromAStationInTheHomeCity()
+    {
+        var warsaw = HomeCities.All[0];
+
+        Assert.True(TrainPublisher.SameCity(new Station("warszawa-centralna", "Warszawa Centralna", 52.2, 21.0, 9000), warsaw));
+        Assert.False(TrainPublisher.SameCity(new Station("krakow-glowny", "Kraków Główny", 50.0, 19.9, 9000), warsaw));
     }
 }

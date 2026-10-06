@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { html, safeUrl } from "./html";
-import { applyOverride, currentPass, isEurope, matchesLevel, type Pass } from "./model";
+import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, tierFor, type Pass } from "./model";
 import { addDays, bookingUrl, flightKey, homeCities, koleoUrl } from "./travel";
 
 const pass = (kind: Pass["kind"], tier: string, until: string | null): Pass => ({ kind, tier, price: 100, currency: "EUR", until });
@@ -89,5 +89,35 @@ describe("matchesLevel", () => {
   it("without a division, any division at a chosen level matches", () => {
     expect(matchesLevel(chips, null, ["Easy"])).toBe(true);
     expect(matchesLevel(chips, null, ["Medium"])).toBe(false);
+  });
+});
+
+describe("tierFor", () => {
+  it("follows Chart 5 of the WSDC Registry Event Rules", () => {
+    expect(tierFor(4)).toBeNull();
+    expect(tierFor(5)?.tier).toBe(1);
+    expect(tierFor(10)?.tier).toBe(1);
+    expect(tierFor(11)?.tier).toBe(2);
+    expect(tierFor(39)?.tier).toBe(3);
+    expect(tierFor(40)?.tier).toBe(4);
+    expect(tierFor(129)?.tier).toBe(5);
+    expect(tierFor(400)?.tier).toBe(6);
+  });
+});
+
+describe("levelScore", () => {
+  const chips = [
+    { division: "NOV", level: "Easy" as const, top: 6 },
+    { division: "INT", level: "Hard" as const, top: 25 },
+  ];
+
+  it("uses the chosen division's top-quartile points", () => {
+    expect(levelScore(chips, "INT")).toBe(25);
+    expect(levelScore(chips, "ADV")).toBeNull();
+  });
+
+  it("without a division, ranks by average level first", () => {
+    const harder = [{ division: "NOV", level: "Hard" as const, top: 1 }];
+    expect(levelScore(harder, null)!).toBeGreaterThan(levelScore(chips, null)!);
   });
 });

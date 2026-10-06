@@ -1,7 +1,7 @@
-import { getEvent, getFlights, getInfo } from "../firebase";
+import { getEvent, getFlights, getInfo, getTrains } from "../firebase";
 import { date, duration, level, localDateTime, money, range, short, today } from "../format";
 import { html, safeUrl, type Raw } from "../html";
-import { applyOverride, currentPass, type Flights, type Info, type Leg, type Pass, type ScrapedEvent } from "../model";
+import { applyOverride, currentPass, tierFor, tiers, type Flights, type Info, type Leg, type Pass, type ScrapedEvent, type TrainLeg, type Trains } from "../model";
 import {
   addDays,
   airbnbUrl,
@@ -30,7 +30,10 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
   const city = findCity(params.get("from"));
   const people = Math.min(12, Math.max(1, Number(params.get("people")) || 1));
   const upcoming = e.dateTo >= now;
-  const flights = upcoming && e.country !== "Poland" ? await getFlights(id, flightKey(city)) : undefined;
+  const [flights, trains] = await Promise.all([
+    upcoming && e.country !== "Poland" ? getFlights(id, flightKey(city)) : undefined,
+    upcoming && e.country === "Poland" ? getTrains(id, city.koleoSlug) : undefined,
+  ]);
 
   return html`
     <p class="back"><a href="#/year/${e.dateFrom.slice(0, 4)}">← ${e.dateFrom.slice(0, 4)} events</a></p>
@@ -55,7 +58,7 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
     </div>
     ${strengthCard(scraped)}
     ${resultsCard(scraped)}
-    ${upcoming ? travelCard(scraped, e, info, city, people, flights) : ""}`;
+    ${upcoming ? travelCard(scraped, e, info, city, people, flights, trains) : ""}`;
 }
 
 function links(e: ScrapedEvent, info: Info | undefined): Raw {
@@ -115,13 +118,14 @@ function strengthCard(e: ScrapedEvent): Raw {
       ${e.strengthsFrom ? html`<p class="muted">Based on the previous edition: <a href="#/event/${e.strengthsFrom.id}">${e.strengthsFrom.name} (${date(e.strengthsFrom.dateFrom)})</a>.</p>` : ""}
       <p class="muted small">WSDC points competitors held in the division when they danced. <strong>Top 25%</strong> is the average of the strongest quarter of the field, roughly who you have to beat to make the final; the level is ranked by it ("hard" = top third of all events in that division). <strong>Avg</strong> covers everyone, so it mostly shows how many entrants have no points yet.</p>
       <table>
-        <thead><tr><th>Division</th><th></th><th class="num">Dancers</th><th class="num">Top 25% avg</th><th class="num">Avg</th><th class="num">Median</th><th>Level</th></tr></thead>
+        <thead><tr><th>Division</th><th></th><th class="num">Dancers</th><th>Tier</th><th class="num">Top 25% avg</th><th class="num">Avg</th><th class="num">Median</th><th>Level</th></tr></thead>
         <tbody>
           ${e.strengths.map((s) => html`
             <tr>
               <td>${s.division}</td>
               <td>${s.role === "Leader" ? "Leaders" : "Followers"}</td>
               <td class="num">${s.fieldSize}</td>
+              <td>${tierCell(s.fieldSize)}</td>
               <td class="num"><strong>${s.topQuartileAverage != null ? s.topQuartileAverage.toFixed(1) : "—"}</strong></td>
               <td class="num">${s.averagePoints.toFixed(1)}</td>
               <td class="num">${s.medianPoints}</td>
@@ -129,6 +133,7 @@ function strengthCard(e: ScrapedEvent): Raw {
             </tr>`)}
         </tbody>
       </table>
+      ${tiersTable()}
     </section>`;
 }
 
@@ -147,7 +152,7 @@ function resultsCard(e: ScrapedEvent): Raw {
     </section>`;
 }
 
-function travelCard(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string; city: string | null; country: string | null }, info: Info | undefined, city: HomeCity, people: number, flights: Flights | undefined): Raw {
+function travelCard(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string; city: string | null; country: string | null }, info: Info | undefined, city: HomeCity, people: number, flights: Flights | undefined, trains: Trains | undefined): Raw {
   const coords = info?.lat != null && info?.lng != null ? { lat: info.lat, lng: info.lng } : scraped.coords;
   const place = info?.venueAddress || [e.city, e.country].filter(Boolean).join(", ");
   const checkOut = addDays(e.dateTo, 1);
@@ -170,18 +175,18 @@ function travelCard(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string
         <a class="button" target="_blank" rel="noopener" href="${airbnbUrl(place, coords, e.dateFrom, checkOut, people)}">Airbnb</a>
       </p>
 
-      ${e.country === "Poland" ? trains(scraped, e, city, place) : flightsBlock(scraped, e, city, people, flights)}
+      ${e.country === "Poland" ? trainsBlock(scraped, e, city, place, people, trains) : flightsBlock(scraped, e, city, people, flights)}
     </section>`;
 }
 
-function trains(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string }, city: HomeCity, place: string): Raw {
+function trainsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string }, city: HomeCity, place: string, people: number, fares: Trains | undefined): Raw {
   const s = scraped.station;
   if (!s) {
     return html`<h3>Train</h3><p class="buttons"><a class="button" target="_blank" rel="noopener" href="${googleTransitUrl(city.name, place)}">Google Maps: public transport</a></p>`;
   }
   // Station names start with the city's ("Warszawa Centralna"): nothing to book from home to home.
   if (s.name.toLowerCase().startsWith(city.name.toLowerCase())) {
-    return html`<h3>Train</h3><p class="muted">The event is in ${city.name}, no train needed.</p>`;
+    return html``;
   }
   const out = [addDays(e.dateFrom, -1), e.dateFrom];
   const back = [e.dateTo, addDays(e.dateTo, 1)];
@@ -193,7 +198,7 @@ function trains(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string }, 
       <a class="button" target="_blank" rel="noopener" href="${koleoUrl(s.slug, city.koleoSlug, back[0], 12)}">Back: ${short(back[0])}</a>
       <a class="button" target="_blank" rel="noopener" href="${koleoUrl(s.slug, city.koleoSlug, back[1])}">Back: ${short(back[1])}</a>
     </p>
-    <p class="muted small">Prices and connections on koleo.pl (PKP has no public price API).</p>`;
+    ${fares ? trainFares(fares, people, city, s.slug) : html`<p class="muted small">Fares appear here about a month before the event, when PKP Intercity starts selling. Until then, check koleo.pl.</p>`}`;
 }
 
 function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string }, city: HomeCity, people: number, flights: Flights | undefined): Raw {
@@ -251,6 +256,44 @@ function leg(l: Leg, people: number, withPrice: boolean): Raw {
       ${l.from}→${l.to} · ${short(l.date)} ${times} <span class="muted">· direct</span>
       ${withPrice ? html`<strong> · ${money(l.price, l.currency)}</strong>` : ""}
     </a>`;
+}
+
+function trainFares(t: Trains, people: number, city: HomeCity, stationSlug: string): Raw {
+  const row = (l: TrainLeg, from: string, to: string) => html`
+    <li><a class="leg" href="${koleoUrl(from, to, l.date, Number(l.departure.slice(0, 2)))}" target="_blank" rel="noopener">
+      ${short(l.date)} ${l.departure}–${l.arrival} <span class="muted">(${duration(l.durationMinutes)}, ${l.changes ? `${l.changes} change${l.changes > 1 ? "s" : ""}` : "direct"})</span>
+      <strong> · ${money(l.price, t.currency)}</strong>
+    </a></li>`;
+  return html`
+    ${t.cheapest != null
+      ? html`<p>Cheapest return: <strong>${money(t.cheapest, t.currency)}</strong> per person${people > 1 ? html`, <strong>${money(t.cheapest * people, t.currency)}</strong> for ${people}` : ""}.</p>`
+      : ""}
+    <div class="grid">
+      <div><h4>There</h4>${t.out.length ? html`<ul class="legs">${t.out.map((l) => row(l, city.koleoSlug, stationSlug))}</ul>` : html`<p class="muted">Not on sale yet.</p>`}</div>
+      <div><h4>Back</h4>${t.back.length ? html`<ul class="legs">${t.back.map((l) => row(l, stationSlug, city.koleoSlug))}</ul>` : html`<p class="muted">Not on sale yet.</p>`}</div>
+    </div>
+    <p class="muted small">Standard one-way fares per adult from koleo.pl, checked ${date(t.fetchedOn)}; discounts (students, ISIC, Big Family Card) not included.</p>`;
+}
+
+function tierCell(fieldSize: number): Raw {
+  const t = tierFor(fieldSize);
+  return t
+    ? html`<span title="1st–5th: ${t.points.join(" / ")} points${t.extra ? `; ${t.extra} more in the final` : ""}">Tier ${t.tier}</span>`
+    : html`<span class="muted" title="Fewer than 5 competitors: no points awarded">—</span>`;
+}
+
+function tiersTable(): Raw {
+  return html`
+    <details>
+      <summary>WSDC tiers and points (Registry Event Rules, Chart 5)</summary>
+      <table>
+        <thead><tr><th>Tier</th><th class="num">Competitors per role</th><th class="num">1st</th><th class="num">2nd</th><th class="num">3rd</th><th class="num">4th</th><th class="num">5th</th><th>Other finalists</th></tr></thead>
+        <tbody>
+          ${tiers.map((t) => html`<tr><td>Tier ${t.tier}</td><td class="num">${t.max === Infinity ? `${t.min}+` : `${t.min}–${t.max}`}</td>${t.points.map((p) => html`<td class="num">${p}</td>`)}<td>${t.extra ? `${t.extra}` : "0"}</td></tr>`)}
+        </tbody>
+      </table>
+      <p class="muted small">Tier here is estimated from the dancers in the largest round of each division, the closest the published results come to the official unique-competitor count.</p>
+    </details>`;
 }
 
 export function wireEvent(id: string): void {

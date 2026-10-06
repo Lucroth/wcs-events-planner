@@ -48,8 +48,15 @@ export interface YearSummary {
     city: string | null;
     country: string | null;
     isWsdc: boolean;
-    chips: { division: string; level: Difficulty | null }[];
+    chips: Chip[];
   }[];
+}
+
+/** One division of an event in the list: its level and the top-quartile points it was ranked by. */
+export interface Chip {
+  division: string;
+  level: Difficulty | null;
+  top?: number;
 }
 
 export type PassKind = "Full" | "Party";
@@ -107,12 +114,37 @@ export interface Leg {
 }
 
 export interface Flights {
+  eventId?: string;
+  key?: string;
+  /** Cheapest return combination per person. */
+  cheapest?: number | null;
   origins: string[];
   destinations: string[];
   currency: string;
   combos: { out: Leg; back: Leg; perPerson: number }[];
   out: Leg[];
   back: Leg[];
+  fetchedOn: string;
+}
+
+export interface TrainLeg {
+  date: string;
+  departure: string;
+  arrival: string;
+  durationMinutes: number;
+  changes: number;
+  price: number;
+}
+
+export interface Trains {
+  eventId: string;
+  city: string;
+  station: string;
+  currency: string;
+  /** Cheapest out plus cheapest back, per person; null when one direction had no fare on sale. */
+  cheapest: number | null;
+  out: TrainLeg[];
+  back: TrainLeg[];
   fetchedOn: string;
 }
 
@@ -167,11 +199,42 @@ export const isEurope = (country: string | null | undefined): boolean => !!count
  * division's level counts; without one, any division at a chosen level does.
  */
 export function matchesLevel(
-  chips: { division: string; level: Difficulty | null }[],
+  chips: Chip[],
   division: string | null,
   levels: Difficulty[],
 ): boolean {
   const candidates = division ? chips.filter((c) => c.division === division) : chips;
   if (!levels.length) return !division || candidates.length > 0;
   return candidates.some((c) => c.level !== null && levels.includes(c.level));
+}
+
+/** WSDC Registry Event Rules, Chart 5: tiers by unique competitors per role, and the points each awards. */
+export const tiers = [
+  { tier: 1, min: 5, max: 10, points: [3, 2, 1, 0, 0], extra: "" },
+  { tier: 2, min: 11, max: 19, points: [6, 4, 3, 2, 1], extra: "" },
+  { tier: 3, min: 20, max: 39, points: [10, 8, 6, 4, 2], extra: "1 (up to 10th)" },
+  { tier: 4, min: 40, max: 79, points: [15, 12, 10, 8, 6], extra: "1 (up to 12th)" },
+  { tier: 5, min: 80, max: 129, points: [20, 16, 14, 12, 10], extra: "2 (up to 15th)" },
+  { tier: 6, min: 130, max: Infinity, points: [25, 22, 18, 15, 12], extra: "2 (up to 15th)" },
+] as const;
+
+/** The tier a field of this size competes at; null below 5, where no points are awarded. */
+export const tierFor = (competitors: number) => tiers.find((t) => competitors >= t.min && competitors <= t.max) ?? null;
+
+const levelRank: Record<Difficulty, number> = { Easy: 0, Medium: 1, Hard: 2 };
+
+/**
+ * How hard an event is for sorting: with a division picked, that division's top-quartile points;
+ * otherwise the average level across divisions, top-quartile points breaking ties. Null without data.
+ */
+export function levelScore(chips: Chip[], division: string | null): number | null {
+  if (division) {
+    const c = chips.find((x) => x.division === division);
+    return c?.top ?? (c?.level ? levelRank[c.level] : null);
+  }
+  const known = chips.filter((c) => c.level);
+  if (!known.length) return null;
+  const avgLevel = known.reduce((s, c) => s + levelRank[c.level!], 0) / known.length;
+  const avgTop = known.reduce((s, c) => s + (c.top ?? 0), 0) / known.length;
+  return avgLevel * 1000 + avgTop;
 }
