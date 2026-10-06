@@ -1,7 +1,7 @@
 import { getInfosForYear, getManualEvents, getYear } from "../firebase";
 import { date, level, money, month, range, today } from "../format";
 import { html, type Raw } from "../html";
-import { applyOverride, currentPass, type Difficulty, type YearSummary } from "../model";
+import { applyOverride, currentPass, isEurope, type Difficulty, type YearSummary } from "../model";
 
 type Row = YearSummary["events"][number];
 
@@ -15,6 +15,7 @@ export async function listPage(year: number, all: boolean): Promise<Raw> {
     ...manual.map((e) => ({ id: e.id, name: e.name, dateFrom: e.dateFrom, dateTo: e.dateTo, city: e.city, country: e.country, isWsdc: e.isWsdc, chips: [] })),
   ]
     .map((r) => applyOverride(r, infos.get(r.id)))
+    .filter((r) => isEurope(r.country))
     .filter((r) => all || r.isWsdc)
     .sort((a, b) => a.dateFrom.localeCompare(b.dateFrom));
 
@@ -29,7 +30,7 @@ export async function listPage(year: number, all: boolean): Promise<Raw> {
   }
 
   return html`
-    <h1>WSDC events ${year}</h1>
+    <h1>WSDC events in Europe ${year}</h1>
     <div class="filters">
       <nav class="years">
         ${years.map((y) => html`<a href="#/year/${y}${all ? "?all" : ""}" class="${y === year ? "chip on" : "chip"}">${y}</a>`)}
@@ -37,7 +38,7 @@ export async function listPage(year: number, all: boolean): Promise<Raw> {
       <label><input type="checkbox" id="show-all" ${all ? "checked" : ""} /> include events without WSDC points</label>
     </div>
     ${rows.length === 0
-      ? html`<p class="muted">No events in ${year}.</p>`
+      ? html`<p class="muted">No European events in ${year}.</p>`
       : [...byMonth].map(
           ([m, list]) => html`
             <h2 class="month">${month(m)}</h2>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { html, safeUrl } from "./html";
-import { applyOverride, currentPass, type Pass } from "./model";
+import { applyOverride, currentPass, isEurope, type Pass } from "./model";
 import { addDays, bookingUrl, flightKey, homeCities, koleoUrl } from "./travel";
 
 const pass = (kind: Pass["kind"], tier: string, until: string | null): Pass => ({ kind, tier, price: 100, currency: "EUR", until });
@@ -55,5 +55,14 @@ describe("travel links", () => {
   it("keys flights the way the sync job writes them", () => {
     expect(flightKey(homeCities[0])).toBe("WAW-WMI");
     expect(flightKey(homeCities.find((c) => c.name === "Białystok")!)).toBe("WAW-WMI");
+  });
+});
+
+describe("isEurope", () => {
+  it("keeps European countries and drops the rest or the unknown", () => {
+    expect(isEurope("Germany")).toBe(true);
+    expect(isEurope("poland")).toBe(true);
+    expect(isEurope("United States of America")).toBe(false);
+    expect(isEurope(null)).toBe(false);
   });
 });

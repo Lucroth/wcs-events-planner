@@ -145,3 +145,17 @@ export function currentPass(passes: Pass[] | undefined, kind: PassKind, today: s
   const dated = ofKind.filter((p) => p.until && p.until >= today).sort((a, b) => a.until!.localeCompare(b.until!));
   return dated[0] ?? ofKind.find((p) => !p.until) ?? null;
 }
+
+/** Country names as scoring.dance spells them, the same list as Countries.IsEuropean in the sync. */
+const europe = new Set(
+  [
+    "Austria", "Belgium", "Bulgaria", "Switzerland", "Czechia", "Czech Republic", "Germany", "Denmark", "Spain",
+    "Estonia", "Finland", "France", "United Kingdom", "Great Britain", "Greece", "Croatia", "Hungary", "Ireland",
+    "Iceland", "Italy", "Lithuania", "Latvia", "Netherlands", "The Netherlands", "Norway", "Poland", "Portugal",
+    "Romania", "Russia", "Slovakia", "Slovenia", "Sweden", "Turkey", "Ukraine", "Serbia", "Luxembourg", "Malta",
+    "Cyprus", "Belarus", "Moldova", "Bosnia and Herzegovina", "Montenegro", "North Macedonia", "Albania",
+  ].map((c) => c.toLowerCase()),
+);
+
+/** An event with no country is left out: the admin can set one. */
+export const isEurope = (country: string | null | undefined): boolean => !!country && europe.has(country.trim().toLowerCase());
