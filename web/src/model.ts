@@ -27,6 +27,8 @@ export interface Strength {
   fieldSize: number;
   averagePoints: number;
   medianPoints: number;
+  /** Mean of the strongest quarter of the field; what the difficulty is ranked by. Absent on documents published before it existed. */
+  topQuartileAverage?: number;
   difficulty: Difficulty | null;
 }
 

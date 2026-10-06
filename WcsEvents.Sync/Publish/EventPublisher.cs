@@ -46,6 +46,7 @@ public sealed partial class EventPublisher(
                     s.FieldSize,
                     AveragePoints = Math.Round(s.AveragePoints, 2),
                     MedianPoints = Math.Round(s.MedianPoints, 2),
+                    TopQuartileAverage = Math.Round(s.TopQuartileAverage, 2),
                     Difficulty = s.Difficulty?.ToString(),
                 }),
                 StrengthsFrom = facts.StrengthsFrom is { } p ? new { id = p.Id.ToString(), p.Name, DateFrom = Iso(p.DateFrom) } : null,

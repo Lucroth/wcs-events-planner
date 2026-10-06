@@ -16,6 +16,14 @@ public sealed class EventLogicTests
     }
 
     [Fact]
+    public void TopQuartile_AveragesTheStrongestQuarterAndAtLeastOne()
+    {
+        Assert.Equal(9.5, Strength.TopQuartileAverage([0, 0, 0, 0, 0, 1, 9, 10]));
+        Assert.Equal(7, Strength.TopQuartileAverage([0, 7]));
+        Assert.Equal(4, Strength.TopQuartileAverage([4]));
+    }
+
+    [Fact]
     public void PointsHistory_CountsOnlyMonthsBeforeTheEvent()
     {
         var history = new Strength.PointsHistory(

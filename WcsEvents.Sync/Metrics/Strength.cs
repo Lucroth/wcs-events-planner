@@ -16,14 +16,17 @@ public enum Difficulty
 /// held coming in. Taken from the round with the largest field, normally the prelim.
 /// </summary>
 public sealed record DivisionStrength(
-    string Division, Role Role, string RoundName, int FieldSize, double AveragePoints, double MedianPoints, Difficulty? Difficulty);
+    string Division, Role Role, string RoundName, int FieldSize, double AveragePoints, double MedianPoints,
+    double TopQuartileAverage, Difficulty? Difficulty);
 
 /// <summary>
 /// How strong each event's fields were, and so how hard it is to final there. Points are those each
 /// entrant held in the division <em>at the time</em>, rebuilt from registry placements dated in
 /// earlier months, the same reconstruction wsdc-stats uses: today's totals would mostly measure how
-/// long ago an event was. Difficulty ranks an event's average against every other event's in the
-/// same division and role, in thirds.
+/// long ago an event was. Difficulty ranks an event's top-quartile average (the strongest quarter of
+/// the field) against every other event's in the same division and role, in thirds: the plain
+/// average is mostly a count of newcomers with no points, while the top quarter is who has to be
+/// beaten to make the final.
 /// </summary>
 public sealed class Strength(AppDbContext db, IMemoryCache cache)
 {
@@ -86,17 +89,21 @@ public sealed class Strength(AppDbContext db, IMemoryCache cache)
             {
                 var first = g.First();
                 List<double> held = [.. g.Select(e => e.Wscid is { } id ? history.AsOf(id, first.EventDate) : 0).Order()];
-                return (first.ScoringEventId, first.RoundName, Size: held.Count, Average: held.Average(), Median: Ranking.Median(held));
+                return (first.ScoringEventId, first.RoundName, Size: held.Count, Average: held.Average(), Median: Ranking.Median(held), Top: TopQuartileAverage(held));
             })
             .GroupBy(r => r.ScoringEventId)
             .Select(g => g.MaxBy(r => r.Size))
             .ToList();
 
-        List<double> averages = [.. perEvent.Select(r => r.Average).Order()];
+        List<double> tops = [.. perEvent.Select(r => r.Top).Order()];
 
         return [.. perEvent.Select(r => (r.ScoringEventId, new DivisionStrength(
-            division, role, r.RoundName, r.Size, r.Average, r.Median, Classify(r.Average, averages))))];
+            division, role, r.RoundName, r.Size, r.Average, r.Median, r.Top, Classify(r.Top, tops))))];
     }
+
+    /// <summary>Mean of the highest quarter of an ascending list, at least one value.</summary>
+    internal static double TopQuartileAverage(IReadOnlyList<double> sortedAscending) =>
+        sortedAscending.TakeLast(Math.Max(1, (int)Math.Ceiling(sortedAscending.Count / 4.0))).Average();
 
     /// <summary>Which third of <paramref name="sorted"/> a value falls in; null when there are too few events to say.</summary>
     internal static Difficulty? Classify(double value, IReadOnlyList<double> sorted)
