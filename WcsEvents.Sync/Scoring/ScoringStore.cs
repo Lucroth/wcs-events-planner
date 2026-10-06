@@ -173,10 +173,15 @@ public static class ScoringStore
     }
 
     /// <summary>
-    /// A Jack &amp; Jill prelim publishes two unlabelled tables, one per role. Rounds that pair a
-    /// leader with a follower on one row state both roles outright, so a bib seen in such a round
+    /// A Jack &amp; Jill prelim usually publishes two unlabelled tables, one per role. Rounds that pair
+    /// a leader with a follower on one row state both roles outright, so a bib seen in such a round
     /// settles that dancer's role for the whole event. Tables with no bib evidence fall back to how
     /// their dancers usually compete. Returns rows labelled.
+    /// <para>
+    /// Every one-role table is labelled afresh on each run, not only unlabelled ones: the parser
+    /// never labels a prelim table, so any such label is an earlier run's inference, and evidence
+    /// improves as the mirror grows (or, as with SwingVester 2025/26, a bad source of it is fixed).
+    /// </para>
     /// <para>
     /// Finals are skipped: their roles come straight from the couple columns of the result list. The
     /// only role-less final entry is the deliberate one the parser leaves when scoring.dance named a
@@ -187,60 +192,36 @@ public static class ScoringStore
     public static async Task<int> InferRolesAsync(AppDbContext db, CancellationToken ct)
     {
         var roleByDancer = await DominantRolesAsync(db, minCount: 1, ct);
-        var roleByBib = await PublishedRolesByBibAsync(db, ct);
+        var roleByBib = await PublishedRolesByBibAsync(db, roleByDancer, ct);
 
-        var unlabelled = await db.ScoringEntries
-            .Where(e => e.Role == null && e.Round.Kind != RoundKind.Final)
+        var rows = await db.ScoringEntries
+            .Where(e => e.Round.Kind != RoundKind.Final)
             .Select(e => new { Entry = e, e.Round.ScoringEventId })
             .ToListAsync(ct);
 
         var labelled = 0;
 
-        foreach (var table in unlabelled.GroupBy(r => (r.Entry.RoundId, r.Entry.TableIndex)))
+        // A table already holding both roles was read from leader/follower columns and is left alone.
+        foreach (var table in rows.GroupBy(r => (r.Entry.RoundId, r.Entry.TableIndex))
+                     .Where(t => t.Select(r => r.Entry.Role).Where(r => r is not null).Distinct().Count() < 2))
         {
             ct.ThrowIfCancellationRequested();
 
-            var leaders = 0;
-            var followers = 0;
+            List<(ScoringEntry Entry, Role? Evidence, int Weight)> evidence = [.. table.Select(row =>
+                row.Entry.Bib is not null && roleByBib.TryGetValue((row.ScoringEventId, row.Entry.Bib), out var byBib)
+                    ? (row.Entry, (Role?)byBib, 100)
+                    : row.Entry.Wscid is { } wscid && roleByDancer.TryGetValue(wscid, out var byHistory)
+                        ? (row.Entry, byHistory, 1)
+                        : (row.Entry, (Role?)null, 0))];
 
-            foreach (var row in table)
+            var leaders = evidence.Where(e => e.Evidence is Role.Leader).Sum(e => e.Weight);
+            var followers = evidence.Where(e => e.Evidence is Role.Follower).Sum(e => e.Weight);
+            Role? tableRole = leaders == followers ? null : leaders > followers ? Role.Leader : Role.Follower;
+            foreach (var row in table.Where(r => r.Entry.Role != tableRole))
             {
-                // A bib matched to a published pairing is direct evidence; registry history is a guess.
-                if (row.Entry.Bib is not null
-                    && roleByBib.TryGetValue((row.ScoringEventId, row.Entry.Bib), out var byBib))
-                {
-                    Count(byBib, weight: 100);
-                }
-                else if (row.Entry.Wscid is { } wscid && roleByDancer.TryGetValue(wscid, out var byHistory))
-                {
-                    Count(byHistory, weight: 1);
-                }
-            }
-
-            if (leaders == followers)
-            {
-                // No evidence either way — leave the rows unlabelled rather than guess.
-                continue;
-            }
-
-            var tableRole = leaders > followers ? Role.Leader : Role.Follower;
-
-            foreach (var row in table)
-            {
+                // No evidence either way leaves the rows unlabelled rather than guessed.
                 row.Entry.Role = tableRole;
                 labelled++;
-            }
-
-            void Count(Role role, int weight)
-            {
-                if (role is Role.Leader)
-                {
-                    leaders += weight;
-                }
-                else
-                {
-                    followers += weight;
-                }
             }
         }
 
@@ -250,25 +231,42 @@ public static class ScoringStore
     }
 
     /// <summary>
-    /// Bib to role, per event, from rounds that publish the pairing itself. A table holding both
-    /// roles was read from leader/follower columns; a table holding one role was labelled by this
-    /// method on an earlier run, and treating that as evidence would let a single guess spread.
+    /// Bib to role, per event, from Jack &amp; Jill rounds that publish the pairing itself. A table
+    /// holding both roles was read from leader/follower columns; a table holding one role was
+    /// labelled by inference, and treating that as evidence would let a single guess spread.
+    /// <para>
+    /// Only Jack &amp; Jill: Pro-Am "(Am F)" rounds print the amateur follower in the leader column,
+    /// and some events list Strictly couples in no particular order (SwingVester 2025/26 put its
+    /// Novice followers there, which then labelled the whole Novice follower prelim as leaders). A
+    /// pairing table whose columns mostly disagree with the dancers' registry roles is dropped too.
+    /// </para>
     /// </summary>
     private static async Task<Dictionary<(int Event, string Bib), Role>> PublishedRolesByBibAsync(
-        AppDbContext db, CancellationToken ct)
+        AppDbContext db, IReadOnlyDictionary<int, Role> roleByDancer, CancellationToken ct)
     {
         var rows = await db.ScoringEntries.AsNoTracking()
-            .Where(e => e.Role != null && e.Bib != null)
-            .Select(e => new { e.Round.ScoringEventId, e.RoundId, e.TableIndex, e.Bib, e.Role })
+            .Where(e => e.Role != null && e.Bib != null && e.Round.IsJackAndJill)
+            .Select(e => new { e.Round.ScoringEventId, e.RoundId, e.TableIndex, e.Bib, e.Role, e.Wscid })
             .ToListAsync(ct);
 
         return rows
             .GroupBy(r => (r.RoundId, r.TableIndex))
-            .Where(g => g.Select(r => r.Role).Distinct().Count() > 1)
+            .Where(g => g.Select(r => r.Role).Distinct().Count() > 1 && ColumnsTrusted([.. g.Select(r => (r.Role!.Value, r.Wscid))], roleByDancer))
             .SelectMany(g => g)
             .GroupBy(r => (r.ScoringEventId, r.Bib!))
             .Where(g => g.Select(r => r.Role).Distinct().Count() == 1)
             .ToDictionary(g => g.Key, g => g.First().Role!.Value);
+    }
+
+    /// <summary>Whether a pairing table's columns agree with its dancers' usual roles: at least 80%
+    /// of those with a registry history, or too few of them to judge.</summary>
+    internal static bool ColumnsTrusted(IReadOnlyList<(Role Role, int? Wscid)> rows, IReadOnlyDictionary<int, Role> roleByDancer)
+    {
+        List<bool> agree = [.. rows
+            .Where(r => r.Wscid is { } id && roleByDancer.ContainsKey(id))
+            .Select(r => roleByDancer[r.Wscid!.Value] == r.Role)];
+
+        return agree.Count < 4 || agree.Count(a => a) >= 0.8 * agree.Count;
     }
 
     /// <summary>

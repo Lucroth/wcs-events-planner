@@ -3,7 +3,10 @@ using WcsEvents.Sync.Data;
 
 namespace WcsEvents.Sync.Metrics;
 
-public sealed record FinalPlace(int Position, string Names);
+/// <summary>One dancer of a placed couple; <paramref name="Wscid"/> is set once they hold WSDC points.</summary>
+public sealed record Finalist(string Name, int? Wscid);
+
+public sealed record FinalPlace(int Position, string Names, IReadOnlyList<Finalist> Dancers);
 
 public sealed record DivisionResult(string Division, string RoundName, int RoundId, IReadOnlyList<FinalPlace> Places);
 
@@ -54,7 +57,7 @@ public sealed class EventCatalog(AppDbContext db, Strength strength)
     {
         var entries = await db.ScoringEntries.AsNoTracking()
             .Where(e => e.Round.IsJackAndJill && e.Round.Kind == RoundKind.Final && e.Round.DivisionAbbreviation != null && !e.IsScratched)
-            .Select(e => new { e.Round.ScoringEventId, e.RoundId, e.Round.RoundName, Division = e.Round.DivisionAbbreviation!, e.Position, e.Name, e.Role, e.TableIndex })
+            .Select(e => new { e.Round.ScoringEventId, e.RoundId, e.Round.RoundName, Division = e.Round.DivisionAbbreviation!, e.Position, e.Name, e.Wscid, e.Role, e.TableIndex })
             .ToListAsync(ct);
 
         return entries
@@ -66,10 +69,14 @@ public sealed class EventCatalog(AppDbContext db, Strength strength)
                     .Select(g => new DivisionResult(g.Key.Division, g.Key.RoundName, g.Key.RoundId, [.. g
                         .GroupBy(e => e.Position)
                         .OrderBy(p => p.Key)
-                        .Select(p => new FinalPlace(p.Key, string.Join(" & ", p
-                            .OrderBy(x => x.Role is null ? 2 : (int)x.Role)
-                            .ThenBy(x => x.TableIndex)
-                            .Select(x => x.Name))))]))
+                        .Select(p =>
+                        {
+                            List<Finalist> couple = [.. p
+                                .OrderBy(x => x.Role is null ? 2 : (int)x.Role)
+                                .ThenBy(x => x.TableIndex)
+                                .Select(x => new Finalist(x.Name, x.Wscid))];
+                            return new FinalPlace(p.Key, string.Join(" & ", couple.Select(d => d.Name)), couple);
+                        })]))
                     .OrderBy(r => Strength.DivisionOrder(r.Division))]);
     }
 

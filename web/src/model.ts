@@ -47,7 +47,8 @@ export interface DivisionResult {
   division: string;
   roundName: string;
   roundId: number;
-  places: { position: number; names: string }[];
+  /** `dancers` is absent on documents published before it existed; `wscid` only for dancers with WSDC points. */
+  places: { position: number; names: string; dancers?: { name: string; wscid: number | null }[] }[];
 }
 
 export interface YearSummary {

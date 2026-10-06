@@ -161,7 +161,7 @@ function resultsCard(e: ScrapedEvent): Raw {
         ${e.results.map((r) => html`
           <div>
             <h3><a href="https://scoring.dance/enUS/events/${e.id}/results/${r.roundId}.html" target="_blank" rel="noopener">${r.roundName}</a></h3>
-            <ol>${r.places.map((p) => html`<li value="${p.position}">${p.names}</li>`)}</ol>
+            <ol>${r.places.map((p) => html`<li value="${p.position}">${p.dancers?.length ? couple(p.dancers) : p.names}</li>`)}</ol>
           </div>`)}
       </div>
     </section>`;
@@ -318,4 +318,9 @@ export function wireEvent(id: string): void {
     const params = new URLSearchParams({ from: String(data.get("from")), people: String(data.get("people")) });
     location.hash = `#/event/${id}?${params}`;
   });
+}
+
+/** Each dancer's scoring.dance registry page, for those with a WSDC id (given with their first points). */
+function couple(dancers: { name: string; wscid: number | null }[]): Raw {
+  return html`${dancers.map((d, i) => html`${i ? " & " : ""}${d.wscid ? html`<a href="https://scoring.dance/enUS/wsdc/registry/${d.wscid}.html" target="_blank" rel="noopener">${d.name}</a>` : d.name}`)}`;
 }

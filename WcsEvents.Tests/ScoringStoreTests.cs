@@ -157,6 +157,16 @@ public sealed class ScoringStoreTests : IDisposable
     }
 
     [Fact]
+    public void ColumnsTrusted_RejectsAPairingWhoseLeaderColumnHoldsFollowers()
+    {
+        Dictionary<int, Role> usual = new() { [1] = Role.Follower, [2] = Role.Follower, [3] = Role.Follower, [4] = Role.Follower, [5] = Role.Leader, [6] = Role.Leader };
+
+        Assert.False(ScoringStore.ColumnsTrusted([(Role.Leader, 1), (Role.Leader, 2), (Role.Leader, 3), (Role.Follower, 5), (Role.Follower, 6)], usual));
+        Assert.True(ScoringStore.ColumnsTrusted([(Role.Leader, 5), (Role.Leader, 6), (Role.Follower, 1), (Role.Follower, 2), (Role.Follower, 3)], usual));
+        Assert.True(ScoringStore.ColumnsTrusted([(Role.Leader, 1), (Role.Follower, 5)], usual));
+    }
+
+    [Fact]
     public void InheritCities_ReplacesAPlaceholderCityFromAnotherCountry()
     {
         ScoringEvent rolling = new() { Id = 146, Name = "Rolling Swing 2024", DateFrom = new DateOnly(2024, 8, 29), City = "Bron", Country = "France" };
