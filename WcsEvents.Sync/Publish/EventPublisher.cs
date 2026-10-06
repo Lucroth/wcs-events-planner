@@ -1,4 +1,5 @@
 using WcsEvents.Sync.Metrics;
+using WcsEvents.Sync.Scoring;
 using WcsEvents.Sync.Travel;
 
 namespace WcsEvents.Sync.Publish;
@@ -17,7 +18,24 @@ public sealed partial class EventPublisher(
     {
         var today = DateOnly.FromDateTime(time.GetUtcNow().UtcDateTime);
         var infos = await AdminInfosAsync(store, ct);
-        var all = await catalog.AllAsync(ct);
+        var everything = await catalog.AllAsync(ct);
+
+        // The app covers European events only. One that is not (or has no country, unless the admin
+        // gave it one) is never published, and anything published for it before is taken down.
+        List<EventFacts> all = [];
+        var removed = 0;
+        foreach (var facts in everything)
+        {
+            var info = infos.GetValueOrDefault(facts.Event.Id.ToString()) ?? AdminInfo.Empty;
+            if (Countries.IsEuropean(info.Country ?? facts.Event.Country))
+            {
+                all.Add(facts);
+                continue;
+            }
+
+            removed += await store.DeletePublishedAsync($"events/{facts.Event.Id}", isPrefix: false, ct);
+            removed += await store.DeletePublishedAsync($"flights/{facts.Event.Id}_", isPrefix: true, ct);
+        }
 
         foreach (var facts in all)
         {
@@ -72,7 +90,7 @@ public sealed partial class EventPublisher(
             }, ct);
         }
 
-        LogPublished(logger, all.Count, store.Written, store.Skipped);
+        LogPublished(logger, all.Count, store.Written, store.Skipped, removed);
     }
 
     public static async Task<IReadOnlyDictionary<string, AdminInfo>> AdminInfosAsync(FirestoreStore store, CancellationToken ct) =>
@@ -127,6 +145,6 @@ public sealed partial class EventPublisher(
 
     private static string? Iso(DateOnly? d) => d?.ToString("yyyy-MM-dd");
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Published {Events} events: {Written} documents written, {Skipped} unchanged")]
-    private static partial void LogPublished(ILogger logger, int events, int written, int skipped);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Published {Events} European events: {Written} documents written, {Skipped} unchanged, {Removed} outside Europe removed")]
+    private static partial void LogPublished(ILogger logger, int events, int written, int skipped, int removed);
 }

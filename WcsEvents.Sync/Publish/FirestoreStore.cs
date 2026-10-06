@@ -55,6 +55,26 @@ public sealed partial class FirestoreStore(FirestoreDb firestore, AppDbContext d
         Written++;
     }
 
+    /// <summary>
+    /// Deletes a document this mirror published, or with <paramref name="isPrefix"/> every one whose
+    /// path starts with <paramref name="path"/> (e.g. "flights/412_"). Only paths it wrote itself are
+    /// touched, so admin data and hand-made events are never removed.
+    /// </summary>
+    public async Task<int> DeletePublishedAsync(string path, bool isPrefix, CancellationToken ct)
+    {
+        var key = $"{firestore.ProjectId}/{path}";
+        var known = await db.PublishedDocs.Where(d => isPrefix ? d.Path.StartsWith(key) : d.Path == key).ToListAsync(ct);
+
+        foreach (var doc in known)
+        {
+            await firestore.Document(doc.Path[(firestore.ProjectId.Length + 1)..]).DeleteAsync(cancellationToken: ct);
+            db.PublishedDocs.Remove(doc);
+        }
+
+        await db.SaveChangesAsync(ct);
+        return known.Count;
+    }
+
     /// <summary>Every document of a collection the admin edits, by id, as JSON.</summary>
     public Task<IReadOnlyDictionary<string, JsonElement>> ReadAllAsync(string collection, CancellationToken ct) =>
         ReadAsync(collection, firestore.Collection(collection), ct);

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using WcsEvents.Sync.Data;
+using WcsEvents.Sync.Scoring;
 using WcsEvents.Sync.Travel;
 
 namespace WcsEvents.Sync.Publish;
@@ -36,7 +37,7 @@ public sealed partial class FlightPublisher(
 
         var upcoming = trips
             .Where(t => t.Start > today && t.Start <= today.AddDays(HorizonDays))
-            .Where(t => t.Country is not "Poland")
+            .Where(t => t.Country is not "Poland" && Countries.IsEuropean(t.Country))
             .ToList();
 
         var origins = HomeCities.All.Select(c => c.FlightOrigins).DistinctBy(HomeCities.Key).ToList();

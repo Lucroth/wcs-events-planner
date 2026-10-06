@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using WcsEvents.Sync.Data;
+using WcsEvents.Sync.Scoring;
 
 namespace WcsEvents.Sync.Metrics;
 
@@ -24,7 +25,7 @@ public sealed record DivisionStrength(
 /// entrant held in the division <em>at the time</em>, rebuilt from registry placements dated in
 /// earlier months, the same reconstruction wsdc-stats uses: today's totals would mostly measure how
 /// long ago an event was. Difficulty ranks an event's top-quartile average (the strongest quarter of
-/// the field) against every other event's in the same division and role, in thirds: the plain
+/// the field) against every other event's in the same division and role, in thirds, among European events only: the plain
 /// average is mostly a count of newcomers with no points, while the top quarter is who has to be
 /// beaten to make the final.
 /// </summary>
@@ -49,13 +50,14 @@ public sealed class Strength(AppDbContext db, IMemoryCache cache)
             .Distinct()
             .ToListAsync(ct);
 
+        var european = await EuropeanEventIdsAsync(ct);
         List<(int EventId, DivisionStrength Strength)> rows = [];
 
         foreach (var division in divisions)
         {
             foreach (var role in (Role[])[Role.Leader, Role.Follower])
             {
-                rows.AddRange(await ForDivisionAsync(division, role, ct));
+                rows.AddRange(await ForDivisionAsync(division, role, european, ct));
             }
         }
 
@@ -69,12 +71,31 @@ public sealed class Strength(AppDbContext db, IMemoryCache cache)
         return result;
     }
 
-    private async Task<List<(int EventId, DivisionStrength Strength)>> ForDivisionAsync(string division, Role role, CancellationToken ct)
+    /// <summary>
+    /// The app covers European events only, so levels are ranked among them alone. The event's own
+    /// country is preferred; a round's is the fallback for events the listing never carried.
+    /// </summary>
+    private async Task<HashSet<int>> EuropeanEventIdsAsync(CancellationToken ct)
+    {
+        var events = await db.ScoringEvents.AsNoTracking().Select(e => new { e.Id, e.Country }).ToListAsync(ct);
+        var rounds = await db.ScoringRounds.AsNoTracking().Select(r => new { r.ScoringEventId, r.Country }).Distinct().ToListAsync(ct);
+        var byEvent = events.ToDictionary(e => e.Id, e => e.Country);
+
+        return [.. rounds
+            .Select(r => (Id: r.ScoringEventId, Country: byEvent.GetValueOrDefault(r.ScoringEventId) ?? r.Country))
+            .Concat(events.Select(e => (e.Id, e.Country)))
+            .Where(x => Countries.IsEuropean(x.Country))
+            .Select(x => x.Id)];
+    }
+
+    private async Task<List<(int EventId, DivisionStrength Strength)>> ForDivisionAsync(
+        string division, Role role, IReadOnlySet<int> european, CancellationToken ct)
     {
         var entrants = await db.ScoringEntries.AsNoTracking()
             .Where(e => e.Round.DivisionAbbreviation == division && e.Round.IsJackAndJill && !e.IsScratched && e.Role == role)
             .Select(e => new { e.RoundId, e.Round.ScoringEventId, e.Round.RoundName, e.Wscid, e.Round.EventDate })
             .ToListAsync(ct);
+        entrants.RemoveAll(e => !european.Contains(e.ScoringEventId));
 
         var placements = await db.Placements.AsNoTracking()
             .Where(p => p.Division.Abbreviation == division && p.Role == role)
