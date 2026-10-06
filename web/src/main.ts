@@ -4,7 +4,7 @@ import { auth, isAdmin } from "./firebase";
 import { html, type Raw } from "./html";
 import { dashboardPage, editPage, loginPage, logout, wireEdit, wireLogin } from "./pages/admin";
 import { eventPage, wireEvent } from "./pages/event";
-import { listPage, wireList } from "./pages/list";
+import { listPage, readFilter, wireList } from "./pages/list";
 
 const app = document.getElementById("app")!;
 const nav = document.getElementById("nav")!;
@@ -66,7 +66,7 @@ async function route(): Promise<void> {
       }
     } else {
       const year = parts[0] === "year" ? Number(parts[1]) || thisYear : thisYear;
-      set(await listPage(year, params.has("all")), () => wireList(year));
+      set(await listPage(year, readFilter(params)), () => wireList(year));
     }
   } catch (e) {
     console.error(e);

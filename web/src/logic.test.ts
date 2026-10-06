@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { html, safeUrl } from "./html";
-import { applyOverride, currentPass, isEurope, type Pass } from "./model";
+import { applyOverride, currentPass, isEurope, matchesLevel, type Pass } from "./model";
 import { addDays, bookingUrl, flightKey, homeCities, koleoUrl } from "./travel";
 
 const pass = (kind: Pass["kind"], tier: string, until: string | null): Pass => ({ kind, tier, price: 100, currency: "EUR", until });
@@ -64,5 +64,30 @@ describe("isEurope", () => {
     expect(isEurope("poland")).toBe(true);
     expect(isEurope("United States of America")).toBe(false);
     expect(isEurope(null)).toBe(false);
+  });
+});
+
+describe("matchesLevel", () => {
+  const chips = [
+    { division: "NOV", level: "Easy" as const },
+    { division: "INT", level: "Hard" as const },
+    { division: "ADV", level: null },
+  ];
+
+  it("passes everything when no filter is set", () => {
+    expect(matchesLevel([], null, [])).toBe(true);
+  });
+
+  it("with a division, judges only that division", () => {
+    expect(matchesLevel(chips, "INT", ["Hard"])).toBe(true);
+    expect(matchesLevel(chips, "INT", ["Easy"])).toBe(false);
+    expect(matchesLevel(chips, "ADV", ["Easy", "Medium", "Hard"])).toBe(false);
+    expect(matchesLevel(chips, "ALS", [])).toBe(false);
+    expect(matchesLevel(chips, "NOV", [])).toBe(true);
+  });
+
+  it("without a division, any division at a chosen level matches", () => {
+    expect(matchesLevel(chips, null, ["Easy"])).toBe(true);
+    expect(matchesLevel(chips, null, ["Medium"])).toBe(false);
   });
 });

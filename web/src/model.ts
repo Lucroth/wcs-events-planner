@@ -161,3 +161,17 @@ const europe = new Set(
 
 /** An event with no country is left out: the admin can set one. */
 export const isEurope = (country: string | null | undefined): boolean => !!country && europe.has(country.trim().toLowerCase());
+
+/**
+ * Whether an event's division chips pass the list filter. With a division picked, only that
+ * division's level counts; without one, any division at a chosen level does.
+ */
+export function matchesLevel(
+  chips: { division: string; level: Difficulty | null }[],
+  division: string | null,
+  levels: Difficulty[],
+): boolean {
+  const candidates = division ? chips.filter((c) => c.division === division) : chips;
+  if (!levels.length) return !division || candidates.length > 0;
+  return candidates.some((c) => c.level !== null && levels.includes(c.level));
+}
