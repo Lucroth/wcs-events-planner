@@ -18,6 +18,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /live/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /trains/{id} {
       allow read: if true;
       allow write: if false;

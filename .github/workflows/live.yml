@@ -1,0 +1,78 @@
+name: Live
+
+# While an event is running, follows its competition on scoring.dance into Firestore (live/{id})
+# once a minute, so open pages update by themselves. Each run covers 25 minutes and a new one
+# starts every 20, queued behind the last; on a day with no event the check step ends it in seconds.
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch:
+    inputs:
+      events:
+        description: "Comma-separated scoring.dance event ids to follow regardless of dates (testing)"
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live
+  cancel-in-progress: false
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+    steps:
+      - name: Any event today?
+        id: check
+        env:
+          FORCED: ${{ inputs.events }}
+        run: |
+          if [ -n "$FORCED" ]; then echo "live=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import datetime, json, os, urllib.request
+          today = datetime.date.today()
+          base = f"https://firestore.googleapis.com/v1/projects/{os.environ['FIREBASE_PROJECT_ID']}/databases/(default)/documents/years/"
+          live = False
+          for year in {today.year - 1, today.year}:
+              try:
+                  doc = json.load(urllib.request.urlopen(base + str(year)))
+              except Exception:
+                  continue
+              for v in doc.get("fields", {}).get("events", {}).get("arrayValue", {}).get("values", []):
+                  f = v["mapValue"]["fields"]
+                  if f.get("expected", {}).get("booleanValue"):
+                      continue
+                  start = datetime.date.fromisoformat(f["dateFrom"]["stringValue"]) - datetime.timedelta(days=1)
+                  end = datetime.date.fromisoformat(f["dateTo"]["stringValue"]) + datetime.timedelta(days=1)
+                  live = live or start <= today <= end
+          print(f"live={'true' if live else 'false'}")
+          EOF
+
+      - uses: actions/checkout@v5
+        if: steps.check.outputs.live == 'true'
+      - uses: actions/setup-dotnet@v5
+        if: steps.check.outputs.live == 'true'
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Firebase credentials
+        if: steps.check.outputs.live == 'true'
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: printf '%s' "$SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+
+      - name: Follow live events
+        if: steps.check.outputs.live == 'true'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+          ConnectionStrings__Db: Data Source=${{ runner.temp }}/live.db
+          LIVE_EVENTS: ${{ inputs.events }}
+        run: dotnet run --project WcsEvents.Sync -c Release -- live --minutes 25
+
+      - name: Remove credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/sa.json"

@@ -2,6 +2,7 @@ import "./style.css";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth, isAdmin } from "./firebase";
 import { html, type Raw } from "./html";
+import { stopListening } from "./live";
 import { dashboardPage, editPage, loginPage, logout, wireEdit, wireLogin } from "./pages/admin";
 import { eventPage, wireEvent } from "./pages/event";
 import { listPage, readFilter, wireList } from "./pages/list";
@@ -30,6 +31,7 @@ function renderNav(): void {
 /** Hash routes, so GitHub Pages never has to know about them: #/year/2026, #/event/435, #/admin/... */
 async function route(): Promise<void> {
   const mine = ++renderId;
+  stopListening();
   const [path, search = ""] = location.hash.replace(/^#/, "").split("?");
   const params = new URLSearchParams(search);
   const parts = path.split("/").filter(Boolean);

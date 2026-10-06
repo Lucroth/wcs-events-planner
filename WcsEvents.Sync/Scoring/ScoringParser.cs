@@ -97,6 +97,16 @@ public static partial class ScoringParser
             }
         }
 
+        // The wall later moved to one page per round: links to /events/{id}/wall/{round}.html.
+        foreach (var anchor in doc.DocumentNode.SelectNodes("//a[@href]") ?? new HtmlNodeCollection(null))
+        {
+            var match = WallRoundHref().Match(anchor.GetAttributeValue("href", string.Empty));
+            if (match.Success && int.TryParse(match.Groups[1].Value, out var id) && links.All(l => l.RoundId != id))
+            {
+                links.Add(new RoundLink(id, Clean(anchor.InnerText)));
+            }
+        }
+
         return links;
     }
 
@@ -842,4 +852,7 @@ public static partial class ScoringParser
 
     [GeneratedRegex(@"/wsdc/registry/(\d+)\.html$")]
     private static partial Regex WallRegistryLinkRegex();
+
+    [GeneratedRegex(@"/events/\d+/wall/(\d+)\.html$")]
+    private static partial Regex WallRoundHref();
 }

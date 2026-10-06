@@ -492,5 +492,1360 @@
         }
       ]
     }
+  },
+  "354": {
+    "source": "https://wcs-budafest.com/location/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://wcs-budafest.com/",
+      "venueName": "Hotel InterContinental Budapest",
+      "venueAddress": "H-1052 Budapest, 12-14 Apáczai Csere János utca, Hungary"
+    }
+  },
+  "362": {
+    "source": "https://www.trinityswing.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.trinityswing.com/",
+      "facebookUrl": "https://www.facebook.com/trinityswing",
+      "instagramUrl": "https://www.instagram.com/trinity_swing",
+      "venueName": "Carrickdale Hotel & Spa"
+    }
+  },
+  "366": {
+    "source": "https://www.danceapp.net/en/events/133/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.wintercoastswing.com/",
+      "facebookUrl": "https://www.facebook.com/wintercoastswing",
+      "venueName": "Sport & Spa Hotel Vesileppis"
+    }
+  },
+  "373": {
+    "source": "https://kingswing.pl/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://kingswing.pl/",
+      "facebookUrl": "https://www.facebook.com/events/318752448822051",
+      "streamUrl": "https://www.triplestep.tv/live/king-swing-2026",
+      "staff": [
+        "Robert Royston",
+        "Chuck Brown & Lauren Jones",
+        "Sean McKeever & Alyssa Glanville",
+        "PJ Turner & Karin Kakun",
+        "Browly Adjavon & Inga Kurcisa",
+        "Marta Nita & Piotr „Badman” Lenart"
+      ],
+      "eventSchedule": "https://drive.google.com/file/d/1f31-VETal3xzw2TTWAY98RlTc8bciXSC/view?usp=sharing",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early Bird (Lancelot)",
+          "price": 790,
+          "currency": "PLN",
+          "until": "2025-11-25"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Bird (Merlin)",
+          "price": 860,
+          "currency": "PLN",
+          "until": "2025-12-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird (King Arthur)",
+          "price": 930,
+          "currency": "PLN",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass (Dragon)",
+          "price": 500,
+          "currency": "PLN",
+          "until": null
+        }
+      ]
+    }
+  },
+  "356": {
+    "source": "https://tanzhaus-bonn.de/swingin-festival/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://tanzhaus-bonn.de/swingin-festival/",
+      "registrationOpens": "2025-12-13T12:00",
+      "venueName": "Tanzhaus Bonn",
+      "venueAddress": "Gerhardstraße 1, D-53225 Bonn, Germany",
+      "staff": [
+        "Philippe & Flore Berne",
+        "Maddy & Zac Skinner",
+        "Chuck Brown & Lauren Jones",
+        "Marta Nita & Piotr Lenart",
+        "Ken Knipphals (Head DJ)"
+      ],
+      "eventSchedule": "https://www.canva.com/design/DAHAXQE_8Ig/hAhgod_or1clJ37MQgt2og/view",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Early Bird (first 10)",
+          "price": 160,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Early Bird (next 130)",
+          "price": 170,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird (next 100)",
+          "price": 180,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Knocking Bird (next 70)",
+          "price": 190,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass",
+          "price": 90,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "407": {
+    "source": "https://www.nordicwcschamps.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.nordicwcschamps.com/",
+      "facebookUrl": "https://www.facebook.com/events/770642958880163/",
+      "venueName": "Scandic Infra City",
+      "staff": [
+        "Jordan Frisbee & Tatiana Mollman",
+        "Thibault & Nicole Ramirez",
+        "Olivier & Virginie Massart",
+        "Kyle Fitzgerald & Melodie Paletta",
+        "Irina Puzanova",
+        "Arnaud Perga"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Tier 1 (World region, passes 1-150)",
+          "price": 1400,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 2 (World region, passes 151-300)",
+          "price": 1600,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 3 (World region, passes 301-450)",
+          "price": 1800,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 4 (World region, passes 451+)",
+          "price": 2000,
+          "currency": "SEK",
+          "until": null
+        }
+      ]
+    }
+  },
+  "391": {
+    "source": "https://www.fowcs.com/registration/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.fowcs.com/",
+      "facebookUrl": "https://www.facebook.com/events/1330202962095092/",
+      "instagramUrl": "https://www.instagram.com/frenchywestyevents/",
+      "venueName": "Van der Valk Hotel Paris CDG Airport",
+      "venueAddress": "351 Avenue du Bois de la Pie, 95912 ROISSY, France",
+      "staff": [
+        "Maxence Martin & Virginie Grondin",
+        "Maxime Zzaoui & Tori Zzaoui",
+        "Thibault Ramirez & Nicole Ramirez",
+        "Miguel Ortega & Alexis Garrish",
+        "Igor Pitangui & Fernanda Dubiel",
+        "Teddy Sanchez & Dianéva Poirson",
+        "Arnaud Perga & Irina Puzanova",
+        "Michael Kielbasa & Emilia Jaskot",
+        "Joseph Tong & Kristen Wallace",
+        "Joao Parada & Savana Barreau",
+        "Allan Thivoz & Alexandra Branco",
+        "Henriette Koefoed Svendsen (Chief Judge)"
+      ],
+      "eventSchedule": "https://www.fowcs.com/schedule/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "01.01.26-09.02.26",
+          "price": 180,
+          "currency": "EUR",
+          "until": "2026-02-09"
+        },
+        {
+          "kind": "Full",
+          "tier": "10.02.26-16.03.26",
+          "price": 190,
+          "currency": "EUR",
+          "until": "2026-03-16"
+        },
+        {
+          "kind": "Full",
+          "tier": "17.03.26 until sold out",
+          "price": 200,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Event Pass 01.01.26-09.02.26",
+          "price": 120,
+          "currency": "EUR",
+          "until": "2026-02-09"
+        },
+        {
+          "kind": "Party",
+          "tier": "Event Pass 10.02.26-16.03.26",
+          "price": 130,
+          "currency": "EUR",
+          "until": "2026-03-16"
+        },
+        {
+          "kind": "Party",
+          "tier": "Event Pass 17.03.26 until sold out",
+          "price": 140,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "365": {
+    "source": "https://www.danceapp.net/en/events/156/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Grand Hotel Barone di Sassj"
+    }
+  },
+  "422": {
+    "source": "https://ekarolas.com/saunaswing/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://ekarolas.com/saunaswing/",
+      "registrationOpens": "2026-03-01T11:00",
+      "venueName": "Ikaalinen Spa&Resort",
+      "staff": [
+        "Chuck Brown",
+        "Lauren Jones",
+        "Daniel Pavlov",
+        "Clement Turpain",
+        "Evgenia Itkina",
+        "Rachel Schubert",
+        "Lotte Meier",
+        "Florian Hamm",
+        "Ken Knipphals (Head DJ)"
+      ],
+      "eventSchedule": "https://scoring.dance/fiFI/events/422/wall/schedule",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "First 50 leaders / 50 followers",
+          "price": 175,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Next dancers",
+          "price": 195,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass",
+          "price": 115,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "420": {
+    "source": "https://www.danceapp.net/en/events/155/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.infinite-swing.com/",
+      "instagramUrl": "https://www.instagram.com/infinite.swing/",
+      "venueName": "Hep Cat Club München"
+    }
+  },
+  "370": {
+    "source": "https://wcs-gps.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://wcs-gps.com/"
+    }
+  },
+  "396": {
+    "source": "https://www.westiejoy.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.westiejoy.com/",
+      "registrationOpens": "2026-02-05T19:00",
+      "venueName": "Sheraton Bucharest Hotel",
+      "venueAddress": "Calea Dorobanților 5-7, Bucharest, Romania",
+      "staff": [
+        "Igor Pitangui & Fernanda Dubiel",
+        "Ludovic Pelegrin Pardou & Stefanie Tschom",
+        "Philipp Wolf & Ekaterina Wolf",
+        "Allan Thivoz & Alexandra Branco",
+        "Paul Warden (Chief Judge)",
+        "Tana (Head DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Early Bird (first 50 passes)",
+          "price": 155,
+          "currency": "EUR",
+          "until": "2026-03-05"
+        },
+        {
+          "kind": "Full",
+          "tier": "Early Bird",
+          "price": 165,
+          "currency": "EUR",
+          "until": "2026-03-05"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Bird",
+          "price": 175,
+          "currency": "EUR",
+          "until": "2026-06-05"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird",
+          "price": 185,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Early Bird",
+          "price": 115,
+          "currency": "EUR",
+          "until": "2026-03-05"
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal Bird",
+          "price": 125,
+          "currency": "EUR",
+          "until": "2026-06-05"
+        },
+        {
+          "kind": "Party",
+          "tier": "Late Bird",
+          "price": 135,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "441": {
+    "source": "https://www.wcsparty.com/tickets/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.wcsparty.com/",
+      "facebookUrl": "https://www.facebook.com/events/811167011426222",
+      "instagramUrl": "https://www.instagram.com/wcsparty_in.vienna/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "First 50 tickets",
+          "price": 180,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Tickets 51-100",
+          "price": 190,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Tickets 101-200",
+          "price": 199,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Ticket",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "447": {
+    "source": "https://mooselandswing.com/passes/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://mooselandswing.com/",
+      "facebookUrl": "https://www.facebook.com/people/Mooseland-Swing/61558017611122/",
+      "registrationOpens": "2026-04-15T18:00",
+      "venueName": "Best Western Hotel Gamla Teatern",
+      "staff": [
+        "Evgenia Itkina",
+        "PJ Turner",
+        "Miquel Menéndez",
+        "Hanna Ojanaho",
+        "Chuck Brown",
+        "Stefanie Tschom",
+        "John Kirkconnel",
+        "DJ Pikachu (Paulina Górka) (Head DJ)",
+        "Olga Ruban (Contest DJ)"
+      ],
+      "eventSchedule": "https://mooselandswing.com/schedule/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early Moose (International)",
+          "price": 1400,
+          "currency": "SEK",
+          "until": "2026-05-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Moose (International)",
+          "price": 1600,
+          "currency": "SEK",
+          "until": "2026-07-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Moose (International)",
+          "price": 1800,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Early Moose",
+          "price": 1000,
+          "currency": "SEK",
+          "until": "2026-05-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal Moose",
+          "price": 1100,
+          "currency": "SEK",
+          "until": "2026-07-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "Late Moose",
+          "price": 1200,
+          "currency": "SEK",
+          "until": null
+        }
+      ]
+    }
+  },
+  "334": {
+    "source": "https://www.avignoncityswing.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.avignoncityswing.com/",
+      "instagramUrl": "https://www.instagram.com/avignoncityswing/",
+      "venueAddress": "202, rue Nicolas Ledoux, 30900 Nîmes, France"
+    }
+  },
+  "357": {
+    "source": "https://praguealchemyswing.cz/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://praguealchemyswing.cz/",
+      "facebookUrl": "https://www.facebook.com/PragueAlchemySwing",
+      "instagramUrl": "https://www.instagram.com/prague_alchemy_swing"
+    }
+  },
+  "337": {
+    "source": "https://www.west-in-lyon.fr/location",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.west-in-lyon.fr/",
+      "venueName": "Complexe Moulin Carron",
+      "venueAddress": "42 chemin de Parsonge, 69570 Dardilly"
+    }
+  },
+  "382": {
+    "source": "https://danceapp.net/en/events/124/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.ukwcschamps.com/",
+      "streamUrl": "https://www.twitch.tv/5678wcs",
+      "venueName": "Radisson RED & Conference Centre, London Heathrow",
+      "staff": [
+        "Robert Royston",
+        "Emeline Rochefeuille",
+        "Jakub Jakoubek",
+        "Sean McKeever",
+        "Alyssa McKeever",
+        "KP Rutland",
+        "Bryn Anderson",
+        "PJ Turner",
+        "Mia Pastor",
+        "Olivier Massart",
+        "Virginie Massart",
+        "Fernanda Dubiel",
+        "Igor Pitangui",
+        "Lauren Jones"
+      ]
+    }
+  },
+  "389": {
+    "source": "https://detonationdance.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://detonationdance.com/",
+      "facebookUrl": "https://www.facebook.com/EastonSwing/",
+      "instagramUrl": "https://www.instagram.com/eastonswing/"
+    }
+  },
+  "372": {
+    "source": "https://danceapp.net/en/events/127/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://beemadwcs.com/",
+      "venueName": "Hotel Eurostars Puerta Madrid",
+      "staff": [
+        "Hugo Miguez & Stacy Kay",
+        "Maxime & Torri Zzaoui",
+        "Chuck Brown & Lotte Meier",
+        "Doug Silton",
+        "Heejung Jung",
+        "Sara Mouchon",
+        "Miquel Menéndez"
+      ]
+    }
+  },
+  "415": {
+    "source": "https://wcs-ho.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://wcs-ho.com/",
+      "facebookUrl": "https://www.facebook.com/events/754806351024057",
+      "registrationOpens": "2026-02-19T14:00",
+      "venueName": "Verdi Budapest Aquincum Hotel",
+      "venueAddress": "Árpád fejedelem útja 94, H-1036 Budapest",
+      "staff": [
+        "Joao Parada & Savana Barreau",
+        "Byron Brunerie & Maïna Vila Cobarsi",
+        "Daniel Pavlov & Lauren Jones",
+        "Miguel Ortega & Karin Kakun"
+      ],
+      "eventSchedule": "https://wcs-ho.com/2019/schedule/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Early bird",
+          "price": 175,
+          "currency": "EUR",
+          "until": "2026-02-24"
+        },
+        {
+          "kind": "Full",
+          "tier": "Regular",
+          "price": 190,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Super Early bird",
+          "price": 125,
+          "currency": "EUR",
+          "until": "2026-02-24"
+        },
+        {
+          "kind": "Party",
+          "tier": "Regular",
+          "price": 135,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "378": {
+    "source": "https://d-townswing.com/location",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://d-townswing.com/",
+      "facebookUrl": "https://www.facebook.com/groups/286058848224016/",
+      "venueName": "Boston-Club",
+      "venueAddress": "Vennhauser Allee 135, 40627 Düsseldorf"
+    }
+  },
+  "387": {
+    "source": "https://www.frenchconnectionwcs.com/hotel",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.frenchconnectionwcs.com/",
+      "venueName": "Imperial Palace Annecy (Centre de congrès)",
+      "venueAddress": "All. de l'impérial, 74000 Annecy"
+    }
+  },
+  "399": {
+    "source": "https://www.summernightswestival.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.summernightswestival.com/",
+      "instagramUrl": "https://www.instagram.com/summernightswestival/",
+      "venueName": "Sound Garden Hotel",
+      "staff": [
+        "Emeline Rochefeuille & Jakub Jakoubek",
+        "Torri & Maxime Zzaoui",
+        "Irina Puzanova & Florian Hamm",
+        "Ekaterina & Philipp Wolff",
+        "Stefanie Tschom & Ludovic Pelegrin Pardou"
+      ]
+    }
+  },
+  "437": {
+    "source": "https://uptownswing.se/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://uptownswing.se/",
+      "facebookUrl": "https://www.facebook.com/events/1238466541507574",
+      "venueName": "Scandic Infra City"
+    }
+  },
+  "445": {
+    "source": "https://finnfest.fi/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://finnfest.fi/",
+      "facebookUrl": "https://www.facebook.com/FinnfestWCS",
+      "instagramUrl": "https://www.instagram.com/finnfestwcs/",
+      "registrationOpens": "2026-03-03T20:00",
+      "venueName": "Paasitorni (Scandic Paasi)",
+      "venueAddress": "Paasivuorenkatu 5 B, 00530 Helsinki",
+      "staff": [
+        "Alyssa & Sean McKeever",
+        "Ben Morris",
+        "Chuck Brown",
+        "Maxence Martin & Virginie Grondin",
+        "Wee Tze Yi & Dalena Lee",
+        "Larisa Tingle",
+        "Savana Barreau & Joao Parada"
+      ],
+      "eventSchedule": "https://finnfest.fi/images/schedule/Aikataulu%20-%20Finnfest%202026.pdf",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Regular (international)",
+          "price": 180,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Regular (international)",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "423": {
+    "source": "https://westieharbor.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://westieharbor.com/",
+      "facebookUrl": "https://www.facebook.com/events/568891179595764",
+      "instagramUrl": "https://www.instagram.com/westieharbor/",
+      "venueName": "Scandic Göteborg Central",
+      "staff": [
+        "Kenneth Rutland & Bryn Anderson",
+        "Matieu Compagnon & Vanessa Bachmann",
+        "Michael Kielbasa & Irina Puzanova",
+        "Semion Ovsiannikov & Maria Elizarova",
+        "Kevin Town (Head DJ)"
+      ]
+    }
+  },
+  "336": {
+    "source": "https://swingresolution.com/pages/hotel-travel",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://swingresolution.com/",
+      "venueName": "Radisson Blu Edinburgh",
+      "venueAddress": "80 High Street, The Royal Mile, EH1 1TH Edinburgh, United Kingdom"
+    }
+  },
+  "368": {
+    "source": "https://valentineswing.dance/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://valentineswing.dance/",
+      "instagramUrl": "https://www.instagram.com/valentineswing.vs/",
+      "venueName": "Johannesbergs Slott"
+    }
+  },
+  "291": {
+    "source": "https://swingincapital.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://swingincapital.com/",
+      "instagramUrl": "https://instagram.com/swing_in_capital_wsdc",
+      "venueName": "Hotel Capannelle",
+      "venueAddress": "Via Siderno, 37, 00178 Roma, Italy"
+    }
+  },
+  "404": {
+    "source": "https://slovenianopen.dance/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://slovenianopen.dance/",
+      "facebookUrl": "https://www.facebook.com/slovenianopen/",
+      "instagramUrl": "https://www.instagram.com/slovenian_open_wcs",
+      "registrationOpens": "2025-11-27T19:00",
+      "venueName": "DoubleTree Hotel Ljubljana",
+      "venueAddress": "Dunajska cesta 154, 1000 Ljubljana, Slovenia",
+      "staff": [
+        "Karin & Ludovic",
+        "Savana & João",
+        "Andrea & Attila",
+        "Evgenia & Clement",
+        "Daniel",
+        "Ludovic (Chief Judge)",
+        "Paulina aka DJ Pikachu (Head & Comp DJ)"
+      ],
+      "eventSchedule": "https://slovenianopen.dance/files/schedule_v6.pdf",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early Bird",
+          "price": 150,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Bird",
+          "price": 160,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird",
+          "price": 170,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Early Bird",
+          "price": 110,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal Bird",
+          "price": 120,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Late Bird",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "395": {
+    "source": "https://www.medinswing.rocks/hotel",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.medinswing.rocks/",
+      "facebookUrl": "https://www.facebook.com/MedInSwing/",
+      "instagramUrl": "https://www.instagram.com/med_in_swing/",
+      "venueName": "Résidence Club Odalys \"Les Océanides\"",
+      "venueAddress": "395 Boulevard Plage de l'Argentière, 83250 La Londe-les-Maures, France"
+    }
+  },
+  "364": {
+    "source": "https://www.neverlandswing.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.neverlandswing.com/",
+      "instagramUrl": "https://www.instagram.com/neverlandswing/",
+      "venueName": "CanDance Studios",
+      "venueAddress": "Isolatorweg 28, 1014 AS Amsterdam, Netherlands",
+      "staff": [
+        "Keerigan Rudd & Mia Primavera",
+        "Lee & Fabienne Easton",
+        "Chuck Brown & Stefanie Tschom",
+        "Giulia Rusch",
+        "Gordon Mac Donald",
+        "Chuck Brown (Head Judge)",
+        "Chris van Dommelen (Head DJ)",
+        "Martin Lahmann (Competition DJ)",
+        "Susana Jütte (Social DJ)"
+      ],
+      "eventSchedule": "https://www.neverlandswing.com/_files/ugd/351e48_411a0d43b2ec47bd9b1dbba71a78a7b7.pdf",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Regular",
+          "price": 170,
+          "currency": "EUR",
+          "until": "2026-04-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late",
+          "price": 190,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Regular",
+          "price": 140,
+          "currency": "EUR",
+          "until": "2026-04-30"
+        },
+        {
+          "kind": "Party",
+          "tier": "Late",
+          "price": 150,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "403": {
+    "source": "https://www.swinglab-berlin.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.swinglab-berlin.com/",
+      "facebookUrl": "https://facebook.com/profile.php?id=61579049277131",
+      "instagramUrl": "https://instagram.com/swinglab.berlin",
+      "venueName": "Hotel Vienna House By Wyndham Andel's Berlin",
+      "venueAddress": "Landsberger Allee 106, 10369 Berlin, Germany"
+    }
+  },
+  "360": {
+    "source": "https://lisbonwestiefest.com/passes/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://lisbonwestiefest.com/",
+      "facebookUrl": "https://www.facebook.com/LisbonWestieFestWCS",
+      "instagramUrl": "https://www.instagram.com/lisbonwestiefestwcs",
+      "venueName": "VIP Santa Iria Hotel",
+      "venueAddress": "Estrada Nacional, 1260, Santa Iria de Azoia, Portugal",
+      "staff": [
+        "Jordan Frisbee & Tatiana Mollmann",
+        "Paul Warden",
+        "Igor Pitangui & Fernanda Dubiel",
+        "Daniel Pavlov & Lauren Jones",
+        "Ardena Gojani",
+        "Paul Warden (Chief Judge)",
+        "Justin Peterson (Head DJ)",
+        "John Miller (Social DJ)"
+      ],
+      "eventSchedule": "https://lisbonwestiefest.com/schedule/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Early Bird",
+          "price": 140,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Early Bird",
+          "price": 160,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal",
+          "price": 170,
+          "currency": "EUR",
+          "until": "2026-05-03"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late",
+          "price": 185,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Early Bird",
+          "price": 110,
+          "currency": "EUR",
+          "until": "2026-02-28"
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "436": {
+    "source": "https://www.hamburgswing.dance/venue",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.hamburgswing.dance/",
+      "facebookUrl": "https://www.facebook.com/profile.php?id=61586691706227",
+      "instagramUrl": "https://www.instagram.com/swingcreation.hamburg/",
+      "venueName": "Warehouse Studios",
+      "venueAddress": "Kehrwieder 5, 20457 Hamburg, Germany"
+    }
+  },
+  "418": {
+    "source": "https://www.bristolcityswing.com/bsf",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.bristolcityswing.com/bsf",
+      "facebookUrl": "https://www.facebook.com/bristolcityswingwcs/",
+      "instagramUrl": "https://www.instagram.com/bristolcityswing/",
+      "venueName": "Bristol Beacon",
+      "venueAddress": "Trenchard Street, BS1 5AR Bristol, United Kingdom",
+      "staff": [
+        "Robert Royston",
+        "Leo Lorenzo & Fernanda Dubiel",
+        "Stefanie Tschom",
+        "Florian Hamm",
+        "Ellen Dacombe",
+        "Henry & Julia Leonard",
+        "Orhiane Dang",
+        "Peter Fradley (Chief Judge)"
+      ],
+      "eventSchedule": "https://www.bristolcityswing.com/bsf#bsf-schedule",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Early Bird",
+          "price": 160,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Early Bird",
+          "price": 170,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Bird",
+          "price": 180,
+          "currency": "GBP",
+          "until": null
+        }
+      ]
+    }
+  },
+  "428": {
+    "source": "https://www.globalgrandprixwcs.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.globalgrandprixwcs.com/",
+      "instagramUrl": "https://www.instagram.com/globalgrandprixwcs",
+      "venueName": "Hilton Paris Charles de Gaulle Airport Hotel",
+      "staff": [
+        "Jaden & Mackenzie",
+        "João & Savana",
+        "Kevin & Nataliya",
+        "Zac & Maddy",
+        "Olivier & Virginie",
+        "Lionel & Amandine",
+        "Joshua & Maina",
+        "Kyle & Melodie",
+        "Allan & Alex",
+        "Philipp & Ekaterina",
+        "Raphael & Charline",
+        "Igor & Fernanda",
+        "Joelle Navarre (Chief Judge)",
+        "Vincent Morand (Head DJ)",
+        "Arnauld Perga (Competition DJ)",
+        "Justin Petersen (Competition DJ)"
+      ],
+      "eventSchedule": "https://www.globalgrandprixwcs.com/_files/ugd/638ea7_3d81964fc26f4bac8610ce822e7d9940.pdf",
+      "facebookUrl": "https://www.facebook.com/globalgrandprixwcs"
+    }
+  },
+  "443": {
+    "source": "https://norwegianopen.no/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://norwegianopen.no/",
+      "instagramUrl": "https://www.instagram.com/norwegianopen_wcs"
+    }
+  },
+  "363": {
+    "source": "https://swingtzerland.com/en/location/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://swingtzerland.com/en/",
+      "instagramUrl": "https://www.instagram.com/swingtzerland/",
+      "venueName": "Tanzwerk101",
+      "venueAddress": "Pfingstweidstrasse 101, 8005 Zürich"
+    }
+  },
+  "335": {
+    "source": "https://www.euro-dance-festival.com/en/rust/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.euro-dance-festival.com/en/rust/",
+      "facebookUrl": "https://www.facebook.com/EURODANCEFESTIVAL/",
+      "instagramUrl": "https://www.instagram.com/eurodancefestival/",
+      "venueName": "Europa-Park"
+    }
+  },
+  "381": {
+    "source": "https://westiespringthing.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://westiespringthing.com/",
+      "instagramUrl": "https://www.instagram.com/springthingwcs/"
+    }
+  },
+  "338": {
+    "source": "https://www.westynantes.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.westynantes.com/"
+    }
+  },
+  "383": {
+    "source": "https://springtimeswing.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://springtimeswing.com/",
+      "instagramUrl": "https://www.instagram.com/springtimeswing",
+      "venueName": "M.A.K. Studios International Dancestudio",
+      "venueAddress": "Kaiser-Joseph-Straße 268, 79098 Freiburg"
+    }
+  },
+  "409": {
+    "source": "https://www.swingofmusic.com/tickets/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.swingofmusic.com/",
+      "facebookUrl": "https://www.facebook.com/events/1129290662595429",
+      "instagramUrl": "https://www.instagram.com/swingofmusic.austria/",
+      "venueName": "Hippmann 7 Dance School",
+      "venueAddress": "Gerstlhaus, Pollheimerstraße 7, Wels",
+      "staff": [
+        "Markus & Tren",
+        "Ben Morris",
+        "Jennifer DeLuca",
+        "Zac & Maddy Skinner",
+        "Marc Heldt (Head Judge)",
+        "Justin Petersen (Head DJ)"
+      ],
+      "eventSchedule": "https://www.swingofmusic.com/app/download/15455324923/Schedule+SwingOfMusic2026NEU.pdf?t=1778286647",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Workshop Ticket",
+          "price": 190,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Ticket",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "412": {
+    "source": "https://www.balticswing.com/registration/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.balticswing.com/",
+      "facebookUrl": "https://www.facebook.com/BalticSwing/",
+      "streamUrl": "https://www.balticswing.com/live/",
+      "registrationOpens": "2026-02-16T19:00",
+      "venueName": "Scandic Gdansk",
+      "venueAddress": "Podwale Grodzkie 9, 80-895 Gdańsk",
+      "staff": [
+        "Daniel Pavlov & Lauren Jones",
+        "Sean McKeever & Alyssa Glanville",
+        "Jakub Jakoubek & Emeline Rochefeuille",
+        "PJ Turner & Agnieszka Powell"
+      ],
+      "eventSchedule": "https://www.balticswing.com/schedule-2026/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Full Pass (couple registration)",
+          "price": 840,
+          "currency": "PLN",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass (couple registration)",
+          "price": 525,
+          "currency": "PLN",
+          "until": null
+        }
+      ]
+    }
+  },
+  "419": {
+    "source": "https://baroqueswing.com/tickets-prices",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://baroqueswing.com/",
+      "facebookUrl": "https://www.facebook.com/profile.php?id=61568872950053",
+      "instagramUrl": "https://www.instagram.com/barockswing_ludwigsburg/",
+      "venueName": "ADTV Tanzschule MonRo",
+      "venueAddress": "Friedenstraße 88, 71636 Ludwigsburg",
+      "staff": [
+        "Joshua Schubert",
+        "Vanessa Bachmann (Head Judge)",
+        "Ekaterina & Philipp Wolff",
+        "Inga Kurciša & Browly Adjavon",
+        "Maria Elizarova & Semion Ovsiannikov",
+        "Coleen Man & Paul Warden",
+        "Ken Knipphals (Head DJ)"
+      ],
+      "eventSchedule": "https://baroqueswing.com/workshops-schedule",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early Bird",
+          "price": 175,
+          "currency": "EUR",
+          "until": "2026-01-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Regular",
+          "price": 195,
+          "currency": "EUR",
+          "until": "2026-04-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird",
+          "price": 215,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "424": {
+    "source": "https://rockthebarn.se/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://rockthebarn.se/",
+      "facebookUrl": "https://www.facebook.com/events/1567855957700281",
+      "instagramUrl": "https://www.instagram.com/rockthebarn_wcs",
+      "registrationOpens": "2026-03-01T18:00",
+      "staff": [
+        "Lauren & Chuck",
+        "João & Savana",
+        "Zac & Maddy",
+        "Sonya & Nelson"
+      ],
+      "eventSchedule": "https://rockthebarn.se/wp-content/uploads/2026/07/Schedule_20260712.pdf",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early Bird — International (first 25 passes)",
+          "price": 1400,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Regular Bird — International",
+          "price": 1600,
+          "currency": "SEK",
+          "until": null
+        }
+      ]
+    }
+  },
+  "393": {
+    "source": "https://www.mannekenswing.com/venue",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.mannekenswing.com/",
+      "venueName": "Concert Noble",
+      "venueAddress": "Rue d'Arlon 82, 1040 Bruxelles, Belgium",
+      "staff": [
+        "Jakub & Em",
+        "Max & Aymie",
+        "Chuck & Lauren",
+        "Arnaud & Maïna"
+      ]
+    }
+  },
+  "438": {
+    "source": "https://bavarianopen.com/registration/index.en.html",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://bavarianopen.com/",
+      "facebookUrl": "https://www.facebook.com/BavarianOpenWCS",
+      "venueName": "Alte Kongresshalle",
+      "venueAddress": "Theresienhöhe 15, D-80339 München",
+      "staff": [
+        "Alyssa Glanville & Sean McKeever",
+        "Cameo McHenry & Ben McHenry",
+        "Karin Kakun & PJ Turner",
+        "Sonya Dessureault & Chuck Brown",
+        "Chantelle Pianetta & Joel Torgeson",
+        "Dalena Lee & Wee Tze Yi",
+        "Ben Morris",
+        "Robert Royston"
+      ],
+      "eventSchedule": "https://bavarianopen.com/schedule/timetable/index.en.html",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Registration day (3.3.2026)",
+          "price": 180,
+          "currency": "EUR",
+          "until": "2026-03-03"
+        },
+        {
+          "kind": "Full",
+          "tier": "before 1.6.2026",
+          "price": 190,
+          "currency": "EUR",
+          "until": "2026-05-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "before 1.8.2026",
+          "price": 205,
+          "currency": "EUR",
+          "until": "2026-07-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "from 1.8.2026 / at the door",
+          "price": 220,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "444": {
+    "source": "https://midlandswingopen.com/register/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://midlandswingopen.com/",
+      "facebookUrl": "https://www.facebook.com/msowcs/",
+      "instagramUrl": "https://www.instagram.com/midlandswingopen/",
+      "streamUrl": "https://www.twitch.tv/dancetvuk",
+      "venueName": "Thistle Hotel & Conference Centre, Heathrow Terminal 5",
+      "venueAddress": "Terminal 5, Bath Rd, Longford, London UB7 0EQ, UK",
+      "staff": [
+        "Ben Morris & Tara Trafzer",
+        "Kyle Redd & Sarah Vann Drake",
+        "Leo Lorenzo & Fernanda Dubiel",
+        "Mathieu Compagnon & Aymeline Felmy-Martin",
+        "Maxence Martin & Virginie Grondin",
+        "Maxime & Torri Zzaoui",
+        "Miguel Ortega & Maina Cobarsi",
+        "Paul Warden & Coleen Man",
+        "Zac & Maddy Skinner"
+      ],
+      "eventSchedule": "https://midlandswingopen.com/schedule/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "International (Level 2-4, fixed price)",
+          "price": 159,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "EarlyBird",
+          "price": 129,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Full Price",
+          "price": 149,
+          "currency": "GBP",
+          "until": null
+        }
+      ]
+    }
+  },
+  "452": {
+    "source": "https://www.riverswingnights.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.riverswingnights.com/",
+      "instagramUrl": "https://www.instagram.com/riverswingnights/"
+    }
   }
 }

@@ -3,6 +3,7 @@ import { date, level, money, month, range, today } from "../format";
 import { html, type Raw } from "../html";
 import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, sideOf, type Chip, type DanceRole, type Difficulty, type Info, type YearSummary } from "../model";
 import { findCity, flightKey, homeCities } from "../travel";
+import { mayBeLive, nowLine, watchLive } from "../live";
 
 type Row = YearSummary["events"][number];
 
@@ -201,11 +202,13 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
     ? html`<span title="travel ${money(Math.round(cost.travel), "PLN")}${cost.pass != null ? ` + pass ${money(Math.round(cost.pass), "PLN")}` : ", pass price unknown"}">≈ <strong>${money(Math.round(cost.total), "PLN")}</strong>${cost.pass == null ? "*" : ""}</span>`
     : html`${full ? html`<span>Full ${money(full.price, full.currency)}</span>` : ""}${party ? html`<span>Party ${money(party.price, party.currency)}</span>` : ""}`;
 
+  const live = mayBeLive(r.dateFrom, r.dateTo, now) && /^\d+$/.test(r.id);
   return html`
-    <li class="${r.dateTo < now ? "past" : ""}">
+    <li class="${r.dateTo < now && !live ? "past" : ""}" ${live ? html`data-live="${r.id}"` : ""}>
       <a href="#/event/${r.id}" class="event-card">
         <span class="dates">${range(r.dateFrom, r.dateTo)}</span>
-        <span class="name">${r.name} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
+        <span class="name">${r.name} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
+        ${live ? html`<span class="now" hidden></span>` : ""}
         <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
         <span class="price">${price}</span>
         ${chips(r.chips, f.division, f.role)}
@@ -246,6 +249,19 @@ function chips(list: Chip[], mine: string | null, role: DanceRole | null): Raw {
 }
 
 export function wireList(year: number): void {
+  // An event shows as live once scoring.dance has its schedule; the line then follows the floor.
+  document.querySelectorAll<HTMLElement>("li[data-live]").forEach((li) =>
+    watchLive(li.dataset.live!, (live) => {
+      const line = nowLine(live);
+      const badge = li.querySelector<HTMLElement>(".tag.live")!;
+      const now = li.querySelector<HTMLElement>(".now")!;
+      badge.hidden = !line;
+      now.hidden = !line;
+      now.textContent = line;
+      badge.textContent = line === "All competitions finished" ? "FINISHED" : "LIVE";
+    }),
+  );
+
   const form = document.getElementById("list-filter") as HTMLFormElement | null;
   form?.addEventListener("change", () => {
     const data = new FormData(form);

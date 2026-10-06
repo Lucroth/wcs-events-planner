@@ -2,6 +2,7 @@ import { getAllFlights, getEvent, getInfo, getScheduleImage, getTrains } from ".
 import { isImageDataUrl } from "../image";
 import { date, duration, level, localDateTime, money, range, short, today } from "../format";
 import { html, safeUrl, type Raw } from "../html";
+import { liveCard, mayBeLive, watchLive } from "../live";
 import { applyOverride, currentPass, tierFor, tiers, type Flights, type Info, type Leg, type Pass, type ScrapedEvent, type TrainLeg, type Trains } from "../model";
 import {
   addDays,
@@ -54,6 +55,7 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
     </p>
     ${info?.autofill ? html`<p class="notice small">Prices and details were copied automatically from <a href="${safeUrl(info.autofill.source) ?? "#"}" target="_blank" rel="noopener">the event's website</a> on ${date(info.autofill.on)} and not yet reviewed; check there before buying.</p>` : ""}
     <section class="links">${links(scraped, info)}</section>
+    ${(mayBeLive(e.dateFrom, e.dateTo, now) || params.has("live")) && /^\d+$/.test(id) ? html`<section class="card live-card" id="live" data-id="${id}" hidden><h2><span class="tag live">LIVE</span> Competitions</h2><div id="live-body"></div></section>` : ""}
     <div class="grid">
       ${passesCard(info, now)}
       <section class="card">
@@ -330,6 +332,14 @@ function tiersTable(): Raw {
 }
 
 export function wireEvent(id: string): void {
+  const card = document.getElementById("live");
+  if (card) {
+    watchLive(id, (live) => {
+      card.hidden = !live?.rounds.length;
+      document.getElementById("live-body")!.innerHTML = liveCard(live, id).value;
+    });
+  }
+
   document.getElementById("travel-form")?.addEventListener("submit", (ev) => {
     ev.preventDefault();
     const data = new FormData(ev.target as HTMLFormElement);

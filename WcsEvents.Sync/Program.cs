@@ -10,21 +10,22 @@ using WcsEvents.Sync.Scoring;
 using WcsEvents.Sync.Travel;
 using WcsEvents.Sync.Wsdc;
 
-// Usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill> [--minutes N]
+// Usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill|live> [--minutes N]
 //   sweep / refresh  mirror the WSDC registry into the local SQLite file (resumable; stops after N minutes)
 //   scoring          mirror scoring.dance (run after the registry, or prelim roles stay unknown)
 //   publish          write events, strengths and results to Firestore
 //   flights          write Ryanair/Wizz fares for upcoming events abroad to Firestore
 //   trains           write koleo train fares for upcoming events in Poland to Firestore
 //   autofill         fill empty admin fields from data/autofill.json (details read off event websites)
+//   live             follow today's events on scoring.dance into live/{id}, once a minute, for N minutes
 // Firestore needs FIREBASE_PROJECT_ID and GOOGLE_APPLICATION_CREDENTIALS (or FIRESTORE_EMULATOR_HOST).
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
-if (args.FirstOrDefault() is not ("sweep" or "refresh" or "scoring" or "publish" or "flights" or "trains" or "autofill") || args.Length is not (1 or 3))
+if (args.FirstOrDefault() is not ("sweep" or "refresh" or "scoring" or "publish" or "flights" or "trains" or "autofill" or "live") || args.Length is not (1 or 3))
 {
-    Console.Error.WriteLine("usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill> [--minutes N]");
+    Console.Error.WriteLine("usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill|live> [--minutes N]");
     return 2;
 }
 
@@ -116,6 +117,7 @@ builder.Services.AddScoped<EventPublisher>();
 builder.Services.AddScoped<FlightPublisher>();
 builder.Services.AddScoped<TrainPublisher>();
 builder.Services.AddScoped<AutofillPublisher>();
+builder.Services.AddScoped<LivePublisher>();
 builder.Services.AddScoped<FirestoreStore>();
 builder.Services.AddSingleton(_ => new FirestoreDbBuilder
 {
@@ -161,6 +163,9 @@ switch (command)
         break;
     case "trains":
         await services.GetRequiredService<TrainPublisher>().PublishAsync(stop.Token);
+        break;
+    case "live":
+        await services.GetRequiredService<LivePublisher>().PublishAsync(linked.Token);
         break;
     case "autofill":
         await services.GetRequiredService<AutofillPublisher>().PublishAsync(Path.Combine("data", "autofill.json"), stop.Token);

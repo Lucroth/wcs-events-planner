@@ -30,6 +30,25 @@ public sealed class ScoringClient(HttpClient http)
     public Task<string?> GetWallRoundAsync(int scoringEventId, int roundId, CancellationToken ct) =>
         GetAsync($"enUS/events/{scoringEventId}/wall?act=ajaxround&round={roundId}", ct);
 
+    /// <summary>
+    /// The wall's competition schedule as JSON: every round in running order with its day, planned
+    /// time and status (on the floor, being scored, finished...). The page itself loads it this way.
+    /// </summary>
+    public async Task<string?> GetScheduleJsonAsync(int scoringEventId, CancellationToken ct)
+    {
+        using var response = await http.PostAsync(
+            $"enUS/events/{scoringEventId}/wall/schedule",
+            new FormUrlEncodedContent([new("act", "getdatajson")]),
+            ct);
+        if (response.StatusCode is HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(ct);
+    }
+
     /// <summary>Null when the page does not exist.</summary>
     private async Task<string?> GetAsync(string path, CancellationToken ct)
     {
