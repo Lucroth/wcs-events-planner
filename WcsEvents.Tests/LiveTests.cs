@@ -40,7 +40,7 @@ public sealed class LiveTests
         var final = LivePublisher.Result(ScoringParser.ParseRound(Fixture("scoring-live-final.html")));
 
         Assert.NotNull(prelim?.Advanced);
-        Assert.Contains("Gerald Reschner", prelim.Advanced.SelectMany(t => t));
+        Assert.Contains("Gerald Reschner", prelim.Advanced.SelectMany(t => t.Names));
         Assert.NotNull(final?.Placements);
         Assert.NotEmpty(final.Placements);
     }

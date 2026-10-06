@@ -13,7 +13,7 @@ export interface LiveRound {
   label: string;
   roundId: number | null;
   /** Callbacks of a finished prelim or semi, one list per published table. */
-  advanced?: string[][] | null;
+  advanced?: { names: string[] }[] | null;
   /** Placings of a finished final. */
   placements?: { position: number; names: string }[] | null;
 }
@@ -78,7 +78,7 @@ function round(r: LiveRound, scoringId: string): Raw {
   const detail = r.placements?.length
     ? html`<ol class="placings">${r.placements.map((p) => html`<li value="${p.position}">${p.names}</li>`)}</ol>`
     : r.advanced?.length
-      ? html`${r.advanced.map((table) => html`<p class="small"><strong>Through (${table.length}):</strong> ${table.join(", ")}</p>`)}`
+      ? html`${r.advanced.map((table) => html`<p class="small"><strong>Through (${table.names.length}):</strong> ${table.names.join(", ")}</p>`)}`
       : "";
 
   return html`

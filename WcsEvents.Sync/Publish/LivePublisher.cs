@@ -43,7 +43,7 @@ public sealed partial class LivePublisher(FirestoreDb firestore, ScoringClient s
                     {
                         await PublishEventAsync(id, ct);
                     }
-                    catch (Exception e) when (e is HttpRequestException or JsonException)
+                    catch (Exception e) when (e is HttpRequestException or JsonException or Grpc.Core.RpcException)
                     {
                         LogFailed(logger, id, e.Message);
                     }
@@ -216,7 +216,10 @@ public sealed partial class LivePublisher(FirestoreDb firestore, ScoringClient s
         _ => "Coming up",
     };
 
-    internal sealed record LiveResult(List<List<string>>? Advanced, List<object>? Placements);
+    /// <summary>Callbacks per table as <c>{ names }</c> objects: Firestore cannot store an array of arrays.</summary>
+    internal sealed record LiveResult(List<CalledBack>? Advanced, List<object>? Placements);
+
+    internal sealed record CalledBack(List<string> Names);
 
     /// <summary>
     /// A finished round: its callbacks, one list per published table (a prelim usually lists leaders
@@ -243,11 +246,11 @@ public sealed partial class LivePublisher(FirestoreDb firestore, ScoringClient s
             return new LiveResult(null, placements);
         }
 
-        List<List<string>> advanced = [.. round.Entries
+        List<CalledBack> advanced = [.. round.Entries
             .Where(e => e.Advanced && !e.IsScratched)
             .GroupBy(e => e.TableIndex)
             .OrderBy(g => g.Key)
-            .Select(g => g.OrderBy(e => e.Position).Select(e => e.Name).Distinct().ToList())];
+            .Select(g => new CalledBack([.. g.OrderBy(e => e.Position).Select(e => e.Name).Distinct()]))];
         return advanced.Count is 0 ? null : new LiveResult(advanced, null);
     }
 
