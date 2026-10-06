@@ -1,0 +1,37 @@
+rules_version = '2';
+
+// Anyone may read. Only the sync job (service account, bypasses rules) and admins write.
+// An admin is a signed-in user whose uid has a document in /admins, added by hand in the console.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /years/{year} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /flights/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Scraped events are the sync's; admins may only create and edit hand-made ones ("m-" ids).
+    match /events/{id} {
+      allow read: if true;
+      allow write: if isAdmin() && id.matches('m-.*') && request.resource.data.manual == true;
+    }
+
+    match /info/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}

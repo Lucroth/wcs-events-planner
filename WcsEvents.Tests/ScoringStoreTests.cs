@@ -1,0 +1,173 @@
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using WcsEvents.Sync.Data;
+using WcsEvents.Sync.Scoring;
+
+namespace WcsEvents.Tests;
+
+public sealed class ScoringStoreTests : IDisposable
+{
+    private readonly SqliteConnection connection;
+    private readonly DbContextOptions<AppDbContext> options;
+
+    public ScoringStoreTests()
+    {
+        connection = new SqliteConnection("Data Source=:memory:");
+        connection.Open();
+        options = new DbContextOptionsBuilder<AppDbContext>().UseSqlite(connection).Options;
+
+        using var db = new AppDbContext(options);
+        db.Database.EnsureCreated();
+    }
+
+    private AppDbContext NewContext() => new(options);
+
+    private static ParsedRound Prelim() =>
+        ScoringParser.ParseRound(File.ReadAllText(Path.Combine("Fixtures", "scoring-prelim.html")))!;
+
+    private async Task StorePrelimAsync()
+    {
+        await using var db = NewContext();
+        db.ScoringRounds.Add(ScoringStore.ToEntity(201, 3343, "Novice Jack&Jill prelim", Prelim()));
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
+    public async Task ToEntity_StoresTheRoundAndItsWholeField()
+    {
+        await StorePrelimAsync();
+
+        await using var db = NewContext();
+        var round = await db.ScoringRounds.SingleAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal("NOV", round.DivisionAbbreviation);
+        Assert.Equal(RoundKind.Prelim, round.Kind);
+        Assert.Equal(new DateOnly(2025, 3, 27), round.EventDate);
+        Assert.Equal(202, await db.ScoringEntries.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task InferRoles_LabelsEachPrelimTableFromHowItsDancersUsuallyCompete()
+    {
+        await StorePrelimAsync();
+
+        // Three dancers from the first table have a leader history in the mirror, one from the second
+        // has a follower history. That majority decides each table.
+        await SeedRoleHistoryAsync((21723, Role.Leader), (21682, Role.Leader), (12758, Role.Leader), (9094, Role.Follower));
+
+        await using var db = NewContext();
+        var labelled = await ScoringStore.InferRolesAsync(db, TestContext.Current.CancellationToken);
+
+        Assert.Equal(202, labelled);
+
+        var entries = await db.ScoringEntries.AsNoTracking().ToListAsync(TestContext.Current.CancellationToken);
+        Assert.All(entries, e => Assert.NotNull(e.Role));
+
+        // Every row in a table shares its role, including dancers with no registry entry.
+        var firstTable = entries.Where(e => e.TableIndex == 0).ToList();
+        Assert.All(firstTable, e => Assert.Equal(Role.Leader, e.Role));
+        Assert.Contains(firstTable, e => e.Wscid is null);
+
+        Assert.All(entries.Where(e => e.TableIndex == 1), e => Assert.Equal(Role.Follower, e.Role));
+    }
+
+    [Fact]
+    public async Task InferRoles_LeavesATableUnlabelledWhenTheMirrorGivesNoMajority()
+    {
+        await StorePrelimAsync();
+        await SeedRoleHistoryAsync((21723, Role.Leader), (21682, Role.Follower));
+
+        await using var db = NewContext();
+        await ScoringStore.InferRolesAsync(db, TestContext.Current.CancellationToken);
+
+        // Both known dancers sit in table 0 and disagree, so that table stays unlabelled.
+        Assert.All(
+            await db.ScoringEntries.AsNoTracking().Where(e => e.TableIndex == 0).ToListAsync(TestContext.Current.CancellationToken),
+            e => Assert.Null(e.Role));
+    }
+
+    [Fact]
+    public async Task SyncEventsAsync_RecoversPastEventsFromTheRoundsAlreadyMirrored()
+    {
+        await StorePrelimAsync();
+
+        await using var db = NewContext();
+        await ScoringStore.SyncEventsAsync(db, [], TestContext.Current.CancellationToken);
+
+        var stored = await db.ScoringEvents.SingleAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(201, stored.Id);
+        Assert.Equal("UK West Coast Swing Championships 2025", stored.Name);
+        Assert.Equal(new DateOnly(2025, 3, 27), stored.DateFrom);
+        Assert.Equal("London", stored.City);
+        Assert.Equal("United Kingdom", stored.Country);
+    }
+
+    [Fact]
+    public async Task SyncEventsAsync_LetsTheListingCorrectWhatTheRoundsImplied()
+    {
+        await StorePrelimAsync();
+
+        ParsedEvent listed = new(
+            Id: 201,
+            Name: "UK West Coast Swing Championships 2025",
+            DateFrom: new DateOnly(2025, 3, 26),
+            DateTo: new DateOnly(2025, 3, 30),
+            City: "London",
+            CountryCode: "GBR",
+            IsWsdc: true,
+            TicketUrl: "https://ukwcs.example/register");
+
+        await using var db = NewContext();
+        await ScoringStore.SyncEventsAsync(db, [listed], TestContext.Current.CancellationToken);
+
+        var stored = await db.ScoringEvents.SingleAsync(TestContext.Current.CancellationToken);
+
+        // A round only knows the day it was danced; the event knows when it opened and closed.
+        Assert.Equal(new DateOnly(2025, 3, 26), stored.DateFrom);
+        Assert.Equal(new DateOnly(2025, 3, 30), stored.DateTo);
+        Assert.Equal("United Kingdom", stored.Country);
+        Assert.True(stored.IsWsdc);
+        Assert.Equal("https://ukwcs.example/register", stored.TicketUrl);
+    }
+
+    [Fact]
+    public async Task SyncEventsAsync_RunsTwiceWithoutDuplicatingAnything()
+    {
+        await StorePrelimAsync();
+
+        await using var db = NewContext();
+        await ScoringStore.SyncEventsAsync(db, [], TestContext.Current.CancellationToken);
+        await ScoringStore.SyncEventsAsync(db, [], TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, await db.ScoringEvents.CountAsync(TestContext.Current.CancellationToken));
+    }
+
+    private Task SeedRoleHistoryAsync(params (int Wscid, Role Role)[] dancers) =>
+        SeedRoleHistoryAsync(divisionId: 4, dancers);
+
+    private async Task SeedRoleHistoryAsync(int divisionId, params (int Wscid, Role Role)[] dancers)
+    {
+        await using var db = NewContext();
+
+        foreach (var (wscid, role) in dancers)
+        {
+            db.Dancers.Add(new Dancer { Wscid = wscid, FirstName = "Test", LastName = $"D{wscid}" });
+            db.Placements.Add(new Placement
+            {
+                DancerWscid = wscid,
+                EventId = 1,
+                DivisionId = divisionId,
+                Role = role,
+                DateRaw = "March 2025",
+                Date = new DateOnly(2025, 3, 1),
+                EventName = "Seed",
+                Points = 1,
+                ResultRaw = "F",
+            });
+        }
+
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    public void Dispose() => connection.Dispose();
+}

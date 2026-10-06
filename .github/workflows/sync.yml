@@ -1,0 +1,89 @@
+name: Sync
+
+# The mirror (WSDC registry + scoring.dance, SQLite) lives as an asset on the "mirror" release:
+# each run downloads it, works on it, and uploads it back. One run at a time, so no run ever
+# overwrites another's mirror.
+on:
+  schedule:
+    - cron: "0 4 * * *"   # daily: flight fares
+    - cron: "0 2 * * 1"   # Mondays: scoring.dance + publish
+    - cron: "0 0 3 * *"   # 3rd of the month: registry refresh, then scoring.dance + publish
+  workflow_dispatch:
+    inputs:
+      commands:
+        description: "Space-separated: sweep refresh scoring publish flights"
+        default: "scoring publish flights"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mirror
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Pick commands
+        id: pick
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          REQUESTED: ${{ inputs.commands }}
+        run: |
+          case "$SCHEDULE" in
+            "0 4 * * *") c="flights" ;;
+            "0 2 * * 1") c="scoring publish" ;;
+            "0 0 3 * *") c="refresh scoring publish" ;;
+            *) c="$REQUESTED" ;;
+          esac
+          for x in $c; do
+            case "$x" in sweep|refresh|scoring|publish|flights) ;; *) echo "Unknown command: $x"; exit 1 ;; esac
+          done
+          echo "commands=$c" >> "$GITHUB_OUTPUT"
+
+      - name: Download mirror
+        run: |
+          gh release download mirror --pattern 'wcs-events.db.gz' --dir . || echo "No mirror yet: starting empty."
+          if [ -f wcs-events.db.gz ]; then gunzip wcs-events.db.gz; fi
+
+      - name: Firebase credentials
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: printf '%s' "$SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+
+      - name: Run
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+          ConnectionStrings__Db: Data Source=${{ github.workspace }}/wcs-events.db
+          COMMANDS: ${{ steps.pick.outputs.commands }}
+        run: |
+          dotnet build WcsEvents.Sync -c Release
+          for c in $COMMANDS; do
+            case "$c" in
+              # A full sweep takes ~3.5 h; cap it so the upload below always gets to run.
+              sweep|refresh) dotnet run --project WcsEvents.Sync -c Release --no-build -- "$c" --minutes 240 ;;
+              *) dotnet run --project WcsEvents.Sync -c Release --no-build -- "$c" ;;
+            esac
+          done
+
+      - name: Upload mirror
+        if: always()
+        run: |
+          [ -f wcs-events.db ] || exit 0
+          gzip -kf wcs-events.db
+          gh release view mirror >/dev/null 2>&1 || gh release create mirror --title "Data mirror" --notes "SQLite mirror used by the Sync workflow. Not a software release."
+          gh release upload mirror wcs-events.db.gz --clobber
+
+      - name: Remove credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/sa.json"

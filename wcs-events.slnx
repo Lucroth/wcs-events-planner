@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="WcsEvents.Tests/WcsEvents.Tests.csproj" />
+  <Project Path="WcsEvents.Sync/WcsEvents.Sync.csproj" />
+</Solution>

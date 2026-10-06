@@ -1,0 +1,10 @@
+bin/
+obj/
+TestResults/
+*.db
+*.db-shm
+*.db-wal
+*.db.gz
+*-debug.log
+.vs/
+.claude/
