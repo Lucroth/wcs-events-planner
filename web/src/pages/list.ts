@@ -31,6 +31,8 @@ export type SortBy = (typeof sorts)[number][0];
 /** What the list is narrowed to and how it is ordered; kept in the URL so a view can be shared. */
 export interface ListFilter {
   all: boolean;
+  /** Hide events that have already ended. */
+  upcoming: boolean;
   division: string | null;
   levels: Difficulty[];
   sort: SortBy;
@@ -42,6 +44,7 @@ export function readFilter(params: URLSearchParams): ListFilter {
   const division = params.get("div");
   return {
     all: params.has("all"),
+    upcoming: params.has("upcoming"),
     division: divisions.some(([d]) => d === division) ? division : null,
     levels: (params.get("level") ?? "").split(",").filter((l): l is Difficulty => levels.includes(l as Difficulty)),
     sort: sorts.find(([s]) => s === params.get("sort"))?.[0] ?? "date",
@@ -52,6 +55,7 @@ export function readFilter(params: URLSearchParams): ListFilter {
 function query(f: ListFilter): string {
   const parts: string[] = [];
   if (f.all) parts.push("all");
+  if (f.upcoming) parts.push("upcoming");
   if (f.division) parts.push(`div=${f.division}`);
   if (f.levels.length) parts.push(`level=${f.levels.join(",")}`);
   if (f.sort !== "date") parts.push(`sort=${f.sort}`);
@@ -67,6 +71,7 @@ interface Cost {
 }
 
 export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
+  const now = today();
   const [summary, infos, manual] = await Promise.all([getYear(year), getInfosForYear(year), getManualEvents(year)]);
 
   const rows: Row[] = [
@@ -76,10 +81,10 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
     .map((r) => applyOverride(r, infos.get(r.id)))
     .filter((r) => isEurope(r.country))
     .filter((r) => filter.all || r.isWsdc)
+    .filter((r) => !filter.upcoming || r.dateTo >= now)
     .filter((r) => matchesLevel(r.chips, filter.division, filter.levels))
     .sort((a, b) => a.dateFrom.localeCompare(b.dateFrom));
 
-  const now = today();
   const home = findCity(filter.from);
   const costs = filter.sort === "cost" ? await tripCosts(rows, infos, filter.from, now) : new Map<string, Cost>();
   const thisYear = new Date().getFullYear();
@@ -129,6 +134,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
             <select name="from">${homeCities.map((c) => html`<option value="${c.name}" ${c === home ? "selected" : ""}>${c.name}</option>`)}</select>
           </label>`
         : ""}
+      <label><input type="checkbox" name="upcoming" ${filter.upcoming ? "checked" : ""} /> hide finished events</label>
       <label><input type="checkbox" name="all" ${filter.all ? "checked" : ""} /> include events without WSDC points</label>
       ${filtered ? html`<a href="#/year/${year}${query({ ...filter, division: null, levels: [] })}">clear filter</a>` : ""}
     </form>
@@ -216,6 +222,7 @@ export function wireList(year: number): void {
     const data = new FormData(form);
     const filter: ListFilter = {
       all: data.has("all"),
+      upcoming: data.has("upcoming"),
       division: String(data.get("div") ?? "") || null,
       levels: data.getAll("level").map(String) as Difficulty[],
       sort: (String(data.get("sort") ?? "date") as SortBy) || "date",

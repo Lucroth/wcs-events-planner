@@ -1,3 +1,4 @@
+using WcsEvents.Sync.Data;
 using WcsEvents.Sync.Metrics;
 using WcsEvents.Sync.Scoring;
 using WcsEvents.Sync.Travel;
@@ -68,6 +69,8 @@ public sealed partial class EventPublisher(
                     Difficulty = s.Difficulty?.ToString(),
                 }),
                 StrengthsFrom = facts.StrengthsFrom is { } p ? new { id = p.Id.ToString(), p.Name, DateFrom = Iso(p.DateFrom) } : null,
+                Previous = Edition(Editions(e, all).LastOrDefault(o => o.DateFrom < e.DateFrom)),
+                Next = Edition(Editions(e, all).FirstOrDefault(o => o.DateFrom > e.DateFrom)),
                 facts.Results,
             }, ct);
         }
@@ -142,6 +145,15 @@ public sealed partial class EventPublisher(
                 Difficulty? level = known.Count is 0 ? null : (Difficulty)(int)Math.Round(known.Average(), MidpointRounding.AwayFromZero);
                 return (object)new { division = g.Key, level = level?.ToString(), top = Math.Round(g.Average(s => s.TopQuartileAverage), 1) };
             });
+
+    /// <summary>The other published editions of an event's series, oldest first.</summary>
+    internal static IEnumerable<ScoringEvent> Editions(ScoringEvent e, IEnumerable<EventFacts> all) =>
+        all.Select(f => f.Event)
+            .Where(o => o.Id != e.Id && EventMatching.SameName(o.Name, e.Name))
+            .OrderBy(o => o.DateFrom);
+
+    private static object? Edition(ScoringEvent? e) =>
+        e is null ? null : new { id = e.Id.ToString(), e.Name, DateFrom = Iso(e.DateFrom) };
 
     private static string? Iso(DateOnly? d) => d?.ToString("yyyy-MM-dd");
 

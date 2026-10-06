@@ -604,23 +604,44 @@ public static class ScoringStore
     }
 
     /// <summary>
-    /// An upcoming edition is often listed before its organisers fill in the city; the series rarely
-    /// moves, so it takes the city (and the country, if missing) of its latest earlier edition.
+    /// An upcoming edition is often listed before its organisers fill in the city, or with a
+    /// placeholder: "Rome" is the listing's default, and others are copied from another event
+    /// ("Bron" for a Swedish one). A city some other event places in a different country is suspect;
+    /// a suspect city, or a missing one, is replaced by the city of the latest earlier edition, since
+    /// the series rarely moves. A default "Rome" with no earlier edition to fall back on is dropped.
     /// </summary>
     internal static void InheritCities(IEnumerable<ScoringEvent> events)
     {
         List<ScoringEvent> all = [.. events.Where(e => e.DateFrom is not null)];
 
-        foreach (var e in all.Where(e => e.City is null))
+        var byCity = all
+            .Where(e => e.City is not null && e.Country is not null)
+            .ToLookup(e => e.City!.Trim(), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var e in all)
         {
+            var isDefault = string.Equals(e.City?.Trim(), "Rome", StringComparison.OrdinalIgnoreCase) && e.Country != "Italy";
+            var isSuspect = isDefault
+                || (e.City is not null && e.Country is not null && byCity[e.City.Trim()].Any(o => o.Id != e.Id && o.Country != e.Country));
+
+            if (e.City is not null && !isSuspect)
+            {
+                continue;
+            }
+
             var previous = all
-                .Where(p => p.City is not null && p.DateFrom < e.DateFrom && EventMatching.SameName(p.Name, e.Name))
+                .Where(p => p.City is not null && p.DateFrom < e.DateFrom && EventMatching.SameName(p.Name, e.Name)
+                    && (e.Country is null || p.Country == e.Country))
                 .MaxBy(p => p.DateFrom);
 
             if (previous is not null)
             {
                 e.City = previous.City;
                 e.Country ??= previous.Country;
+            }
+            else if (isDefault)
+            {
+                e.City = null;
             }
         }
     }

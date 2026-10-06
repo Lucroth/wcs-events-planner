@@ -14,9 +14,18 @@ export interface ScrapedEvent {
   station: { slug: string; name: string } | null;
   strengths: Strength[];
   strengthsFrom: { id: string; name: string; dateFrom: string | null } | null;
+  /** Neighbouring editions of the same series; absent on documents published before they existed. */
+  previous?: EditionRef | null;
+  next?: EditionRef | null;
   results: DivisionResult[];
   /** Added by hand in the admin; never touched by the sync. */
   manual?: boolean;
+}
+
+export interface EditionRef {
+  id: string;
+  name: string;
+  dateFrom: string | null;
 }
 
 export type Difficulty = "Easy" | "Medium" | "Hard";

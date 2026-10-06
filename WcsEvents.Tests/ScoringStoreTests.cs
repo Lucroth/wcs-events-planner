@@ -156,6 +156,23 @@ public sealed class ScoringStoreTests : IDisposable
         Assert.Null(other.City);
     }
 
+    [Fact]
+    public void InheritCities_ReplacesAPlaceholderCityFromAnotherCountry()
+    {
+        ScoringEvent rolling = new() { Id = 146, Name = "Rolling Swing 2024", DateFrom = new DateOnly(2024, 8, 29), City = "Bron", Country = "France" };
+        ScoringEvent last = new() { Id = 300, Name = "Scandinavian Open 2025 [SNOW]", DateFrom = new DateOnly(2025, 10, 29), City = "Stockholm", Country = "Sweden" };
+        ScoringEvent next = new() { Id = 433, Name = "Scandinavian Open 2026 [SNOW]", DateFrom = new DateOnly(2026, 10, 28), City = "Bron", Country = "Sweden" };
+        ScoringEvent defaulted = new() { Id = 396, Name = "Westie Joy 2026", DateFrom = new DateOnly(2026, 8, 21), City = "Rome", Country = "Romania" };
+        ScoringEvent rome = new() { Id = 2, Name = "Swing In Capital 2026", DateFrom = new DateOnly(2026, 4, 9), City = "Rome", Country = "Italy" };
+
+        ScoringStore.InheritCities([rolling, last, next, defaulted, rome]);
+
+        Assert.Equal("Stockholm", next.City);
+        Assert.Equal("Bron", rolling.City);
+        Assert.Null(defaulted.City);
+        Assert.Equal("Rome", rome.City);
+    }
+
     private Task SeedRoleHistoryAsync(params (int Wscid, Role Role)[] dancers) =>
         SeedRoleHistoryAsync(divisionId: 4, dancers);
 

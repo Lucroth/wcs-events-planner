@@ -39,7 +39,13 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
   ]);
 
   return html`
-    <p class="back"><a href="#/year/${e.dateFrom.slice(0, 4)}">← ${e.dateFrom.slice(0, 4)} events</a></p>
+    <nav class="back editions">
+      <a href="#/year/${e.dateFrom.slice(0, 4)}">← ${e.dateFrom.slice(0, 4)} events</a>
+      <span class="buttons">
+        ${scraped?.previous ? html`<a class="button small" href="#/event/${scraped.previous.id}" title="${scraped.previous.name}">‹ ${scraped.previous.dateFrom?.slice(0, 4) ?? "Previous"} edition</a>` : ""}
+        ${scraped?.next ? html`<a class="button small" href="#/event/${scraped.next.id}" title="${scraped.next.name}">${scraped.next.dateFrom?.slice(0, 4) ?? "Next"} edition ›</a>` : ""}
+      </span>
+    </nav>
     <h1>${e.name}</h1>
     <p class="lead">
       ${range(e.dateFrom, e.dateTo)} ${e.dateFrom.slice(0, 4)} · ${[e.city, e.country].filter(Boolean).join(", ")}

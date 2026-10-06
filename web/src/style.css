@@ -221,3 +221,5 @@ label.check { flex-direction: row; align-items: center; gap: .5rem; }
 .image-field { display: flex; flex-direction: column; gap: .4rem; }
 .image-field .schedule-image { max-height: 320px; width: auto; }
 label.button.file { display: inline-block; flex-direction: row; font-size: .85rem; }
+
+.editions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; }
