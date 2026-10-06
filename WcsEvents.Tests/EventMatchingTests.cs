@@ -71,4 +71,13 @@ public class EventMatchingTests
         Assert.Equal(string.Empty, EventMatching.Normalize("   "));
         Assert.Equal(string.Empty, EventMatching.Normalize(null));
     }
+
+    [Theory]
+    [InlineData("SwingVester 2026/27 WSDC", "SwingVester 2025/26 WSDC")]
+    [InlineData("SwingVester 2026/27 WSDC", "SwingVester 2024/25")]
+    [InlineData("River Swing Nights - 2026 - WSDC Trial Event", "River Swing Nights 2025")]
+    [InlineData("King Swing 2026PL", "King Swing 2025")]
+    [InlineData("Westie Gala 2024/2025", "Westie Gala")]
+    public void SameName_IgnoresSeasonYearsAndEditionTags(string a, string b) =>
+        Assert.True(EventMatching.SameName(a, b));
 }

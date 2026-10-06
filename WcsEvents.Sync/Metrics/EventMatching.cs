@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace WcsEvents.Sync.Metrics;
 
 /// <summary>
@@ -15,7 +17,7 @@ namespace WcsEvents.Sync.Metrics;
 ///
 /// Used wherever a scoring.dance appearance is de-duped against a registry placement.
 /// </summary>
-public static class EventMatching
+public static partial class EventMatching
 {
     /// <summary>How far apart two dates for the same event may sit. The registry normalizes many
     /// events to the first of the month, and an event over New Year straddles two of them.</summary>
@@ -65,7 +67,12 @@ public static class EventMatching
             return string.Empty;
         }
 
-        var letters = new string([.. name.Where(char.IsLetterOrDigit)]).ToLowerInvariant();
+        // Edition markers go first, wherever they sit: "2026", the season form "2026/27" of New
+        // Year events, and the "WSDC" / "Trial Event" tags some organisers append. Only 19xx/20xx
+        // count as years, so the "5280" in "5280 Swing Dance Championships" stays part of the name.
+        var stripped = EditionMarkers().Replace(name, " ");
+
+        var letters = new string([.. stripped.Where(char.IsLetterOrDigit)]).ToLowerInvariant();
 
         var trimEnd = letters.Length;
         while (trimEnd > 0 && char.IsDigit(letters[trimEnd - 1]))
@@ -77,6 +84,9 @@ public static class EventMatching
 
         return trimmed.Replace("westcoastswing", "wcs");
     }
+
+    [GeneratedRegex(@"(?<!\d)(19|20)\d{2}(\s*[/-]\s*((19|20)\d{2}|\d{2}))?(?!\d)|\bWSDC\b|\bTrial\s+Event\b", RegexOptions.IgnoreCase)]
+    private static partial Regex EditionMarkers();
 
     private static int MonthsApart(DateOnly a, DateOnly b) =>
         Math.Abs(((a.Year - b.Year) * 12) + a.Month - b.Month);

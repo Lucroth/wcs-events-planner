@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using WcsEvents.Sync.Data;
+using WcsEvents.Sync.Metrics;
 
 namespace WcsEvents.Sync.Scoring;
 
@@ -581,6 +582,8 @@ public static class ScoringStore
             written++;
         }
 
+        InheritCities(existing.Values);
+
         await db.SaveChangesAsync(ct);
 
         return written;
@@ -597,6 +600,28 @@ public static class ScoringStore
             db.ScoringEvents.Add(created);
 
             return created;
+        }
+    }
+
+    /// <summary>
+    /// An upcoming edition is often listed before its organisers fill in the city; the series rarely
+    /// moves, so it takes the city (and the country, if missing) of its latest earlier edition.
+    /// </summary>
+    internal static void InheritCities(IEnumerable<ScoringEvent> events)
+    {
+        List<ScoringEvent> all = [.. events.Where(e => e.DateFrom is not null)];
+
+        foreach (var e in all.Where(e => e.City is null))
+        {
+            var previous = all
+                .Where(p => p.City is not null && p.DateFrom < e.DateFrom && EventMatching.SameName(p.Name, e.Name))
+                .MaxBy(p => p.DateFrom);
+
+            if (previous is not null)
+            {
+                e.City = previous.City;
+                e.Country ??= previous.Country;
+            }
         }
     }
 }

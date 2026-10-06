@@ -142,6 +142,20 @@ public sealed class ScoringStoreTests : IDisposable
         Assert.Equal(1, await db.ScoringEvents.CountAsync(TestContext.Current.CancellationToken));
     }
 
+    [Fact]
+    public void InheritCities_FillsAMissingCityFromTheLatestEarlierEdition()
+    {
+        ScoringEvent older = new() { Id = 188, Name = "SwingVester 2024/25", DateFrom = new DateOnly(2024, 12, 27), City = "Linz", Country = "Austria" };
+        ScoringEvent last = new() { Id = 349, Name = "SwingVester 2025/26 WSDC", DateFrom = new DateOnly(2025, 12, 31), City = "Wels", Country = "Austria" };
+        ScoringEvent next = new() { Id = 350, Name = "SwingVester 2026/27 WSDC", DateFrom = new DateOnly(2026, 12, 31), Country = "Austria" };
+        ScoringEvent other = new() { Id = 1, Name = "Budafest 2027", DateFrom = new DateOnly(2027, 1, 6) };
+
+        ScoringStore.InheritCities([older, last, next, other]);
+
+        Assert.Equal("Wels", next.City);
+        Assert.Null(other.City);
+    }
+
     private Task SeedRoleHistoryAsync(params (int Wscid, Role Role)[] dancers) =>
         SeedRoleHistoryAsync(divisionId: 4, dancers);
 
