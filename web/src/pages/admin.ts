@@ -34,11 +34,9 @@ export const logout = () => signOut(auth);
 
 export async function dashboardPage(year: number): Promise<Raw> {
   const [summary, infos, manual] = await Promise.all([getYear(year), getInfosForYear(year), getManualEvents(year)]);
-  const rows = [
-    ...(summary?.events ?? []).filter((e) => e.isWsdc || infos.has(e.id)),
-    ...manual.map((m) => ({ ...m, chips: [] })),
-  ]
+  const rows = [...(summary?.events ?? []), ...manual.map((m) => ({ ...m, chips: [] }))]
     .map((e) => applyOverride(e, infos.get(e.id)))
+    .filter((e) => e.isWsdc || infos.has(e.id))
     .sort((a, b) => a.dateFrom.localeCompare(b.dateFrom));
   const thisYear = new Date().getFullYear();
 

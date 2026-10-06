@@ -1,4 +1,3 @@
-using WcsEvents.Sync.Data;
 using WcsEvents.Sync.Metrics;
 using WcsEvents.Sync.Travel;
 
@@ -24,7 +23,7 @@ public sealed partial class EventPublisher(
         {
             var e = facts.Event;
             var info = infos.GetValueOrDefault(e.Id.ToString()) ?? AdminInfo.Empty;
-            var travel = (info.DateTo ?? e.DateTo ?? e.DateFrom) >= today ? await TravelAsync(e, info, places, ct) : null;
+            var travel = (info.DateTo ?? e.DateTo ?? e.DateFrom) >= today ? await TravelAsync(info.City ?? e.City, info.Country ?? e.Country, info, places, ct) : null;
 
             await store.SetIfChangedAsync($"events/{e.Id}", new
             {
@@ -83,10 +82,8 @@ public sealed partial class EventPublisher(
     /// city is geocoded, and the three nearest airports outside Poland are used. Without a city there
     /// is nothing to go on: the country's middle would pick the wrong airports.
     /// </summary>
-    public static async Task<TravelFacts> TravelAsync(ScoringEvent e, AdminInfo info, Places places, CancellationToken ct)
+    public static async Task<TravelFacts> TravelAsync(string? city, string? country, AdminInfo info, Places places, CancellationToken ct)
     {
-        var city = info.City ?? e.City;
-        var country = info.Country ?? e.Country;
         var query = info.VenueAddress ?? (city is null ? null : $"{city}, {country}");
 
         (double, double)? coords = info is { Latitude: { } la, Longitude: { } lo }

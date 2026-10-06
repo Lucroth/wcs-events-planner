@@ -25,7 +25,10 @@ public sealed partial class FirestoreStore(FirestoreDb firestore, AppDbContext d
         var json = JsonSerializer.Serialize(document, Json);
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(json)));
 
-        var known = await db.PublishedDocs.FindAsync([path], ct);
+        // Keyed by project too: a mirror that has published to the emulator or another project must
+        // not conclude the production documents already exist.
+        var key = $"{firestore.ProjectId}/{path}";
+        var known = await db.PublishedDocs.FindAsync([key], ct);
         if (known?.Hash == hash)
         {
             Skipped++;
@@ -40,7 +43,7 @@ public sealed partial class FirestoreStore(FirestoreDb firestore, AppDbContext d
 
         if (known is null)
         {
-            db.PublishedDocs.Add(new PublishedDoc { Path = path, Hash = hash, PublishedUtc = DateTime.UtcNow });
+            db.PublishedDocs.Add(new PublishedDoc { Path = key, Hash = hash, PublishedUtc = DateTime.UtcNow });
         }
         else
         {
@@ -53,9 +56,16 @@ public sealed partial class FirestoreStore(FirestoreDb firestore, AppDbContext d
     }
 
     /// <summary>Every document of a collection the admin edits, by id, as JSON.</summary>
-    public async Task<IReadOnlyDictionary<string, JsonElement>> ReadAllAsync(string collection, CancellationToken ct)
+    public Task<IReadOnlyDictionary<string, JsonElement>> ReadAllAsync(string collection, CancellationToken ct) =>
+        ReadAsync(collection, firestore.Collection(collection), ct);
+
+    /// <summary>The documents of a collection whose <paramref name="field"/> equals <paramref name="value"/>.</summary>
+    public Task<IReadOnlyDictionary<string, JsonElement>> ReadWhereAsync(string collection, string field, object value, CancellationToken ct) =>
+        ReadAsync(collection, firestore.Collection(collection).WhereEqualTo(field, value), ct);
+
+    private async Task<IReadOnlyDictionary<string, JsonElement>> ReadAsync(string collection, Query query, CancellationToken ct)
     {
-        var snapshot = await firestore.Collection(collection).GetSnapshotAsync(ct);
+        var snapshot = await query.GetSnapshotAsync(ct);
         Dictionary<string, JsonElement> result = [];
 
         foreach (var doc in snapshot.Documents)

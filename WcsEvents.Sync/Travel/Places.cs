@@ -135,6 +135,13 @@ public sealed partial class Places(
             return hit;
         }
 
+        // A source that just failed (Wizz blocking the runner, say) is not asked again for an hour:
+        // every event and every flight search would otherwise retry it through its slow rate gate.
+        if (cache.TryGetValue($"{key}:failed", out _))
+        {
+            return null;
+        }
+
         try
         {
             var value = await load(ct);
@@ -144,6 +151,7 @@ public sealed partial class Places(
         catch (Exception ex) when (!ct.IsCancellationRequested)
         {
             LogFailed(logger, key, ex);
+            cache.Set($"{key}:failed", true, TimeSpan.FromHours(1));
             return null;
         }
     }

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using WcsEvents.Sync.Data;
 using WcsEvents.Sync.Travel;
@@ -20,23 +21,30 @@ public sealed partial class FlightPublisher(
         var today = DateOnly.FromDateTime(time.GetUtcNow().UtcDateTime);
         var infos = await EventPublisher.AdminInfosAsync(store, ct);
 
-        var events = await db.ScoringEvents.AsNoTracking()
+        var scraped = await db.ScoringEvents.AsNoTracking()
             .Where(e => e.DateFrom != null && e.Name != "")
             .ToListAsync(ct);
 
-        var upcoming = events
-            .Select(e => (Event: e, Info: infos.GetValueOrDefault(e.Id.ToString()) ?? AdminInfo.Empty))
-            .Select(x => (x.Event, x.Info, Start: x.Info.DateFrom ?? x.Event.DateFrom!.Value, End: x.Info.DateTo ?? x.Event.DateTo ?? x.Event.DateFrom!.Value))
-            .Where(x => x.Start > today && x.Start <= today.AddDays(HorizonDays))
-            .Where(x => (x.Info.Country ?? x.Event.Country) is not "Poland")
+        // Hand-made events live only in Firestore; they need fares as much as scraped ones.
+        var manual = await store.ReadWhereAsync("events", "manual", true, ct);
+
+        List<Trip> trips =
+        [
+            .. scraped.Select(e => Trip.Of(e.Id.ToString(), e.DateFrom!.Value, e.DateTo ?? e.DateFrom!.Value, e.City, e.Country, infos)),
+            .. manual.Select(m => Trip.Of(m.Key, Date(m.Value, "dateFrom"), Date(m.Value, "dateTo"), Str(m.Value, "city"), Str(m.Value, "country"), infos)),
+        ];
+
+        var upcoming = trips
+            .Where(t => t.Start > today && t.Start <= today.AddDays(HorizonDays))
+            .Where(t => t.Country is not "Poland")
             .ToList();
 
         var origins = HomeCities.All.Select(c => c.FlightOrigins).DistinctBy(HomeCities.Key).ToList();
         var searched = 0;
 
-        foreach (var (e, info, start, end) in upcoming)
+        foreach (var (id, start, end, city, country, info) in upcoming)
         {
-            var travel = await EventPublisher.TravelAsync(e, info, places, ct);
+            var travel = await EventPublisher.TravelAsync(city, country, info, places, ct);
             if (travel.Airports.Count is 0)
             {
                 continue;
@@ -49,7 +57,7 @@ public sealed partial class FlightPublisher(
                 var results = await search.SearchAsync(from, destinations, start, end, ct);
                 searched++;
 
-                await store.SetIfChangedAsync($"flights/{e.Id}_{HomeCities.Key(from)}", new
+                await store.SetIfChangedAsync($"flights/{id}_{HomeCities.Key(from)}", new
                 {
                     Origins = from,
                     Destinations = destinations,
@@ -64,6 +72,22 @@ public sealed partial class FlightPublisher(
 
         LogPublished(logger, upcoming.Count, searched, store.Written, store.Skipped);
     }
+
+    /// <summary>One event's dates and place with the admin's corrections applied.</summary>
+    private sealed record Trip(string Id, DateOnly Start, DateOnly End, string? City, string? Country, AdminInfo Info)
+    {
+        public static Trip Of(string id, DateOnly from, DateOnly to, string? city, string? country, IReadOnlyDictionary<string, AdminInfo> infos)
+        {
+            var info = infos.GetValueOrDefault(id) ?? AdminInfo.Empty;
+            return new Trip(id, info.DateFrom ?? from, info.DateTo ?? info.DateFrom ?? to, info.City ?? city, info.Country ?? country, info);
+        }
+    }
+
+    private static string? Str(JsonElement e, string name) =>
+        e.TryGetProperty(name, out var v) && v.ValueKind is JsonValueKind.String ? v.GetString() : null;
+
+    private static DateOnly Date(JsonElement e, string name) =>
+        DateOnly.TryParseExact(Str(e, name), "yyyy-MM-dd", out var d) ? d : DateOnly.MinValue;
 
     private static object Leg(FlightLeg l) => new
     {

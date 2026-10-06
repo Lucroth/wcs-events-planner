@@ -69,8 +69,13 @@ public sealed partial class FlightSearch(
         var backs = (await Task.WhenAll(backTasks)).SelectMany(x => x).Where(l => homeSet.Contains(l.To));
         var wizzLegs = await Task.WhenAll(wizzTasks);
 
-        List<FlightLeg> allOut = [.. outs.Concat(wizzLegs.SelectMany(w => w.Out)).DistinctBy(Key).OrderBy(l => l.Price)];
-        List<FlightLeg> allBack = [.. backs.Concat(wizzLegs.SelectMany(w => w.Back)).DistinctBy(Key).OrderBy(l => l.Price)];
+        // Wizz may answer with flights from a neighbouring airport it considers equivalent; only the
+        // airports asked about count.
+        var wizzOut = wizzLegs.SelectMany(w => w.Out).Where(l => homeSet.Contains(l.From) && destSet.Contains(l.To));
+        var wizzBack = wizzLegs.SelectMany(w => w.Back).Where(l => destSet.Contains(l.From) && homeSet.Contains(l.To));
+
+        List<FlightLeg> allOut = [.. outs.Concat(wizzOut).DistinctBy(Key).OrderBy(l => l.Price)];
+        List<FlightLeg> allBack = [.. backs.Concat(wizzBack).DistinctBy(Key).OrderBy(l => l.Price)];
 
         return new FlightResults(allOut, allBack, FlightCombos.Cheapest(allOut, allBack, Currency, 10));
     }
