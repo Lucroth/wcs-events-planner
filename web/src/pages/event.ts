@@ -165,7 +165,7 @@ function travelCard(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string
 
       <h3>Accommodation</h3>
       <p class="muted small">${date(e.dateFrom)} – ${date(checkOut)}, ${people} ${people === 1 ? "person" : "people"}. ${coords && info?.lat != null ? "Sorted by distance from the venue." : "Venue not set: searching around the city."}</p>
-      <p>
+      <p class="buttons">
         <a class="button" target="_blank" rel="noopener" href="${bookingUrl(place, coords, e.dateFrom, checkOut, people)}">Booking.com</a>
         <a class="button" target="_blank" rel="noopener" href="${airbnbUrl(place, coords, e.dateFrom, checkOut, people)}">Airbnb</a>
       </p>
@@ -177,14 +177,18 @@ function travelCard(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string
 function trains(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string }, city: HomeCity, place: string): Raw {
   const s = scraped.station;
   if (!s) {
-    return html`<h3>Train</h3><p><a class="button" target="_blank" rel="noopener" href="${googleTransitUrl(city.name, place)}">Google Maps: public transport</a></p>`;
+    return html`<h3>Train</h3><p class="buttons"><a class="button" target="_blank" rel="noopener" href="${googleTransitUrl(city.name, place)}">Google Maps: public transport</a></p>`;
+  }
+  // Station names start with the city's ("Warszawa Centralna"): nothing to book from home to home.
+  if (s.name.toLowerCase().startsWith(city.name.toLowerCase())) {
+    return html`<h3>Train</h3><p class="muted">The event is in ${city.name}, no train needed.</p>`;
   }
   const out = [addDays(e.dateFrom, -1), e.dateFrom];
   const back = [e.dateTo, addDays(e.dateTo, 1)];
   return html`
     <h3>Train</h3>
     <p>${city.name} → ${s.name}</p>
-    <p>
+    <p class="buttons">
       ${out.map((d) => html`<a class="button" target="_blank" rel="noopener" href="${koleoUrl(city.koleoSlug, s.slug, d)}">There: ${short(d)}</a> `)}
       <a class="button" target="_blank" rel="noopener" href="${koleoUrl(s.slug, city.koleoSlug, back[0], 12)}">Back: ${short(back[0])}</a>
       <a class="button" target="_blank" rel="noopener" href="${koleoUrl(s.slug, city.koleoSlug, back[1])}">Back: ${short(back[1])}</a>
@@ -208,7 +212,7 @@ function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: stri
       out ${short(addDays(e.dateFrom, -1))}–${short(e.dateFrom)}, back ${short(e.dateTo)}–${short(addDays(e.dateTo, 1))}.
       Direct Ryanair and Wizz Air fares per person, cabin bag only${flights ? `, checked ${date(flights.fetchedOn)}` : ""}.
     </p>
-    <p><a class="button" target="_blank" rel="noopener" href="${google}">Google Flights (all airlines, connections)</a></p>
+    <p class="buttons"><a class="button" target="_blank" rel="noopener" href="${google}">Google Flights (all airlines, connections)</a></p>
     ${!flights
       ? html`<p class="muted">Fares not fetched yet: they refresh once a day.</p>`
       : !flights.combos.length

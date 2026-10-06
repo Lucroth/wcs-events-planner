@@ -104,6 +104,11 @@ h4 { font-size: .95rem; margin: 1rem 0 .5rem; }
     margin: .15rem 0;
 }
 .button:hover, button:hover { text-decoration: none; filter: brightness(1.1); }
+/* Rows of buttons wrap with an even gap instead of relying on the whitespace between them. */
+.buttons, .links { display: flex; flex-wrap: wrap; gap: .5rem; }
+.buttons .button, .links .button { margin: 0; }
+.links { margin: .75rem 0; }
+
 .links .button, .card .button { background: transparent; color: var(--accent); }
 .button.small { padding: .15rem .6rem; font-size: .85rem; }
 button.link { background: none; border: none; color: var(--accent); padding: 0; }

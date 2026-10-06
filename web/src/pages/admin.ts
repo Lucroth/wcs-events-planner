@@ -47,7 +47,7 @@ export async function dashboardPage(year: number): Promise<Raw> {
     <section class="card">
       <p>Scraping runs in GitHub Actions: scoring.dance weekly, flights daily, WSDC registry monthly.
         <a href="https://github.com/Lucroth/wcs-events-planner/actions" target="_blank" rel="noopener">Run or check them</a>.</p>
-      <p><a class="button" href="#/admin/new">+ Add event by hand</a></p>
+      <p class="buttons"><a class="button" href="#/admin/new">+ Add event by hand</a></p>
     </section>
     <section class="card">
       <h2>${year}: what's missing</h2>
