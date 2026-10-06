@@ -29,7 +29,9 @@ if (args.FirstOrDefault() is not ("sweep" or "refresh" or "scoring" or "publish"
 var command = args[0];
 TimeSpan? budget = args is [_, "--minutes", var m] && int.TryParse(m, out var minutes) ? TimeSpan.FromMinutes(minutes) : null;
 
-var builder = Host.CreateApplicationBuilder([]);
+// appsettings.json is copied next to the binary; CI runs `dotnet run --project` from the repo root,
+// where the default content root (the working directory) would not find it.
+var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings { ContentRootPath = AppContext.BaseDirectory });
 
 var database = new SqliteConnectionStringBuilder(builder.Configuration.GetConnectionString("Db") ?? "Data Source=wcs-events.db");
 builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlite(database.ConnectionString));
