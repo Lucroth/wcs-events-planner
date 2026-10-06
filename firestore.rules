@@ -34,6 +34,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Pasted schedule images, one per document, kept apart from info so the list never loads them.
+    match /schedules/{id} {
+      allow read: if true;
+      allow delete: if isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.image is string
+        && request.resource.data.image.matches('data:image/(jpeg|png|webp);base64,.*');
+    }
+
     match /admins/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;

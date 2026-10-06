@@ -214,3 +214,10 @@ label.check { flex-direction: row; align-items: center; gap: .5rem; }
 .edit textarea { width: 100%; }
 .edit .row label { flex: 1 1 12rem; }
 .passes input, .passes select { width: 100%; }
+
+.schedule-image { display: block; max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); margin-top: .5rem; }
+.zoomable { cursor: zoom-in; }
+.zoomed { position: fixed; inset: 0; z-index: 10; width: 100vw; height: 100vh; max-width: none; object-fit: contain; background: rgba(0, 0, 0, .9); margin: 0; border: none; border-radius: 0; cursor: zoom-out; }
+.image-field { display: flex; flex-direction: column; gap: .4rem; }
+.image-field .schedule-image { max-height: 320px; width: auto; }
+label.button.file { display: inline-block; flex-direction: row; font-size: .85rem; }

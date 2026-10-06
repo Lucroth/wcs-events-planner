@@ -1,5 +1,6 @@
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { auth, getEvent, getInfo, getInfosForYear, getManualEvents, getYear, newManualId, saveInfo, saveManualEvent } from "../firebase";
+import { auth, getEvent, getInfo, getInfosForYear, getManualEvents, getScheduleImage, getYear, newManualId, saveInfo, saveManualEvent, saveScheduleImage, type ScheduleKind } from "../firebase";
+import { compressImage } from "../image";
 import { range } from "../format";
 import { html, safeUrl, type Raw } from "../html";
 import { applyOverride, type Info, type Override, type Pass, type ScrapedEvent } from "../model";
@@ -66,7 +67,7 @@ export async function dashboardPage(year: number): Promise<Raw> {
                 ${check(!!i?.staff?.length)}
                 ${check(!!(i?.facebookUrl || i?.websiteUrl))}
                 ${check(i?.lat != null)}
-                ${check(!!i?.eventSchedule)}
+                ${check(!!(i?.eventSchedule || i?.eventScheduleImage))}
                 <td><a href="#/admin/event/${e.id}">Edit</a></td>
               </tr>`;
           })}
@@ -145,12 +146,73 @@ export async function editPage(id: string | null): Promise<Raw> {
       <fieldset>
         <legend>Staff &amp; schedules</legend>
         <label>Staff (one per line) <textarea name="staff" rows="6">${(info.staff ?? []).join("\n")}</textarea></label>
-        <label>Event schedule (text or a link) <textarea name="eventSchedule" rows="6">${v(info.eventSchedule)}</textarea></label>
-        <label>Competition schedule (text or a link) <textarea name="compSchedule" rows="6">${v(info.compSchedule)}</textarea></label>
+        <label>Event schedule (text, a link, or paste an image) <textarea name="eventSchedule" rows="6" data-kind="event">${v(info.eventSchedule)}</textarea></label>
+        ${imageField("event", id && info.eventScheduleImage ? await getScheduleImage(id, "event") : undefined)}
+        <label>Competition schedule (text, a link, or paste an image) <textarea name="compSchedule" rows="6" data-kind="comp">${v(info.compSchedule)}</textarea></label>
+        ${imageField("comp", id && info.compScheduleImage ? await getScheduleImage(id, "comp") : undefined)}
       </fieldset>
 
       <button type="submit">Save</button>
     </form>`;
+}
+
+function imageField(kind: ScheduleKind, image: string | undefined): Raw {
+  return html`
+    <div class="image-field" data-kind="${kind}">
+      <img class="schedule-image" alt="" ${image ? html`src="${image}"` : "hidden"} />
+      <div class="buttons">
+        <label class="button small file">Choose image<input type="file" accept="image/*" hidden /></label>
+        <button type="button" class="small remove" ${image ? "" : "hidden"}>Remove image</button>
+      </div>
+      <p class="muted small">Paste a screenshot with Ctrl+V into the box above, or choose a file. It is shrunk to fit and shown on the event page.</p>
+    </div>`;
+}
+
+/** Image changes not yet saved: a data URL to store, or null to delete. Untouched kinds are absent. */
+const pendingImages = new Map<ScheduleKind, string | null>();
+
+function wireImages(form: HTMLFormElement): void {
+  pendingImages.clear();
+
+  const show = (kind: ScheduleKind, url: string | null) => {
+    const field = form.querySelector<HTMLElement>(`.image-field[data-kind="${kind}"]`)!;
+    const img = field.querySelector("img")!;
+    const remove = field.querySelector<HTMLButtonElement>("button.remove")!;
+    pendingImages.set(kind, url);
+    img.hidden = !url;
+    remove.hidden = !url;
+    if (url) img.src = url;
+    else img.removeAttribute("src");
+  };
+
+  const take = async (kind: ScheduleKind, file: Blob) => {
+    const error = document.getElementById("form-error")!;
+    try {
+      show(kind, await compressImage(file));
+      error.hidden = true;
+    } catch (e) {
+      error.textContent = (e as Error).message;
+      error.hidden = false;
+    }
+  };
+
+  form.querySelectorAll<HTMLTextAreaElement>("textarea[data-kind]").forEach((area) =>
+    area.addEventListener("paste", (ev) => {
+      const file = [...(ev.clipboardData?.items ?? [])].find((i) => i.type.startsWith("image/"))?.getAsFile();
+      if (!file) return;
+      ev.preventDefault();
+      void take(area.dataset.kind as ScheduleKind, file);
+    }),
+  );
+
+  form.querySelectorAll<HTMLElement>(".image-field").forEach((field) => {
+    const kind = field.dataset.kind as ScheduleKind;
+    field.querySelector<HTMLInputElement>("input[type=file]")!.addEventListener("change", (ev) => {
+      const file = (ev.target as HTMLInputElement).files?.[0];
+      if (file) void take(kind, file);
+    });
+    field.querySelector("button.remove")!.addEventListener("click", () => show(kind, null));
+  });
 }
 
 /** Reads the form; returns an error message instead when something would not be safe to show. */
@@ -226,6 +288,7 @@ export function readForm(form: HTMLFormElement, scraped: ScrapedEvent | undefine
 
 export function wireEdit(id: string | null, done: (id: string) => void): void {
   const form = document.getElementById("edit") as HTMLFormElement | null;
+  if (form) wireImages(form);
   form?.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     const error = document.getElementById("form-error")!;
@@ -253,7 +316,20 @@ export function wireEdit(id: string | null, done: (id: string) => void): void {
           results: [],
         });
       }
-      await saveInfo(eventId, read.info);
+      const before = id ? await getInfo(id) : undefined;
+      const hasImage = (kind: ScheduleKind, had: boolean | undefined) =>
+        pendingImages.has(kind) ? pendingImages.get(kind) !== null : !!had;
+
+      for (const [kind, image] of pendingImages) {
+        await saveScheduleImage(eventId, kind, image);
+      }
+
+      await saveInfo(eventId, {
+        ...read.info,
+        eventScheduleImage: hasImage("event", before?.eventScheduleImage),
+        compScheduleImage: hasImage("comp", before?.compScheduleImage),
+      });
+      pendingImages.clear();
       done(eventId);
     } catch (e) {
       error.textContent = `Could not save: ${(e as Error).message}`;

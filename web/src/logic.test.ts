@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { html, safeUrl } from "./html";
+import { isImageDataUrl } from "./image";
 import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, tierFor, type Pass } from "./model";
 import { addDays, bookingUrl, flightKey, homeCities, koleoUrl } from "./travel";
 
@@ -119,5 +120,14 @@ describe("levelScore", () => {
   it("without a division, ranks by average level first", () => {
     const harder = [{ division: "NOV", level: "Hard" as const, top: 1 }];
     expect(levelScore(harder, null)!).toBeGreaterThan(levelScore(chips, null)!);
+  });
+});
+
+describe("isImageDataUrl", () => {
+  it("accepts only raster image data URLs", () => {
+    expect(isImageDataUrl("data:image/jpeg;base64,/9j/4AAQ")).toBe(true);
+    expect(isImageDataUrl("data:image/svg+xml;base64,PHN2Zz4=")).toBe(false);
+    expect(isImageDataUrl("javascript:alert(1)")).toBe(false);
+    expect(isImageDataUrl(undefined)).toBe(false);
   });
 });

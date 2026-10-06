@@ -98,6 +98,9 @@ export interface Info {
   staff?: string[];
   eventSchedule?: string | null;
   compSchedule?: string | null;
+  /** A pasted image of the schedule exists in schedules/{id}_event or _comp; kept apart so the list never downloads it. */
+  eventScheduleImage?: boolean;
+  compScheduleImage?: boolean;
   passes?: Pass[];
 }
 

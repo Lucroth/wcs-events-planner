@@ -86,5 +86,11 @@ onAuthStateChanged(auth, async (user: User | null) => {
 });
 
 window.addEventListener("hashchange", route);
+
+// A schedule image opens full screen on click, and closes the same way.
+app.addEventListener("click", (ev) => {
+  const img = ev.target as HTMLElement;
+  if (img.classList.contains("zoomable")) img.classList.toggle("zoomed");
+});
 renderNav();
 void route();

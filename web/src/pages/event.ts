@@ -1,4 +1,5 @@
-import { getEvent, getFlights, getInfo, getTrains } from "../firebase";
+import { getEvent, getFlights, getInfo, getScheduleImage, getTrains } from "../firebase";
+import { isImageDataUrl } from "../image";
 import { date, duration, level, localDateTime, money, range, short, today } from "../format";
 import { html, safeUrl, type Raw } from "../html";
 import { applyOverride, currentPass, tierFor, tiers, type Flights, type Info, type Leg, type Pass, type ScrapedEvent, type TrainLeg, type Trains } from "../model";
@@ -30,9 +31,11 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
   const city = findCity(params.get("from"));
   const people = Math.min(12, Math.max(1, Number(params.get("people")) || 1));
   const upcoming = e.dateTo >= now;
-  const [flights, trains] = await Promise.all([
+  const [flights, trains, eventImage, compImage] = await Promise.all([
     upcoming && e.country !== "Poland" ? getFlights(id, flightKey(city)) : undefined,
     upcoming && e.country === "Poland" ? getTrains(id, city.koleoSlug) : undefined,
+    info?.eventScheduleImage ? getScheduleImage(id, "event") : undefined,
+    info?.compScheduleImage ? getScheduleImage(id, "comp") : undefined,
   ]);
 
   return html`
@@ -53,8 +56,8 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
       </section>
     </div>
     <div class="grid">
-      ${schedule("Event schedule", info?.eventSchedule)}
-      ${schedule("Competition schedule", info?.compSchedule)}
+      ${schedule("Event schedule", info?.eventSchedule, eventImage)}
+      ${schedule("Competition schedule", info?.compSchedule, compImage)}
     </div>
     ${strengthCard(scraped)}
     ${resultsCard(scraped)}
@@ -99,12 +102,17 @@ function passesCard(info: Info | undefined, now: string): Raw {
     </section>`;
 }
 
-function schedule(title: string, text: string | null | undefined): Raw {
+function schedule(title: string, text: string | null | undefined, image: string | undefined): Raw {
   const url = safeUrl(text);
+  const img = isImageDataUrl(image) ? image : null;
+  const body = !text?.trim()
+    ? img ? "" : html`<p class="muted">Not published yet.</p>`
+    : url ? html`<p><a href="${url}" target="_blank" rel="noopener">See the schedule</a></p>` : html`<pre class="schedule">${text}</pre>`;
   return html`
     <section class="card">
       <h2>${title}</h2>
-      ${!text?.trim() ? html`<p class="muted">Not published yet.</p>` : url ? html`<p><a href="${url}" target="_blank" rel="noopener">See the schedule</a></p>` : html`<pre class="schedule">${text}</pre>`}
+      ${body}
+      ${img ? html`<img class="schedule-image zoomable" src="${img}" alt="${title}" title="Click to enlarge" />` : ""}
     </section>`;
 }
 

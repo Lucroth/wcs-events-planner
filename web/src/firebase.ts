@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
 import {
   collection,
+  deleteDoc,
   connectFirestoreEmulator,
   doc,
   getDoc,
@@ -35,6 +36,7 @@ const C = {
   info: "info",
   flights: "flights",
   trains: "trains",
+  schedules: "schedules",
   admins: "admins",
 } as const;
 
@@ -95,5 +97,13 @@ export const isAdmin = async (uid: string) => (await getDoc(doc(db, C.admins, ui
 export const saveInfo = (id: string, info: Info) => setDoc(doc(db, C.info, id), { ...info, updatedAt: serverTimestamp() });
 
 export const saveManualEvent = (e: ScrapedEvent) => setDoc(doc(db, C.events, e.id), { ...e, manual: true, updatedAt: serverTimestamp() });
+
+export type ScheduleKind = "event" | "comp";
+
+export const getScheduleImage = async (id: string, kind: ScheduleKind) =>
+  (await read<{ image: string }>(C.schedules, `${id}_${kind}`))?.image;
+
+export const saveScheduleImage = (id: string, kind: ScheduleKind, image: string | null) =>
+  image ? setDoc(doc(db, C.schedules, `${id}_${kind}`), { image, updatedAt: serverTimestamp() }) : deleteDoc(doc(db, C.schedules, `${id}_${kind}`));
 
 export const newManualId = () => `m-${doc(collection(db, C.events)).id}`;
