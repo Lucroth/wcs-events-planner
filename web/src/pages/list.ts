@@ -80,9 +80,9 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
 
   const rows: Row[] = [
     ...(summary?.events ?? []),
-    ...manual.map((e) => ({ id: e.id, name: e.name, dateFrom: e.dateFrom, dateTo: e.dateTo, city: e.city, country: e.country, isWsdc: e.isWsdc, chips: [] })),
+    ...manual.map((e) => ({ id: e.id, name: e.name, dateFrom: e.dateFrom, dateTo: e.dateTo, city: e.city, country: e.country, isWsdc: e.isWsdc, chips: [], expected: false })),
   ]
-    .map((r) => applyOverride(r, infos.get(r.id)))
+    .map((r) => (r.expected ? r : applyOverride(r, infos.get(r.id))))
     .filter((r) => isEurope(r.country))
     .filter((r) => filter.all || r.isWsdc)
     .filter((r) => !filter.upcoming || r.dateTo >= now)
@@ -194,6 +194,7 @@ function sortRows(rows: Row[], f: ListFilter, costs: Map<string, Cost>): Row[] {
 }
 
 function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: Cost | undefined): Raw {
+  if (r.expected) return expectedCard(r, f);
   const full = currentPass(info?.passes, "Full", now);
   const party = currentPass(info?.passes, "Party", now);
   const price = cost
@@ -207,6 +208,21 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
         <span class="name">${r.name} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
         <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
         <span class="price">${price}</span>
+        ${chips(r.chips, f.division, f.role)}
+      </a>
+    </li>`;
+}
+
+/** A series not listed yet for this year: roughly when, and how hard its latest edition was. */
+function expectedCard(r: Row, f: ListFilter): Raw {
+  const name = r.name.replace(/\s*\b(19|20)\d{2}(\s*[/-]\s*\d{2,4})?\b/g, "").trim();
+  return html`
+    <li class="expected">
+      <a href="#/event/${r.id}" class="event-card" title="Not listed yet. Opens the latest edition, ${r.name}.">
+        <span class="dates">~ ${month(Number(r.dateFrom.slice(5, 7)))}</span>
+        <span class="name">${name} <span class="tag">expected</span> ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
+        <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
+        <span class="price muted small">dates not announced</span>
         ${chips(r.chips, f.division, f.role)}
       </a>
     </li>`;
