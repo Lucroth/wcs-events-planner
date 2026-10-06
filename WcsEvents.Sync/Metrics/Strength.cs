@@ -18,7 +18,7 @@ public enum Difficulty
 /// </summary>
 public sealed record DivisionStrength(
     string Division, Role Role, string RoundName, int FieldSize, double AveragePoints, double MedianPoints,
-    double TopQuartileAverage, Difficulty? Difficulty);
+    double TopQuartileAverage, Difficulty? Difficulty, double EuropeTopQuartileAverage = 0);
 
 /// <summary>
 /// How strong each event's fields were, and so how hard it is to final there. Points are those each
@@ -119,7 +119,7 @@ public sealed class Strength(AppDbContext db, IMemoryCache cache)
         List<double> tops = [.. perEvent.Select(r => r.Top).Order()];
 
         return [.. perEvent.Select(r => (r.ScoringEventId, new DivisionStrength(
-            division, role, r.RoundName, r.Size, r.Average, r.Median, r.Top, Classify(r.Top, tops))))];
+            division, role, r.RoundName, r.Size, r.Average, r.Median, r.Top, Classify(r.Top, tops), tops.Average())))];
     }
 
     /// <summary>Mean of the highest quarter of an ascending list, at least one value.</summary>

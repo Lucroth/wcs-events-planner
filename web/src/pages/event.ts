@@ -53,6 +53,7 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
       ${e.isWsdc ? html`<span class="tag">WSDC</span>` : ""}
       ${admin ? html`<a class="button small" href="#/admin/event/${id}">Edit</a>` : ""}
     </p>
+    ${info?.autofill ? html`<p class="notice small">Prices and details were copied automatically from <a href="${safeUrl(info.autofill.source) ?? "#"}" target="_blank" rel="noopener">the event's website</a> on ${date(info.autofill.on)} and not yet reviewed; check there before buying.</p>` : ""}
     <section class="links">${links(scraped, info)}</section>
     <div class="grid">
       ${passesCard(info, now)}
@@ -140,7 +141,7 @@ function strengthCard(e: ScrapedEvent): Raw {
               <td>${s.role === "Leader" ? "Leaders" : "Followers"}</td>
               <td class="num">${s.fieldSize}</td>
               <td>${tierCell(s.fieldSize)}</td>
-              <td class="num"><strong>${s.topQuartileAverage != null ? s.topQuartileAverage.toFixed(1) : "—"}</strong></td>
+              <td class="num" ${s.europeTopQuartileAverage != null ? html`title="Average across European events: ${s.europeTopQuartileAverage.toFixed(1)}"` : ""}><strong>${s.topQuartileAverage != null ? s.topQuartileAverage.toFixed(1) : "—"}</strong></td>
               <td class="num">${s.averagePoints.toFixed(1)}</td>
               <td class="num">${s.medianPoints}</td>
               <td>${s.difficulty ? html`<span class="chip diff-${level(s.difficulty)}">${level(s.difficulty)}</span>` : ""}</td>

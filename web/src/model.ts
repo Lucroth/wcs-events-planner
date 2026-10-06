@@ -38,6 +38,8 @@ export interface Strength {
   medianPoints: number;
   /** Mean of the strongest quarter of the field; what the difficulty is ranked by. Absent on documents published before it existed. */
   topQuartileAverage?: number;
+  /** The same figure averaged over every European event of this division and role. */
+  europeTopQuartileAverage?: number;
   difficulty: Difficulty | null;
 }
 
@@ -66,7 +68,20 @@ export interface Chip {
   division: string;
   level: Difficulty | null;
   top?: number;
+  /** One role's own figures; absent on summaries published before they existed. */
+  leader?: Side | null;
+  follower?: Side | null;
 }
+
+export interface Side {
+  level: Difficulty | null;
+  top: number;
+}
+
+export type DanceRole = "leader" | "follower";
+
+/** A chip as seen by a reader dancing one role: that role's level and points, else both roles averaged. */
+export const sideOf = (c: Chip, role: DanceRole | null): Side => (role && c[role]) || { level: c.level, top: c.top ?? 0 };
 
 export type PassKind = "Full" | "Party";
 
@@ -111,6 +126,8 @@ export interface Info {
   eventScheduleImage?: boolean;
   compScheduleImage?: boolean;
   passes?: Pass[];
+  /** Set when the sync filled fields from the event's website; dropped when the admin saves. */
+  autofill?: { source: string; on: string; fields: string[] } | null;
 }
 
 export interface Leg {
@@ -214,10 +231,14 @@ export function matchesLevel(
   chips: Chip[],
   division: string | null,
   levels: Difficulty[],
+  role: DanceRole | null = null,
 ): boolean {
   const candidates = division ? chips.filter((c) => c.division === division) : chips;
   if (!levels.length) return !division || candidates.length > 0;
-  return candidates.some((c) => c.level !== null && levels.includes(c.level));
+  return candidates.some((c) => {
+    const level = sideOf(c, role).level;
+    return level !== null && levels.includes(level);
+  });
 }
 
 /** WSDC Registry Event Rules, Chart 5: tiers by unique competitors per role, and the points each awards. */
@@ -239,14 +260,16 @@ const levelRank: Record<Difficulty, number> = { Easy: 0, Medium: 1, Hard: 2 };
  * How hard an event is for sorting: with a division picked, that division's top-quartile points;
  * otherwise the average level across divisions, top-quartile points breaking ties. Null without data.
  */
-export function levelScore(chips: Chip[], division: string | null): number | null {
+export function levelScore(chips: Chip[], division: string | null, role: DanceRole | null = null): number | null {
   if (division) {
     const c = chips.find((x) => x.division === division);
-    return c?.top ?? (c?.level ? levelRank[c.level] : null);
+    if (!c) return null;
+    const side = sideOf(c, role);
+    return c.top != null ? side.top : side.level ? levelRank[side.level] : null;
   }
-  const known = chips.filter((c) => c.level);
+  const known = chips.map((c) => sideOf(c, role)).filter((c) => c.level);
   if (!known.length) return null;
   const avgLevel = known.reduce((s, c) => s + levelRank[c.level!], 0) / known.length;
-  const avgTop = known.reduce((s, c) => s + (c.top ?? 0), 0) / known.length;
+  const avgTop = known.reduce((s, c) => s + c.top, 0) / known.length;
   return avgLevel * 1000 + avgTop;
 }

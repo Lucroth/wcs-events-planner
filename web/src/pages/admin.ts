@@ -88,6 +88,7 @@ export async function editPage(id: string | null): Promise<Raw> {
   return html`
     <h1>${e ? e.name : "New event"}</h1>
     ${scraped && !scraped.manual ? html`<p class="muted small">From scoring.dance. Changing the name, dates or place stores a correction that the weekly sync will not overwrite.</p>` : ""}
+    ${info.autofill ? html`<p class="notice small">Filled in automatically from <a href="${safeUrl(info.autofill.source) ?? "#"}" target="_blank" rel="noopener">the event's website</a> on ${info.autofill.on}: ${info.autofill.fields.join(", ")}. Check them, then save to mark the event reviewed.</p>` : ""}
     <p class="error" id="form-error" hidden></p>
     <form id="edit" class="stack edit">
       <fieldset>

@@ -66,6 +66,7 @@ public sealed partial class EventPublisher(
                     AveragePoints = Math.Round(s.AveragePoints, 2),
                     MedianPoints = Math.Round(s.MedianPoints, 2),
                     TopQuartileAverage = Math.Round(s.TopQuartileAverage, 2),
+                    EuropeTopQuartileAverage = Math.Round(s.EuropeTopQuartileAverage, 2),
                     Difficulty = s.Difficulty?.ToString(),
                 }),
                 StrengthsFrom = facts.StrengthsFrom is { } p ? new { id = p.Id.ToString(), p.Name, DateFrom = Iso(p.DateFrom) } : null,
@@ -134,7 +135,8 @@ public sealed partial class EventPublisher(
         return new TravelFacts(coords, airports, null);
     }
 
-    /// <summary>One chip per main-ladder division, leader and follower difficulty and top-quartile points averaged.</summary>
+    /// <summary>One chip per main-ladder division, leader and follower difficulty and top-quartile points
+    /// averaged, and each role's own for a reader who picks one.</summary>
     internal static IEnumerable<object> Chips(IReadOnlyList<DivisionStrength> strengths) =>
         strengths
             .Where(s => Strength.DivisionOrder(s.Division) < 10)
@@ -143,8 +145,20 @@ public sealed partial class EventPublisher(
             {
                 var known = g.Where(s => s.Difficulty is not null).Select(s => (int)s.Difficulty!.Value).ToList();
                 Difficulty? level = known.Count is 0 ? null : (Difficulty)(int)Math.Round(known.Average(), MidpointRounding.AwayFromZero);
-                return (object)new { division = g.Key, level = level?.ToString(), top = Math.Round(g.Average(s => s.TopQuartileAverage), 1) };
+                return (object)new
+                {
+                    division = g.Key,
+                    level = level?.ToString(),
+                    top = Math.Round(g.Average(s => s.TopQuartileAverage), 1),
+                    leader = Side(g, Role.Leader),
+                    follower = Side(g, Role.Follower),
+                };
             });
+
+    private static object? Side(IEnumerable<DivisionStrength> division, Role role) =>
+        division.FirstOrDefault(s => s.Role == role) is { } s
+            ? new { level = s.Difficulty?.ToString(), top = Math.Round(s.TopQuartileAverage, 1) }
+            : null;
 
     /// <summary>The other published editions of an event's series, oldest first.</summary>
     internal static IEnumerable<ScoringEvent> Editions(ScoringEvent e, IEnumerable<EventFacts> all) =>

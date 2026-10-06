@@ -1,0 +1,153 @@
+{
+  "379": {
+    "source": "https://www.wcs-festival.de/tickets/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.wcs-festival.de/",
+      "eventSchedule": "https://www.wcs-festival.de/schedule/",
+      "venueName": "Boston-Club",
+      "venueAddress": "Vennhauser Allee 135, 40627 Düsseldorf, Germany",
+      "passes": [
+        { "kind": "Full", "tier": "Neighbour pass (PL), 19–20 Nov", "price": 159, "currency": "EUR", "until": "2025-11-20" },
+        { "kind": "Full", "tier": "Neighbour pass (PL)", "price": 179, "currency": "EUR", "until": "2025-11-30" },
+        { "kind": "Full", "tier": "Neighbour pass (PL)", "price": 189, "currency": "EUR", "until": "2025-12-31" },
+        { "kind": "Full", "tier": "Neighbour pass (PL)", "price": 199, "currency": "EUR", "until": "2026-03-31" },
+        { "kind": "Full", "tier": "Neighbour pass (PL)", "price": 209, "currency": "EUR", "until": "2026-06-30" },
+        { "kind": "Full", "tier": "Neighbour pass (PL), all further tickets", "price": 219, "currency": "EUR", "until": null },
+        { "kind": "Party", "tier": "Party pass (first 20 sold at €59)", "price": 69, "currency": "EUR", "until": null }
+      ]
+    }
+  },
+  "450": {
+    "source": "https://www.augsburgwestiestation.com/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.augsburgwestiestation.com/",
+      "facebookUrl": "https://www.facebook.com/events/1037015420899220",
+      "instagramUrl": "https://www.instagram.com/hepcatclub/",
+      "registrationOpens": "2026-04-22T12:00",
+      "eventSchedule": "https://www.augsburgwestiestation.com/schedule",
+      "venueName": "Hep Cat Club",
+      "venueAddress": "Viktoriastraße 3B, 86150 Augsburg, Germany",
+      "staff": ["João Parada & Savana Barreau", "Irina Puzanova", "Michael Kielbasa", "Daniel Pavlov & Lauren Jones", "Nessa (special instructor)", "Leo (special instructor)"],
+      "passes": [
+        { "kind": "Full", "tier": "Normal Bird (sold out, waitlist)", "price": 210, "currency": "EUR", "until": null },
+        { "kind": "Party", "tier": "Normal Bird (sold out, waitlist)", "price": 140, "currency": "EUR", "until": null }
+      ]
+    }
+  },
+  "440": {
+    "source": "https://www.swingside-invitational.com/registration/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://www.swingside-invitational.com/",
+      "facebookUrl": "https://www.facebook.com/swingsideinvitational",
+      "instagramUrl": "https://www.instagram.com/swingside_invitational/",
+      "eventSchedule": "https://www.swingside-invitational.com/schedule/",
+      "venueName": "Palais des Congrès de Liège",
+      "venueAddress": "Esplanade de l'Europe 2, 4020 Liège, Belgium",
+      "staff": ["Olivier & Virginie Massart", "Kyle FitzGerald & Melodie Paletta", "Arnaud Perga", "Marina Motronenko", "Miguel Ortega & Maïna Vila Cobarsi", "Teddy Sanchez & Dianéva Poirson", "Vivien Meublat (head judge)", "MC Oli (MC)", "DJ A3P (head DJ)"],
+      "passes": [
+        { "kind": "Full", "tier": "Early bird", "price": 165, "currency": "EUR", "until": "2026-02-19" },
+        { "kind": "Full", "tier": "Regular", "price": 180, "currency": "EUR", "until": "2026-06-15" },
+        { "kind": "Full", "tier": "Regular", "price": 190, "currency": "EUR", "until": "2026-09-13" },
+        { "kind": "Full", "tier": "Last price", "price": 200, "currency": "EUR", "until": null },
+        { "kind": "Party", "tier": "Event pass, early bird", "price": 110, "currency": "EUR", "until": "2026-02-19" },
+        { "kind": "Party", "tier": "Event pass", "price": 125, "currency": "EUR", "until": "2026-06-15" },
+        { "kind": "Party", "tier": "Event pass", "price": 135, "currency": "EUR", "until": "2026-09-13" },
+        { "kind": "Party", "tier": "Event pass, last price", "price": 145, "currency": "EUR", "until": null }
+      ]
+    }
+  },
+  "433": {
+    "source": "https://danceapp.net/en/events/176/register",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://snowcs.se/",
+      "facebookUrl": "https://www.facebook.com/scandinavianopenwcs",
+      "instagramUrl": "https://www.instagram.com/scandinavian.open.wcs",
+      "venueName": "Quality Hotel Strawberry Arena",
+      "venueAddress": "Råsta Strandväg 1, 169 56 Solna, Sweden",
+      "staff": ["Maxence Martin & Virginie Grondin", "Hugo Miguez & Stacy Kay", "Joel Torgeson & Chantelle Pianetta", "Igor Pitangui & Fernanda Dubiel", "Christopher Dumond & Emily Huang", "Ben & Cameo McHenry", "Ben Morris & Victoria Henk", "Thibault & Nicole Ramirez", "Maxime & Torri Zzaoui", "Benji Schwimmer"],
+      "passes": [
+        { "kind": "Full", "tier": "Super early bird", "price": 2050, "currency": "SEK", "until": "2026-05-02" },
+        { "kind": "Full", "tier": "Early bird", "price": 2300, "currency": "SEK", "until": "2026-06-01" },
+        { "kind": "Full", "tier": "Normal bird", "price": 2400, "currency": "SEK", "until": "2026-09-01" },
+        { "kind": "Full", "tier": "Late bird", "price": 2500, "currency": "SEK", "until": null },
+        { "kind": "Party", "tier": "Super early bird", "price": 1850, "currency": "SEK", "until": "2026-05-02" },
+        { "kind": "Party", "tier": "Early bird", "price": 1950, "currency": "SEK", "until": "2026-06-01" },
+        { "kind": "Party", "tier": "Normal bird", "price": 2050, "currency": "SEK", "until": "2026-09-01" },
+        { "kind": "Party", "tier": "Late bird", "price": 2150, "currency": "SEK", "until": null }
+      ]
+    }
+  },
+  "435": {
+    "source": "https://warsawhalloweenswing.com/booking/",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://warsawhalloweenswing.com/",
+      "facebookUrl": "https://www.facebook.com/groups/warsawhalloweenswing/",
+      "registrationOpens": "2026-07-08T19:00",
+      "eventSchedule": "https://warsawhalloweenswing.com/schedule/",
+      "venueName": "The Westin Warsaw",
+      "staff": ["Thibault & Nicole Ramirez", "Leo & Karin", "Semion & Maria", "Glenn Ball & Marina Motronenko"],
+      "passes": [
+        { "kind": "Full", "tier": "Couples only (door from 23 Oct: €230)", "price": 840, "currency": "PLN", "until": null },
+        { "kind": "Party", "tier": "Party & comp pass, couples only (door: €150)", "price": 525, "currency": "PLN", "until": null }
+      ]
+    }
+  },
+  "426": {
+    "source": "https://danceapp.net/en/events/160/register",
+    "on": "2026-10-06",
+    "info": {
+      "websiteUrl": "https://danceapp.net/en/events/160/register",
+      "venueName": "Hilton Airport Geneva",
+      "passes": [
+        { "kind": "Full", "tier": "Normal bird (current)", "price": 230, "currency": "EUR", "until": null },
+        { "kind": "Full", "tier": "Late bird", "price": 250, "currency": "EUR", "until": null },
+        { "kind": "Party", "tier": "Normal bird (current)", "price": 185, "currency": "EUR", "until": null },
+        { "kind": "Party", "tier": "Late bird", "price": 200, "currency": "EUR", "until": null }
+      ]
+    }
+  },
+  "350": {
+    "source": "https://swingvester.com/tickets/tickets/",
+    "on": "2026-10-06",
+    "info": {
+      "override": { "dateFrom": "2026-12-30", "dateTo": "2027-01-04" },
+      "websiteUrl": "https://swingvester.com/",
+      "facebookUrl": "https://www.facebook.com/events/3797540690541100/",
+      "instagramUrl": "https://www.instagram.com/swingvester_wcs.event/",
+      "eventSchedule": "https://swingvester.com/schedule/",
+      "venueName": "Tanzschule Hippmann",
+      "venueAddress": "Pollheimerstraße 7, 4600 Wels, Austria",
+      "staff": ["Thibault & Nicole Ramirez", "Kenneth Rutland & Bryn Anderson", "João Parada & Savana Barreau", "Semion & Maria", "Sebastian Quinones & Stefanie Tschom", "Marc Heldt & Mejrem Halidovic"],
+      "passes": [
+        { "kind": "Full", "tier": "Workshop pass, tickets 1–100", "price": 170, "currency": "EUR", "until": null },
+        { "kind": "Full", "tier": "Workshop pass, tickets 101–200", "price": 180, "currency": "EUR", "until": null },
+        { "kind": "Full", "tier": "Workshop pass, tickets 201–300", "price": 190, "currency": "EUR", "until": null },
+        { "kind": "Full", "tier": "Workshop pass, ticket 301 on", "price": 195, "currency": "EUR", "until": null },
+        { "kind": "Party", "tier": "Party pass", "price": 140, "currency": "EUR", "until": null }
+      ]
+    }
+  },
+  "451": {
+    "source": "https://www.colognecallingwcs.com/",
+    "on": "2026-10-06",
+    "info": {
+      "override": { "city": "Cologne" },
+      "websiteUrl": "https://www.colognecallingwcs.com/",
+      "registrationOpens": "2026-05-22T18:00",
+      "venueName": "Leonardo Royal Köln – Am Stadtwald",
+      "venueAddress": "Dürener Straße 287, 50935 Köln, Germany",
+      "staff": ["João Parada & Savana Barreau", "Maxence Martin & Virginie Grondin", "Olivier & Virginie Massart", "Daniel Pavlov & Lauren Jones", "Alicia Speckmann (head DJ)", "Giulia Rush (chief judge)"],
+      "passes": [
+        { "kind": "Full", "tier": "Late bird (current)", "price": 215, "currency": "EUR", "until": null },
+        { "kind": "Party", "tier": "Early bird (current)", "price": 145, "currency": "EUR", "until": null },
+        { "kind": "Party", "tier": "Normal bird", "price": 155, "currency": "EUR", "until": null },
+        { "kind": "Party", "tier": "Late bird", "price": 165, "currency": "EUR", "until": null }
+      ]
+    }
+  }
+}

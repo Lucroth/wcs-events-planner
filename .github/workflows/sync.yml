@@ -5,13 +5,13 @@ name: Sync
 # overwrites another's mirror.
 on:
   schedule:
-    - cron: "0 4 * * *"   # daily: publish (picks up admin corrections), flight and train fares
+    - cron: "0 4 * * *"   # daily: autofill, publish (picks up admin corrections), flight and train fares
     - cron: "0 2 * * 1"   # Mondays: scoring.dance + publish
     - cron: "0 0 3 * *"   # 3rd of the month: registry refresh, then scoring.dance + publish
   workflow_dispatch:
     inputs:
       commands:
-        description: "Space-separated: sweep refresh scoring publish flights trains"
+        description: "Space-separated: sweep refresh scoring autofill publish flights trains"
         default: "scoring publish flights"
 
 permissions:
@@ -41,13 +41,13 @@ jobs:
           REQUESTED: ${{ inputs.commands }}
         run: |
           case "$SCHEDULE" in
-            "0 4 * * *") c="publish flights trains" ;;
+            "0 4 * * *") c="autofill publish flights trains" ;;
             "0 2 * * 1") c="scoring publish" ;;
             "0 0 3 * *") c="refresh scoring publish" ;;
             *) c="$REQUESTED" ;;
           esac
           for x in $c; do
-            case "$x" in sweep|refresh|scoring|publish|flights|trains) ;; *) echo "Unknown command: $x"; exit 1 ;; esac
+            case "$x" in sweep|refresh|scoring|autofill|publish|flights|trains) ;; *) echo "Unknown command: $x"; exit 1 ;; esac
           done
           echo "commands=$c" >> "$GITHUB_OUTPUT"
 

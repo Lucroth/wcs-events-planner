@@ -117,6 +117,14 @@ describe("levelScore", () => {
     expect(levelScore(chips, "ADV")).toBeNull();
   });
 
+  it("uses the reader's role when the chip has it", () => {
+    const both = [{ division: "NOV", level: "Easy" as const, top: 4, leader: { level: "Easy" as const, top: 4.9 }, follower: { level: "Easy" as const, top: 3.1 } }];
+    expect(levelScore(both, "NOV", "leader")).toBe(4.9);
+    expect(levelScore(both, "NOV", "follower")).toBe(3.1);
+    expect(levelScore(both, "NOV", null)).toBe(4);
+    expect(levelScore(chips, "INT", "leader")).toBe(25);
+  });
+
   it("without a division, ranks by average level first", () => {
     const harder = [{ division: "NOV", level: "Hard" as const, top: 1 }];
     expect(levelScore(harder, null)!).toBeGreaterThan(levelScore(chips, null)!);
