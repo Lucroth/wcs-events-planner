@@ -1,0 +1,57 @@
+{
+  "316": {
+    "dateFrom": "2026-11-06",
+    "dateTo": "2026-11-08",
+    "city": "Toulouse",
+    "venue": "15 rue Charles Lindberg, Blagnac",
+    "websiteUrl": "https://www.westiepinkcity.fr/",
+    "source": "https://www.westiepinkcity.fr/"
+  },
+  "314": {
+    "dateFrom": "2026-11-12",
+    "dateTo": "2026-11-15",
+    "city": "Lyon",
+    "websiteUrl": "https://westiehub.dance/events/westies-angels-2026",
+    "source": "https://westiehub.dance/events/westies-angels-2026"
+  },
+  "325": {
+    "dateFrom": "2026-11-13",
+    "dateTo": "2026-11-15",
+    "city": "Budapest",
+    "venue": "Verdi Budapest Aquincum",
+    "websiteUrl": "https://www.asc-budapest.com/",
+    "source": "https://thedanceatlas.com/events/autumn-swing-challenge-2026-wsdc-rising-star-tour-event/131787"
+  },
+  "342": {
+    "dateFrom": "2026-12-03",
+    "dateTo": "2026-12-06",
+    "city": "Oslo",
+    "venue": "Scandic Oslo Airport",
+    "websiteUrl": "https://danceapp.net/en/events/147/",
+    "source": "https://danceapp.net/en/events/147/"
+  },
+  "347": {
+    "dateFrom": "2026-12-10",
+    "dateTo": "2026-12-13",
+    "city": "Berlin",
+    "venue": "Werk36",
+    "websiteUrl": "https://berlinswingrevolution.com/",
+    "source": "https://berlinswingrevolution.com/"
+  },
+  "339": {
+    "dateFrom": "2026-12-30",
+    "dateTo": "2027-01-03",
+    "city": "London",
+    "venue": "Radisson RED Hotel London Heathrow",
+    "websiteUrl": "https://danceapp.net/en/events/187/",
+    "source": "https://danceapp.net/en/events/187/"
+  },
+  "352": {
+    "dateFrom": "2026-12-31",
+    "dateTo": "2027-01-04",
+    "city": "Upplands Väsby",
+    "venue": "Scandic Infra City",
+    "websiteUrl": "https://www.westiegala.com/",
+    "source": "https://socialdancer.org/en/event/2841/"
+  }
+}

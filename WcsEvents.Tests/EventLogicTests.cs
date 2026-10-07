@@ -53,4 +53,19 @@ public sealed class EventLogicTests
 
         Assert.Equal([2, 3, 5], expected);
     }
+
+    [Fact]
+    public void ExpectedRow_UsesAnnouncedDatesOnlyWhenTheyAreLater()
+    {
+        EventFacts last = new(new ScoringEvent { Id = 347, Name = "Berlin Swing Revolution 2025", DateFrom = new DateOnly(2025, 12, 11), DateTo = new DateOnly(2025, 12, 14), City = "Berlin" }, true, [], null, []);
+        Announcement next = new(new DateOnly(2026, 12, 10), new DateOnly(2026, 12, 13), null, "Werk36", "https://berlinswingrevolution.com/", null);
+        Announcement stale = next with { DateFrom = new DateOnly(2025, 12, 11) };
+
+        var announced = EventPublisher.Row.Expected(last, next);
+        var guessed = EventPublisher.Row.Expected(last, stale);
+
+        Assert.Equal((new DateOnly(2026, 12, 10), new DateOnly(2026, 12, 13), "Berlin"), (announced.From, announced.To, announced.City));
+        Assert.Equal(new DateOnly(2026, 12, 11), guessed.From);
+        Assert.Null(guessed.Announcement);
+    }
 }

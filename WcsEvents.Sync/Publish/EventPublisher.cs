@@ -78,24 +78,27 @@ public sealed partial class EventPublisher(
 
         // Each series' next edition is listed a year ahead until organisers create it; a summary is
         // rewritten on every publish, so an expected row disappears once the real edition is listed.
-        var rows = all.Select(f => (Facts: f, Expected: false))
-            .Concat(ExpectedEditions(all, today).Select(f => (Facts: f, Expected: true)));
+        // Dates an organiser has already announced (data/announced.json) replace the guess.
+        var announced = Announcement.Load(Path.Combine("data", "announced.json"));
+        var rows = all.Select(f => Row.Listed(f))
+            .Concat(ExpectedEditions(all, today).Select(f => Row.Expected(f, announced.GetValueOrDefault(f.Event.Id.ToString()))));
 
-        foreach (var year in rows.GroupBy(r => Shift(r.Facts.Event.DateFrom, r.Expected)!.Value.Year))
+        foreach (var year in rows.GroupBy(r => r.From.Year))
         {
             await store.SetIfChangedAsync($"years/{year.Key}", new
             {
-                Events = year.OrderBy(r => Shift(r.Facts.Event.DateFrom, r.Expected)).Select(r => new
+                Events = year.OrderBy(r => r.From).Select(r => new
                 {
                     id = r.Facts.Event.Id.ToString(),
                     r.Facts.Event.Name,
-                    DateFrom = Iso(Shift(r.Facts.Event.DateFrom, r.Expected)),
-                    DateTo = Iso(Shift(r.Facts.Event.DateTo ?? r.Facts.Event.DateFrom, r.Expected)),
-                    r.Facts.Event.City,
+                    DateFrom = Iso(r.From),
+                    DateTo = Iso(r.To),
+                    r.City,
                     r.Facts.Event.Country,
                     r.Facts.IsWsdc,
                     Chips = Chips(r.Facts.Strengths),
-                    Expected = r.Expected ? true : (bool?)null,
+                    Expected = r.IsExpected ? true : (bool?)null,
+                    Announced = r.Announcement is { } a ? new { a.Venue, a.WebsiteUrl, a.Source } : null,
                 }),
             }, ct);
         }
@@ -175,7 +178,21 @@ public sealed partial class EventPublisher(
             && d.AddYears(1) >= today
             && !Editions(f.Event, all).Any(o => o.DateFrom > d));
 
-    private static DateOnly? Shift(DateOnly? date, bool expected) => expected ? date?.AddYears(1) : date;
+    /// <summary>One line of a year summary: a listed event, or a series' expected next edition.</summary>
+    internal sealed record Row(EventFacts Facts, bool IsExpected, DateOnly From, DateOnly To, string? City, Announcement? Announcement)
+    {
+        public static Row Listed(EventFacts f) =>
+            new(f, false, f.Event.DateFrom!.Value, f.Event.DateTo ?? f.Event.DateFrom!.Value, f.Event.City, null);
+
+        /// <summary>A year on from the latest edition, unless the organiser has announced the dates.</summary>
+        public static Row Expected(EventFacts f, Announcement? a)
+        {
+            var from = f.Event.DateFrom!.Value;
+            return a is not null && a.DateFrom > from
+                ? new(f, true, a.DateFrom, a.DateTo, a.City ?? f.Event.City, a)
+                : new(f, true, from.AddYears(1), (f.Event.DateTo ?? from).AddYears(1), f.Event.City, null);
+        }
+    }
 
     /// <summary>The other published editions of an event's series, oldest first.</summary>
     internal static IEnumerable<ScoringEvent> Editions(ScoringEvent e, IEnumerable<EventFacts> all) =>

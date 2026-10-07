@@ -63,6 +63,8 @@ export interface YearSummary {
     chips: Chip[];
     /** Not listed yet: the series' latest edition (whose id this is) moved a year on. */
     expected?: boolean | null;
+    /** Dates the organiser has announced for an expected edition, before scoring.dance lists it. */
+    announced?: { venue: string | null; websiteUrl: string | null; source: string | null } | null;
   }[];
 }
 
