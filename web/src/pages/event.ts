@@ -1,4 +1,4 @@
-import { getAllFlights, getEvent, getInfo, getScheduleImage, getTrains } from "../firebase";
+import { getAllFlights, getEvent, getInfo, getScheduleImage, getTrains, getYear } from "../firebase";
 import { isImageDataUrl } from "../image";
 import { date, duration, level, localDateTime, money, range, short, today } from "../format";
 import { html, safeUrl, type Raw } from "../html";
@@ -46,6 +46,7 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
         ${scraped?.next ? html`<a class="button small" href="#/event/${scraped.next.id}" title="${scraped.next.name}">${scraped.next.dateFrom?.slice(0, 4) ?? "Next"} edition ›</a>` : ""}
       </span>
     </nav>
+    ${params.has("next") ? await nextEdition(id, Number(params.get("next"))) : ""}
     <h1>${e.name}</h1>
     <p class="lead">
       ${range(e.dateFrom, e.dateTo)} ${e.dateFrom.slice(0, 4)} · ${[e.city, e.country].filter(Boolean).join(", ")}
@@ -358,4 +359,19 @@ function days(from: string, to: string): string[] {
   const all: string[] = [];
   for (let d = from; d <= to && all.length < 7; d = addDays(d, 1)) all.push(d);
   return all;
+}
+
+/** Opened from an expected card: what is known of the next edition, above the latest one's page. */
+async function nextEdition(id: string, year: number): Promise<Raw> {
+  const row = (await getYear(year))?.events.find((r) => r.id === id && r.expected);
+  if (!row) return html``;
+  const a = row.announced;
+  const site = safeUrl(a?.websiteUrl);
+  return html`
+    <section class="notice next-edition">
+      <strong>Next edition${a ? `: ${range(row.dateFrom, row.dateTo)} ${row.dateTo.slice(0, 4)}` : ` expected around ${new Date(`${row.dateFrom}T00:00:00Z`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" })}`}</strong>
+      ${a ? html`· ${[a.venue, row.city, row.country].filter(Boolean).join(", ")}` : ""}
+      ${site ? html`· <a href="${site}" target="_blank" rel="noopener">event website</a>` : ""}
+      <br /><span class="muted small">${a ? "Announced by the organiser, not on scoring.dance yet." : "Dates not announced yet."} Below: the latest edition, for passes, staff and how hard the competitions were.</span>
+    </section>`;
 }
