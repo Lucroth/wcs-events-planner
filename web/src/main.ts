@@ -29,7 +29,33 @@ function renderNav(): void {
 }
 
 /** Hash routes, so GitHub Pages never has to know about them: #/year/2026, #/event/435, #/admin/... */
+/**
+ * GitHub Pages lets browsers cache index.html for a while, so a tab can keep running an old build
+ * long after a deploy. The current build's script is compared with the one index.html names now;
+ * when they differ, the next navigation loads the new build instead.
+ */
+const build = document.querySelector<HTMLScriptElement>("script[type=module][src]")?.src;
+let stale = false;
+
+async function checkForUpdate(): Promise<void> {
+  try {
+    const page = await (await fetch(location.pathname, { cache: "no-store" })).text();
+    const current = page.match(/<script[^>]+type="module"[^>]+src="([^"]+)"/)?.[1];
+    stale = !!build && !!current && new URL(current, location.href).href !== build;
+  } catch {
+    // Offline or blocked: keep running what is loaded.
+  }
+}
+
+void checkForUpdate();
+setInterval(() => void checkForUpdate(), 5 * 60_000);
+document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && void checkForUpdate());
+
 async function route(): Promise<void> {
+  if (stale) {
+    location.reload();
+    return;
+  }
   const mine = ++renderId;
   stopListening();
   const [path, search = ""] = location.hash.replace(/^#/, "").split("?");
