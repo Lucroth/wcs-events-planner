@@ -207,7 +207,7 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
     <li class="${r.dateTo < now && !live ? "past" : ""}" ${live ? html`data-live="${r.id}"` : ""}>
       <a href="#/event/${r.id}" class="event-card">
         <span class="dates">${range(r.dateFrom, r.dateTo)}</span>
-        <span class="name">${r.name} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
+        <span class="name">${r.name} ${r.announced ? html`<span class="tag" title="Announced by the organiser, not on scoring.dance yet">announced</span>` : ""} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
         ${live ? html`<span class="now" hidden></span>` : ""}
         <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
         <span class="price">${price}</span>
@@ -218,15 +218,14 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
 
 /** A series not listed yet for this year: roughly when, and how hard its latest edition was. */
 function expectedCard(r: Row, f: ListFilter): Raw {
-  const a = r.announced;
   const name = r.name.replace(/\s*\b(19|20)\d{2}(\s*[/-]\s*\d{2,4})?\b/g, "").trim();
   return html`
     <li class="expected">
-      <a href="#/event/${r.id}?next=${r.dateFrom.slice(0, 4)}" class="event-card" title="${a ? "Announced by the organiser, not on scoring.dance yet." : "Not listed yet."} Opens the latest edition, ${r.name}.">
-        <span class="dates">${a ? range(r.dateFrom, r.dateTo) : `~ ${month(Number(r.dateFrom.slice(5, 7)))}`}</span>
-        <span class="name">${name} <span class="tag">${a ? "announced" : "expected"}</span> ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
-        <span class="where muted">${[a?.venue, r.city, r.country].filter(Boolean).join(", ")}</span>
-        <span class="price muted small">${a ? "not on scoring.dance yet" : "dates not announced"}</span>
+      <a href="#/event/${r.id}?next=${r.dateFrom.slice(0, 4)}" class="event-card" title="Not listed yet. Opens the latest edition, ${r.name}.">
+        <span class="dates">~ ${month(Number(r.dateFrom.slice(5, 7)))}</span>
+        <span class="name">${name} <span class="tag">expected</span> ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
+        <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
+        <span class="price muted small">dates not announced</span>
         ${chips(r.chips, f.division, f.role)}
       </a>
     </li>`;

@@ -67,5 +67,11 @@ public sealed class EventLogicTests
         Assert.Equal((new DateOnly(2026, 12, 10), new DateOnly(2026, 12, 13), "Berlin"), (announced.From, announced.To, announced.City));
         Assert.Equal(new DateOnly(2026, 12, 11), guessed.From);
         Assert.Null(guessed.Announcement);
+        Assert.Equal(("x347", "Berlin Swing Revolution 2026"), (announced.Id, announced.Name));
+        Assert.Equal(("347", "Berlin Swing Revolution 2025"), (guessed.Id, guessed.Name));
+
+        EventFacts gala = new(new ScoringEvent { Id = 352, Name = "Westie Gala 2025/2026", DateFrom = new DateOnly(2025, 12, 28) }, true, [], null, []);
+        Announcement nye = new(new DateOnly(2026, 12, 31), new DateOnly(2027, 1, 4), null, null, null, null);
+        Assert.Equal("Westie Gala 2026/27", EventPublisher.Row.Expected(gala, nye).Name);
     }
 }

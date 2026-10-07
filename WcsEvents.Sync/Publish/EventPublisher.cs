@@ -38,6 +38,15 @@ public sealed partial class EventPublisher(
             removed += await store.DeletePublishedAsync($"flights/{facts.Event.Id}_", isPrefix: true, ct);
         }
 
+        // Each series' next edition is listed a year ahead until organisers create it; a summary is
+        // rewritten on every publish, so an expected row disappears once the real edition is listed.
+        // Dates an organiser has already announced (data/announced.json) replace the guess, and such
+        // an edition is published as an event of its own (id "x" + the latest edition's id), with
+        // travel worked out for its dates and the latest edition's field strengths.
+        var announced = Announcement.Load(Path.Combine("data", "announced.json"));
+        List<Row> expected = [.. ExpectedEditions(all, today).Select(f => Row.Expected(f, announced.GetValueOrDefault(f.Event.Id.ToString())))];
+        var standIns = expected.Where(r => r.Announcement is not null).ToDictionary(r => r.Facts.Event.Id, r => r);
+
         foreach (var facts in all)
         {
             var e = facts.Event;
@@ -58,30 +67,61 @@ public sealed partial class EventPublisher(
                 Coords = travel?.Coords is { } c ? new { lat = c.Lat, lng = c.Lng } : null,
                 Airports = travel?.Airports.Select(a => new { a.Iata, a.Name }),
                 Station = travel?.Station is { } s ? new { s.Slug, s.Name } : null,
-                Strengths = facts.Strengths.Select(s => new
-                {
-                    s.Division,
-                    Role = s.Role.ToString(),
-                    s.FieldSize,
-                    AveragePoints = Math.Round(s.AveragePoints, 2),
-                    MedianPoints = Math.Round(s.MedianPoints, 2),
-                    TopQuartileAverage = Math.Round(s.TopQuartileAverage, 2),
-                    EuropeTopQuartileAverage = Math.Round(s.EuropeTopQuartileAverage, 2),
-                    Difficulty = s.Difficulty?.ToString(),
-                }),
+                Strengths = StrengthDocs(facts.Strengths),
                 StrengthsFrom = facts.StrengthsFrom is { } p ? new { id = p.Id.ToString(), p.Name, DateFrom = Iso(p.DateFrom) } : null,
                 Previous = Edition(Editions(e, all).LastOrDefault(o => o.DateFrom < e.DateFrom)),
-                Next = Edition(Editions(e, all).FirstOrDefault(o => o.DateFrom > e.DateFrom)),
+                Next = standIns.TryGetValue(e.Id, out var standIn)
+                    ? new { id = standIn.Id, name = standIn.Name, dateFrom = Iso(standIn.From) }
+                    : Edition(Editions(e, all).FirstOrDefault(o => o.DateFrom > e.DateFrom)),
                 facts.Results,
             }, ct);
         }
 
-        // Each series' next edition is listed a year ahead until organisers create it; a summary is
-        // rewritten on every publish, so an expected row disappears once the real edition is listed.
-        // Dates an organiser has already announced (data/announced.json) replace the guess.
-        var announced = Announcement.Load(Path.Combine("data", "announced.json"));
-        var rows = all.Select(f => Row.Listed(f))
-            .Concat(ExpectedEditions(all, today).Select(f => Row.Expected(f, announced.GetValueOrDefault(f.Event.Id.ToString()))));
+        foreach (var r in standIns.Values)
+        {
+            var latest = r.Facts.Event;
+            var info = infos.GetValueOrDefault(r.Id) ?? AdminInfo.Empty;
+            var travel = (info.DateTo ?? r.To) >= today ? await TravelAsync(info.City ?? r.City, info.Country ?? latest.Country, info, places, ct) : null;
+
+            await store.SetIfChangedAsync($"events/{r.Id}", new
+            {
+                id = r.Id,
+                r.Name,
+                DateFrom = Iso(r.From),
+                DateTo = Iso(r.To),
+                Year = r.From.Year,
+                r.City,
+                latest.Country,
+                r.Facts.IsWsdc,
+                TicketUrl = r.Announcement!.WebsiteUrl,
+                Coords = travel?.Coords is { } c ? new { lat = c.Lat, lng = c.Lng } : null,
+                Airports = travel?.Airports.Select(a => new { a.Iata, a.Name }),
+                Station = travel?.Station is { } s ? new { s.Slug, s.Name } : null,
+                Strengths = StrengthDocs(r.Facts.Strengths),
+                StrengthsFrom = r.Facts.StrengthsFrom is { } p
+                    ? new { id = p.Id.ToString(), p.Name, DateFrom = Iso(p.DateFrom) }
+                    : new { id = latest.Id.ToString(), latest.Name, DateFrom = Iso(latest.DateFrom) },
+                Previous = Edition(latest),
+                Next = (object?)null,
+                Results = Array.Empty<object>(),
+                Announced = new { r.Announcement.Venue, r.Announcement.Source },
+            }, ct);
+        }
+
+        // A stand-in whose real edition is now listed (or whose announcement was withdrawn) goes.
+        HashSet<string> current = [.. standIns.Values.Select(r => r.Id)];
+        foreach (var path in await store.PublishedPathsAsync("events/x", ct))
+        {
+            var id = path["events/".Length..];
+            if (!current.Contains(id))
+            {
+                removed += await store.DeletePublishedAsync(path, isPrefix: false, ct);
+                removed += await store.DeletePublishedAsync($"flights/{id}_", isPrefix: true, ct);
+                removed += await store.DeletePublishedAsync($"trains/{id}_", isPrefix: true, ct);
+            }
+        }
+
+        var rows = all.Select(f => Row.Listed(f)).Concat(expected);
 
         foreach (var year in rows.GroupBy(r => r.From.Year))
         {
@@ -89,15 +129,15 @@ public sealed partial class EventPublisher(
             {
                 Events = year.OrderBy(r => r.From).Select(r => new
                 {
-                    id = r.Facts.Event.Id.ToString(),
-                    r.Facts.Event.Name,
+                    id = r.Id,
+                    r.Name,
                     DateFrom = Iso(r.From),
                     DateTo = Iso(r.To),
                     r.City,
                     r.Facts.Event.Country,
                     r.Facts.IsWsdc,
                     Chips = Chips(r.Facts.Strengths),
-                    Expected = r.IsExpected ? true : (bool?)null,
+                    Expected = r.IsExpected && r.Announcement is null ? true : (bool?)null,
                     Announced = r.Announcement is { } a ? new { a.Venue, a.WebsiteUrl, a.Source } : null,
                 }),
             }, ct);
@@ -178,9 +218,30 @@ public sealed partial class EventPublisher(
             && d.AddYears(1) >= today
             && !Editions(f.Event, all).Any(o => o.DateFrom > d));
 
+    private static IEnumerable<object> StrengthDocs(IEnumerable<DivisionStrength> strengths) =>
+        strengths.Select(s => new
+        {
+            s.Division,
+            Role = s.Role.ToString(),
+            s.FieldSize,
+            AveragePoints = Math.Round(s.AveragePoints, 2),
+            MedianPoints = Math.Round(s.MedianPoints, 2),
+            TopQuartileAverage = Math.Round(s.TopQuartileAverage, 2),
+            EuropeTopQuartileAverage = Math.Round(s.EuropeTopQuartileAverage, 2),
+            Difficulty = s.Difficulty?.ToString(),
+        });
+
     /// <summary>One line of a year summary: a listed event, or a series' expected next edition.</summary>
     internal sealed record Row(EventFacts Facts, bool IsExpected, DateOnly From, DateOnly To, string? City, Announcement? Announcement)
     {
+        /// <summary>An announced edition is an event of its own; an unannounced one points at the latest.</summary>
+        public string Id => Announcement is null ? Facts.Event.Id.ToString() : $"x{Facts.Event.Id}";
+
+        /// <summary>The series name with the new edition's year: "Budafest 2027", "Westie Gala 2026/27".</summary>
+        public string Name => Announcement is null
+            ? Facts.Event.Name
+            : $"{EditionYear().Replace(Facts.Event.Name, "").Trim()} {(To.Year != From.Year ? $"{From.Year}/{To:yy}" : From.Year.ToString())}";
+
         public static Row Listed(EventFacts f) =>
             new(f, false, f.Event.DateFrom!.Value, f.Event.DateTo ?? f.Event.DateFrom!.Value, f.Event.City, null);
 
@@ -207,4 +268,7 @@ public sealed partial class EventPublisher(
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Published {Events} European events: {Written} documents written, {Skipped} unchanged, {Removed} outside Europe removed")]
     private static partial void LogPublished(ILogger logger, int events, int written, int skipped, int removed);
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"\s*\b(19|20)\d{2}(\s*[/-]\s*\d{2,4})?\b")]
+    private static partial System.Text.RegularExpressions.Regex EditionYear();
 }

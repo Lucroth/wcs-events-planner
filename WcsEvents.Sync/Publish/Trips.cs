@@ -18,6 +18,7 @@ public sealed record Trip(string Id, DateOnly Start, DateOnly End, string? City,
     {
         var infos = await EventPublisher.AdminInfosAsync(store, ct);
         var manual = await store.ReadWhereAsync("events", "manual", true, ct);
+        var announced = (await store.ReadAllAsync("events", ct)).Where(e => e.Key.StartsWith('x'));
         var scraped = await db.ScoringEvents.AsNoTracking()
             .Where(e => e.DateFrom != null && e.Name != "")
             .ToListAsync(ct);
@@ -25,7 +26,7 @@ public sealed record Trip(string Id, DateOnly Start, DateOnly End, string? City,
         return
         [
             .. scraped.Select(e => Of(e.Id.ToString(), e.DateFrom!.Value, e.DateTo ?? e.DateFrom!.Value, e.City, e.Country, infos)),
-            .. manual.Select(m => Of(m.Key, Date(m.Value, "dateFrom"), Date(m.Value, "dateTo"), Str(m.Value, "city"), Str(m.Value, "country"), infos)),
+            .. manual.Concat(announced).Select(m => Of(m.Key, Date(m.Value, "dateFrom"), Date(m.Value, "dateTo"), Str(m.Value, "city"), Str(m.Value, "country"), infos)),
         ];
     }
 

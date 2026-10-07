@@ -47,10 +47,11 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
       </span>
     </nav>
     ${params.has("next") ? await nextEdition(id, Number(params.get("next"))) : ""}
+    ${scraped.announced ? html`<p class="notice small">Announced by the organiser${safeUrl(scraped.announced.source) ? html` (<a href="${safeUrl(scraped.announced.source)!}" target="_blank" rel="noopener">source</a>)` : ""}, not on scoring.dance yet. Competition level is from the latest edition; this page switches to the real listing once scoring.dance has it.</p>` : ""}
     <h1>${e.name}</h1>
     <p class="lead">
       ${range(e.dateFrom, e.dateTo)} ${e.dateFrom.slice(0, 4)} · ${[e.city, e.country].filter(Boolean).join(", ")}
-      ${info?.venueName ? html` · <a href="${mapsUrl(info.venueAddress || info.venueName)}" target="_blank" rel="noopener">${info.venueName}</a>` : ""}
+      ${info?.venueName ? html` · <a href="${mapsUrl(info.venueAddress || info.venueName)}" target="_blank" rel="noopener">${info.venueName}</a>` : scraped.announced?.venue ? html` · <a href="${mapsUrl(`${scraped.announced.venue}, ${e.city ?? ""}`)}" target="_blank" rel="noopener">${scraped.announced.venue}</a>` : ""}
       ${e.isWsdc ? html`<span class="tag">WSDC</span>` : ""}
       ${admin ? html`<a class="button small" href="#/admin/event/${id}">Edit</a>` : ""}
     </p>
@@ -80,7 +81,7 @@ function links(e: ScrapedEvent, info: Info | undefined): Raw {
     ["Instagram", safeUrl(info?.instagramUrl)],
     ["Livestream", safeUrl(info?.streamUrl)],
     ["Polish FB group", safeUrl(info?.polishGroupUrl)],
-    ["scoring.dance", e.manual ? null : `https://scoring.dance/enUS/events/${e.id}/results/`],
+    ["scoring.dance", e.manual || e.announced ? null : `https://scoring.dance/enUS/events/${e.id}/results/`],
   ];
   return html`${list.filter(([, u]) => u).map(([label, u]) => html`<a class="button" href="${u}" target="_blank" rel="noopener">${label}</a>`)}`;
 }

@@ -20,6 +20,8 @@ export interface ScrapedEvent {
   results: DivisionResult[];
   /** Added by hand in the admin; never touched by the sync. */
   manual?: boolean;
+  /** An edition the organiser announced before scoring.dance lists it; replaced once it does. */
+  announced?: { venue: string | null; source: string | null } | null;
 }
 
 export interface EditionRef {

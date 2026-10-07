@@ -75,6 +75,14 @@ public sealed partial class FirestoreStore(FirestoreDb firestore, AppDbContext d
         return known.Count;
     }
 
+    /// <summary>Paths of the documents this mirror published under a prefix, e.g. "events/x".</summary>
+    public async Task<IReadOnlyList<string>> PublishedPathsAsync(string prefix, CancellationToken ct)
+    {
+        var key = $"{firestore.ProjectId}/{prefix}";
+        var paths = await db.PublishedDocs.AsNoTracking().Where(d => d.Path.StartsWith(key)).Select(d => d.Path).ToListAsync(ct);
+        return [.. paths.Select(p => p[(firestore.ProjectId.Length + 1)..])];
+    }
+
     /// <summary>Every document of a collection the admin edits, by id, as JSON.</summary>
     public Task<IReadOnlyDictionary<string, JsonElement>> ReadAllAsync(string collection, CancellationToken ct) =>
         ReadAsync(collection, firestore.Collection(collection), ct);
