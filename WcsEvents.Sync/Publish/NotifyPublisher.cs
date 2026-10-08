@@ -93,8 +93,19 @@ public sealed partial class NotifyPublisher(FirestoreDb firestore, FirestoreStor
     }
 
     /// <summary>One watched connection, as the event page stores it.</summary>
-    internal sealed record Watch(string EventId, string EventName, string Kind, string? Airline, string From, string To, string Date, string? Time, decimal Price, string Currency)
+    internal sealed record Watch(string EventId, string EventName, string Kind, string? Airline, string From, string To, string Date, string? Time, decimal Price, string Currency, string? Url = null)
     {
+        /// <summary>
+        /// Where to book: the airline's search for the route and day (the same links as the event
+        /// page), or the link the page stored with the watch (koleo for a train).
+        /// </summary>
+        public string? BookingUrl => Airline switch
+        {
+            "Ryanair" => $"https://www.ryanair.com/pl/pl/trip/flights/select?adults=1&teens=0&children=0&infants=0&dateOut={Date}&isReturn=false&originIata={From}&destinationIata={To}",
+            "Wizz" => $"https://www.wizzair.com/en-gb/booking/select-flight/{From}/{To}/{Date}/null/1/0/0/null",
+            _ => Url is { } u && Uri.TryCreate(u, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps ? u : null,
+        };
+
         public string Key => LegKey(EventId, Kind, Airline, From, To, Date, Time);
 
         public static Watch? Read(IDictionary<string, object> d)
@@ -103,7 +114,7 @@ public sealed partial class NotifyPublisher(FirestoreDb firestore, FirestoreStor
             decimal? N(string k) => d.TryGetValue(k, out var v) ? v switch { double x => (decimal)x, long l => l, _ => null } : null;
 
             return S("eventId") is { } e && S("kind") is { } kind && S("from") is { } from && S("to") is { } to && S("date") is { } date && N("price") is { } price
-                ? new Watch(e, S("eventName") ?? e, kind, S("airline"), from, to, date, S("time"), price, S("currency") ?? "PLN")
+                ? new Watch(e, S("eventName") ?? e, kind, S("airline"), from, to, date, S("time"), price, S("currency") ?? "PLN", S("url"))
                 : null;
         }
     }
@@ -198,7 +209,8 @@ public sealed partial class NotifyPublisher(FirestoreDb firestore, FirestoreStor
     {
         var rows = string.Concat(drops.Select(d =>
             $"<li><a href=\"{Site}#/event/{WebUtility.UrlEncode(d.Watch.EventId)}\">{WebUtility.HtmlEncode(d.Watch.EventName)}</a>: " +
-            $"{WebUtility.HtmlEncode(Describe(d.Watch))} now <strong>{d.Now:0.##} {d.Watch.Currency}</strong> (was {d.Watch.Price:0.##})</li>"));
+            $"{WebUtility.HtmlEncode(Describe(d.Watch))} now <strong>{d.Now:0.##} {d.Watch.Currency}</strong> (was {d.Watch.Price:0.##})" +
+            (d.Watch.BookingUrl is { } url ? $" · <a href=\"{WebUtility.HtmlEncode(url)}\">book</a>" : "") + "</li>"));
         return $"<p>Prices dropped on connections you watch:</p><ul>{rows}</ul>" +
                $"<p style=\"color:#888\">Fares change fast; check before buying. Manage alerts on the event page in <a href=\"{Site}\">WCS Trips</a>.</p>";
     }

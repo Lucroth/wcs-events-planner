@@ -17,6 +17,8 @@ export interface Watch {
   time: string | null;
   price: number;
   currency: string;
+  /** Booking link from the page (koleo for trains); the email builds airline links itself. */
+  url?: string | null;
 }
 
 /** The same key the sync's NotifyPublisher.LegKey builds, so a watch finds its leg in the fares. */

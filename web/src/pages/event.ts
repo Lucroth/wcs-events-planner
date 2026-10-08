@@ -388,7 +388,7 @@ async function wireAlerts(id: string): Promise<void> {
   }
 
   const watched = starred ? await watches(id) : new Map<string, Watch>();
-  const watchOf = (el: HTMLElement): Watch => ({ ...JSON.parse(el.dataset.watch!), eventId: id, eventName: name });
+  const watchOf = (el: HTMLElement): Watch => ({ ...JSON.parse(el.dataset.watch!), eventId: id, eventName: name, url: (el as HTMLAnchorElement).href || null });
 
   const render = () => {
     star.textContent = starred ? "★ Starred" : "☆ Star";

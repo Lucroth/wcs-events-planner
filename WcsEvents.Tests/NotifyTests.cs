@@ -45,6 +45,8 @@ public sealed class NotifyTests
 
         Assert.NotNull(w);
         Assert.Equal(NotifyPublisher.LegKey("x325", "flight", "Wizz", "BUD", "WAW", "2026-11-16", null), w.Key);
-        Assert.Contains("now <strong>89 PLN</strong> (was 120)", NotifyPublisher.Body([new NotifyPublisher.Drop(w, 89)]));
+        var body = NotifyPublisher.Body([new NotifyPublisher.Drop(w, 89)]);
+        Assert.Contains("now <strong>89 PLN</strong> (was 120)", body);
+        Assert.Contains("<a href=\"https://www.wizzair.com/en-gb/booking/select-flight/BUD/WAW/2026-11-16/null/1/0/0/null\">book</a>", body);
     }
 }
