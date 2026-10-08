@@ -13,6 +13,9 @@ on:
       commands:
         description: "Space-separated: sweep refresh scoring autofill publish flights trains"
         default: "scoring publish flights"
+      wizz:
+        description: "Wizz fares: reuse (keep the home run's) or live (ask Wizz)"
+        default: "reuse"
 
 permissions:
   contents: write
@@ -68,7 +71,7 @@ jobs:
           COMMANDS: ${{ steps.pick.outputs.commands }}
           # Wizz refuses GitHub's network; its fares come from a daily run on a home PC
           # (scripts/flights-home.ps1), and this job keeps them rather than asking Wizz.
-          WIZZ: reuse
+          WIZZ: ${{ inputs.wizz || 'reuse' }}
         run: |
           dotnet build WcsEvents.Sync -c Release
           for c in $COMMANDS; do

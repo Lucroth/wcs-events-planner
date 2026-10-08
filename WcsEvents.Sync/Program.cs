@@ -80,7 +80,11 @@ builder.Services.AddHttpClient<WizzClient>(http =>
     http.DefaultRequestHeaders.Add("Origin", "https://www.wizzair.com");
     http.DefaultRequestHeaders.Referrer = new Uri("https://www.wizzair.com/");
     http.Timeout = TimeSpan.FromMinutes(5);
-}).AddHttpMessageHandler(sp => new PoliteHttpHandler(wizzGate, sp.GetRequiredService<ILogger<PoliteHttpHandler>>()));
+})
+// Wizz's bot protection sets a cookie only a browser can validate; sent back, it gets every later
+// request refused with "InvalidProtocol". Without cookies each request stands on its own.
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false })
+.AddHttpMessageHandler(sp => new PoliteHttpHandler(wizzGate, sp.GetRequiredService<ILogger<PoliteHttpHandler>>()));
 
 // koleo prices one connection per request; a gentle pace keeps a daily run under ten minutes.
 var koleoGate = new RateGate(new CrawlOptions { RequestsPerSecond = 1 });

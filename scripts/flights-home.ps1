@@ -12,6 +12,7 @@ $home_ = Join-Path $env:USERPROFILE ".wcs-events"
 $key = Join-Path $home_ "service-account.json"
 $work = Join-Path $home_ "mirror"
 $log = Join-Path $home_ "flights.log"
+$syncLog = Join-Path $home_ "flights-sync.log"
 
 New-Item -ItemType Directory -Force $work | Out-Null
 Start-Transcript -Path $log -Append | Out-Null
@@ -33,7 +34,10 @@ try {
     $env:ConnectionStrings__Db = "Data Source=$db"
     Remove-Item Env:\WIZZ -ErrorAction SilentlyContinue
 
-    & dotnet run --project (Join-Path $repo "WcsEvents.Sync") -c Release -- flights
+    # Through cmd so the sync's own output is kept (last run only); the transcript only records
+    # PowerShell's and holds its own file open.
+    $project = Join-Path $repo "WcsEvents.Sync"
+    & cmd /c "dotnet run --project `"$project`" -c Release -- flights > `"$syncLog`" 2>&1"
     if ($LASTEXITCODE -ne 0) { throw "Flight search failed with exit code $LASTEXITCODE" }
 }
 finally {
