@@ -196,7 +196,7 @@ public static class ScoringStore
 
         var rows = await db.ScoringEntries
             .Where(e => e.Round.Kind != RoundKind.Final)
-            .Select(e => new { Entry = e, e.Round.ScoringEventId })
+            .Select(e => new { Entry = e, e.Round.ScoringEventId, e.Round.DivisionAbbreviation })
             .ToListAsync(ct);
 
         var labelled = 0;
@@ -208,7 +208,7 @@ public static class ScoringStore
             ct.ThrowIfCancellationRequested();
 
             List<(ScoringEntry Entry, Role? Evidence, int Weight)> evidence = [.. table.Select(row =>
-                row.Entry.Bib is not null && roleByBib.TryGetValue((row.ScoringEventId, row.Entry.Bib, BibName(row.Entry.Name)), out var byBib)
+                row.Entry.Bib is not null && roleByBib.TryGetValue((row.ScoringEventId, row.DivisionAbbreviation, row.Entry.Bib, BibName(row.Entry.Name)), out var byBib)
                     ? (row.Entry, (Role?)byBib, 100)
                     : row.Entry.Wscid is { } wscid && roleByDancer.TryGetValue(wscid, out var byHistory)
                         ? (row.Entry, byHistory, 1)
@@ -241,26 +241,28 @@ public static class ScoringStore
     /// pairing table whose columns mostly disagree with the dancers' registry roles is dropped too.
     /// </para>
     /// </summary>
-    private static async Task<Dictionary<(int Event, string Bib, string Name), Role>> PublishedRolesByBibAsync(
+    private static async Task<Dictionary<(int Event, string? Division, string Bib, string Name), Role>> PublishedRolesByBibAsync(
         AppDbContext db, IReadOnlyDictionary<int, Role> roleByDancer, CancellationToken ct)
     {
         var rows = await db.ScoringEntries.AsNoTracking()
             .Where(e => e.Role != null && e.Bib != null && e.Round.IsJackAndJill)
-            .Select(e => new { e.Round.ScoringEventId, e.RoundId, e.TableIndex, e.Bib, e.Role, e.Wscid, e.Name })
+            .Select(e => new { e.Round.ScoringEventId, e.Round.DivisionAbbreviation, e.RoundId, e.TableIndex, e.Bib, e.Role, e.Wscid, e.Name })
             .ToListAsync(ct);
 
         return rows
             .GroupBy(r => (r.RoundId, r.TableIndex))
             .Where(g => g.Select(r => r.Role).Distinct().Count() > 1 && ColumnsTrusted([.. g.Select(r => (r.Role!.Value, r.Wscid))], roleByDancer))
             .SelectMany(g => g)
-            .GroupBy(r => (r.ScoringEventId, r.Bib!, BibName(r.Name)))
+            .GroupBy(r => (r.ScoringEventId, r.DivisionAbbreviation, r.Bib!, BibName(r.Name)))
             .Where(g => g.Select(r => r.Role).Distinct().Count() == 1)
             .ToDictionary(g => g.Key, g => g.First().Role!.Value);
     }
 
     /// <summary>
-    /// A bib is evidence only for the dancer it was printed for: some events number each division
-    /// from 1 (Westie Harbor 2026), so one bib belongs to a different dancer in every division.
+    /// A bib is evidence only for the dancer it was printed for, in the division it was danced in:
+    /// some events number each division from 1, and dancers lead in one division and follow in
+    /// another (Westie Harbor 2026: Novice leaders who follow in Intermediate or Advanced), so the
+    /// evidence is keyed by event, division, bib and name.
     /// </summary>
     internal static string BibName(string name) => name.Trim().ToLowerInvariant();
 

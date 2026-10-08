@@ -103,6 +103,37 @@ public sealed class ScoringStoreTests : IDisposable
     }
 
     [Fact]
+    public async Task InferRoles_KeepsADancersRoleToItsOwnDivision()
+    {
+        // She leads in Novice and follows in Intermediate: the Intermediate final must not turn the
+        // Novice leader prelim into followers.
+        await using (var seed = NewContext())
+        {
+            ScoringRound Round(int id, string name, RoundKind kind) => new()
+            {
+                Id = id, ScoringEventId = 8, EventName = "Harbor", RoundName = name, DivisionAbbreviation = name[..3].ToUpperInvariant(),
+                IsJackAndJill = true, Kind = kind, EventDate = new DateOnly(2026, 10, 1),
+            };
+            seed.ScoringRounds.AddRange(Round(1, "Int Jack&Jill final", RoundKind.Final), Round(2, "Nov Jack&Jill prelim", RoundKind.Prelim));
+            seed.ScoringEntries.AddRange(
+                new ScoringEntry { RoundId = 1, Name = "Ola Lead", Bib = "1", Role = Role.Leader, Position = 1 },
+                new ScoringEntry { RoundId = 1, Name = "Marta Both", Bib = "23", Role = Role.Follower, Position = 1 },
+                new ScoringEntry { RoundId = 2, Name = "Marta Both", Bib = "23", Position = 1 },
+                new ScoringEntry { RoundId = 2, Name = "Jan Lead", Bib = "24", Wscid = 21723, Position = 2 });
+            await seed.SaveChangesAsync(TestContext.Current.CancellationToken);
+        }
+
+        await SeedRoleHistoryAsync((21723, Role.Leader));
+
+        await using var db = NewContext();
+        await ScoringStore.InferRolesAsync(db, TestContext.Current.CancellationToken);
+
+        Assert.All(
+            await db.ScoringEntries.AsNoTracking().Where(e => e.RoundId == 2).ToListAsync(TestContext.Current.CancellationToken),
+            e => Assert.Equal(Role.Leader, e.Role));
+    }
+
+    [Fact]
     public async Task InferRoles_LeavesATableUnlabelledWhenTheMirrorGivesNoMajority()
     {
         await StorePrelimAsync();
