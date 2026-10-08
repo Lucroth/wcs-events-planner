@@ -1850,7 +1850,7 @@
   },
   "439": {
     "source": "https://www.santaswing.pl/prices/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
       "websiteUrl": "https://www.santaswing.pl/",
       "instagramUrl": "https://www.instagram.com/santa_swing/",
@@ -1891,38 +1891,206 @@
           "currency": "PLN",
           "until": null
         }
-      ]
+      ],
+      "facebookUrl": "https://fb.me/e/6KpUxmFYZ",
+      "venueName": "Galaxy Hotel"
     }
   },
   "x325": {
     "source": "https://thedanceatlas.com/events/autumn-swing-challenge-2026-wsdc-rising-star-tour-event/131787",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Verdi Budapest Aquincum"
+      "venueName": "Verdi Budapest Aquincum",
+      "facebookUrl": "https://www.facebook.com/events/1312687787648965",
+      "venueAddress": "Árpád fejedelem útja 94, 1036 Budapest, Hungary",
+      "staff": [
+        "Joao Parada & Savana Barreau",
+        "Kyle Fitzgerald & Melodie Paletta",
+        "Miguel Ortega & Irina Puzanova",
+        "Ludovic Pelegrin & Coleen Man",
+        "Philipp Wolff & Ekaterina Wolff",
+        "Marina Motronenko",
+        "Attila Kobori",
+        "Ivan Katrunov",
+        "Olga Ruban (DJ)",
+        "Piotr Lenart (MC)",
+        "Marta Nita (chief judge)",
+        "Kevin Town (head DJ)",
+        "Tana Abeni (DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Quick bird",
+          "price": 160,
+          "currency": "EUR",
+          "until": "2026-08-15"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal bird",
+          "price": 180,
+          "currency": "EUR",
+          "until": "2026-09-15"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late bird",
+          "price": 190,
+          "currency": "EUR",
+          "until": "2026-11-01"
+        },
+        {
+          "kind": "Party",
+          "tier": "Quick bird",
+          "price": 120,
+          "currency": "EUR",
+          "until": "2026-08-15"
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal bird",
+          "price": 130,
+          "currency": "EUR",
+          "until": "2026-09-15"
+        },
+        {
+          "kind": "Party",
+          "tier": "Late bird",
+          "price": 140,
+          "currency": "EUR",
+          "until": "2026-11-01"
+        }
+      ]
     },
     "year": 2026
   },
   "x342": {
     "source": "https://danceapp.net/en/events/147/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Scandic Oslo Airport"
+      "venueName": "Scandic Oslo Airport",
+      "facebookUrl": "https://www.facebook.com/winterwhitewcs",
+      "instagramUrl": "https://www.instagram.com/winterwhitewcs/",
+      "venueAddress": "Ravinevegen 15, 2060 Gardermoen, Norway",
+      "staff": [
+        "Jordan Frisbee & Tatiana Mollmann",
+        "Semion & Maria",
+        "Daniel & Lauren",
+        "Irina & Ibi (Ibi also MC)",
+        "Joshua & Maïna",
+        "Ardena & Leo",
+        "Justin Petersen (head DJ)"
+      ],
+      "eventSchedule": "https://www.winterwhite.no/schedule-1",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Early-Bird",
+          "price": 2200,
+          "currency": "NOK",
+          "until": "2026-09-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird",
+          "price": 2800,
+          "currency": "NOK",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Social Pass",
+          "price": 1900,
+          "currency": "NOK",
+          "until": null
+        }
+      ]
     },
     "year": 2026
   },
   "x347": {
     "source": "https://berlinswingrevolution.com/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Werk36"
+      "venueName": "Werk36",
+      "facebookUrl": "https://www.facebook.com/BerlinSwingRevolution",
+      "venueAddress": "Ella-Barowsky-Straße 70, 10829 Berlin, Germany",
+      "staff": [
+        "Savana Barreau & João Parada",
+        "Fabienne & Lee Easton",
+        "John Kirkconnell",
+        "Lee Easton (MC)"
+      ],
+      "eventSchedule": "https://berlinswingrevolution.com/schedule/index.en.html",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Full Pass",
+          "price": 180,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     },
     "year": 2026
   },
   "x339": {
     "source": "https://danceapp.net/en/events/187/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Radisson RED Hotel London Heathrow"
+      "venueName": "Radisson RED Hotel London Heathrow",
+      "facebookUrl": "https://www.facebook.com/people/New-Years-Swing-Fling/61574429602584/",
+      "instagramUrl": "https://www.instagram.com/nyswingfling",
+      "venueAddress": "Bath Road, UB7 0DU London, United Kingdom",
+      "staff": [
+        "Jakub Jakoubek & Emeline Rochefeuille",
+        "Joshua Schubert & Maïna Vila Cobasi",
+        "Karin Kakun",
+        "Leo Lorenzo",
+        "Irina Puzanova",
+        "Allan Thivoz & Alexandra Branco",
+        "Wayne Powell (MC)",
+        "Catherine Bickle (head DJ)"
+      ],
+      "eventSchedule": "https://www.nysf.uk/schedule",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Tier 1",
+          "price": 125,
+          "currency": "GBP",
+          "until": "2026-07-08"
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 2",
+          "price": 145,
+          "currency": "GBP",
+          "until": "2026-10-08"
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 3",
+          "price": 165,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Early bird",
+          "price": 115,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Late bird",
+          "price": 135,
+          "currency": "GBP",
+          "until": null
+        }
+      ]
     },
     "year": 2026
   },
@@ -1936,57 +2104,297 @@
   },
   "x354": {
     "source": "http://wcs-budafest.com",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Hotel InterContinental Budapest"
+      "venueName": "Hotel InterContinental Budapest",
+      "registrationOpens": "2026-08-16T17:00",
+      "venueAddress": "Apáczai Csere János utca 12-14, 1052 Budapest, Hungary",
+      "staff": [
+        "Jordan Frisbee & Tatiana Mollmann",
+        "Thibault Ramirez & Nicole Ramirez",
+        "Jakub Jakoubek & Emeline Rochefeuille",
+        "Sean McKeever & Alyssa McKeever",
+        "Semion Ovsiannikov & Maria Elizarova",
+        "Joao Parada & Savana Barreau",
+        "Robert Royston",
+        "Ben Morris (MC)",
+        "Nicolas Handschuh (head DJ)",
+        "Justin Petersen (DJ)",
+        "Koichi Tsunoda (DJ)",
+        "Daric Lion (head DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super early bird",
+          "price": 210,
+          "currency": "EUR",
+          "until": "2026-08-16"
+        },
+        {
+          "kind": "Full",
+          "tier": "Early bird",
+          "price": 220,
+          "currency": "EUR",
+          "until": "2026-09-15"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late bird",
+          "price": 230,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Super early bird",
+          "price": 145,
+          "currency": "EUR",
+          "until": "2026-08-16"
+        },
+        {
+          "kind": "Party",
+          "tier": "Early bird",
+          "price": 155,
+          "currency": "EUR",
+          "until": "2026-09-15"
+        },
+        {
+          "kind": "Party",
+          "tier": "Late bird",
+          "price": 165,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
   "x336": {
     "source": "https://swingresolution.com/pages/hotel-travel",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Radisson Blu Hotel, Royal Mile"
+      "venueName": "Radisson Blu Hotel, Royal Mile",
+      "venueAddress": "80 High Street, The Royal Mile, EH1 1TH Edinburgh, United Kingdom",
+      "staff": [
+        "Jesse & Ariel",
+        "Jeff Mumford & Lecie Langille",
+        "Paul Warden & Coleen Man",
+        "Bret & Joëlle Navarre",
+        "Fernanda & Igor"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "",
+          "price": 185,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "",
+          "price": 120,
+          "currency": "GBP",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
   "x363": {
     "source": "https://swingtzerland.com/en/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Tanzwerk101"
+      "venueName": "Tanzwerk101",
+      "facebookUrl": "https://www.facebook.com/events/2680222662343290",
+      "instagramUrl": "https://www.instagram.com/swingtzerland/",
+      "venueAddress": "Pfingstweidstrasse 101, 8005 Zürich, Switzerland",
+      "staff": [
+        "Jordan Frisbee & Tatiana Mollmann",
+        "Maxence Martin & Virginie Grondin",
+        "Jakub Jakoubek & Emeline Rochefeuille",
+        "Semion Ovsiannikov & Maria Elizarova",
+        "Olivier & Virginie Massart",
+        "Kevin & Nataliya Kane"
+      ],
+      "eventSchedule": "https://swingtzerland.com/schedule-pdf",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "First 100",
+          "price": 190,
+          "currency": "CHF",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Second 100",
+          "price": 200,
+          "currency": "CHF",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Remaining",
+          "price": 210,
+          "currency": "CHF",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party pass",
+          "price": 140,
+          "currency": "CHF",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
   "x362": {
     "source": "https://www.trinityswing.com/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Carrickdale Hotel & Spa"
+      "venueName": "Carrickdale Hotel & Spa",
+      "facebookUrl": "https://www.facebook.com/trinityswing",
+      "instagramUrl": "https://www.instagram.com/trinity_swing",
+      "staff": [
+        "Sean & Alyssa McKeever",
+        "Zac & Maddy Skinner",
+        "Lee & Fabienne Easton",
+        "Mathieu Compagnon",
+        "Gráinne Farrell",
+        "Bruno Lineker & Alyson Candido"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Bird",
+          "price": 109,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Early Bird",
+          "price": 129,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Full Price",
+          "price": 149,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass",
+          "price": 99,
+          "currency": "GBP",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
   "x335": {
     "source": "https://www.euro-dance-festival.com/rust",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Europa-Park"
+      "venueName": "Europa-Park",
+      "facebookUrl": "https://www.facebook.com/EURODANCEFESTIVAL/",
+      "instagramUrl": "https://www.instagram.com/eurodancefestival/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Six-day pass",
+          "price": 599,
+          "currency": "EUR",
+          "until": "2026-10-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Six-day pass",
+          "price": 619,
+          "currency": "EUR",
+          "until": "2026-11-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Six-day pass",
+          "price": 629,
+          "currency": "EUR",
+          "until": "2026-12-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Six-day pass",
+          "price": 649,
+          "currency": "EUR",
+          "until": "2027-01-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Six-day pass",
+          "price": 679,
+          "currency": "EUR",
+          "until": "2027-02-03"
+        },
+        {
+          "kind": "Full",
+          "tier": "Box office",
+          "price": 699,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
   "x366": {
     "source": "https://www.wintercoastswing.com/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Vesileppis - Hiihtoareena"
+      "venueName": "Vesileppis - Hiihtoareena",
+      "facebookUrl": "https://www.facebook.com/wintercoastswing",
+      "registrationOpens": "2026-09-01T12:00",
+      "staff": [
+        "Maxence Martin & Aymeline Felmy",
+        "Zac & Maddy",
+        "Zee & Dalena",
+        "Chuck Brown (head judge)",
+        "Jennina Färm"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "International Winter Pass",
+          "price": 150,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
   "x381": {
     "source": "https://westiespringthing.com",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Verdi Budapest Aquincum"
+      "venueName": "Verdi Budapest Aquincum",
+      "facebookUrl": "https://www.facebook.com/events/1232741159037815",
+      "instagramUrl": "https://www.instagram.com/springthingwcs/",
+      "registrationOpens": "2026-11-17T19:00"
     },
     "year": 2027
   },
@@ -2000,66 +2408,1135 @@
   },
   "x291": {
     "source": "https://swingincapital.com/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Hotel Capannelle"
+      "venueName": "Hotel Capannelle",
+      "facebookUrl": "https://www.facebook.com/events/roma/swing-in-capital-2027-wsdc-event/1498421311724173",
+      "instagramUrl": "https://instagram.com/swing_in_capital_wsdc",
+      "venueAddress": "Via Siderno 37, 00178 Roma, Italy",
+      "eventSchedule": "https://swingincapital.com/schedule",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "First 150",
+          "price": 149,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Regular",
+          "price": 169,
+          "currency": "EUR",
+          "until": "2027-01-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "From 1 February",
+          "price": 179,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "First 100",
+          "price": 119,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "After first 100",
+          "price": 139,
+          "currency": "EUR",
+          "until": "2027-01-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "From 1 February",
+          "price": 149,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
   "x389": {
     "source": "https://detonationdance.com/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Hilton Hotel, Outwood Ln, Manchester M90 4WP"
+      "venueName": "Hilton Hotel, Outwood Ln, Manchester M90 4WP",
+      "facebookUrl": "https://www.facebook.com/EastonSwing/",
+      "instagramUrl": "https://www.instagram.com/eastonswing/",
+      "venueAddress": "Outwood Ln, Manchester M90 4WP, United Kingdom",
+      "staff": [
+        "Ben & Cameo",
+        "Teddy & Dianeva",
+        "James & Nicole",
+        "Philipp & Ekaterina",
+        "Lee & Fab"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Earlybird (international)",
+          "price": 149,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Full ticket (international)",
+          "price": 169,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "",
+          "price": 129,
+          "currency": "GBP",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
   "x372": {
     "source": "https://danceapp.net/events/192-BeeMAD_2027/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Hotel Eurostars Puerta Madrid"
+      "venueName": "Hotel Eurostars Puerta Madrid",
+      "staff": [
+        "Hugo Miguez & Stacy Kay",
+        "Maxime Zzaoui & Torri Smith-Zzaoui",
+        "Chuck Brown (head judge)",
+        "Sara Mouchon (MC)",
+        "Justin Petersen (head DJ)",
+        "DJ Daric (DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early bird",
+          "price": 165,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal bird",
+          "price": 185,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Late bird",
+          "price": 198,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Early bird",
+          "price": 125,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal bird",
+          "price": 140,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Late bird",
+          "price": 155,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
   "x383": {
     "source": "https://springtimeswing.com/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "M.A.K. Studios"
+      "venueName": "M.A.K. Studios",
+      "facebookUrl": "https://www.facebook.com/events/1651355852183831",
+      "instagramUrl": "https://www.instagram.com/springtimeswing",
+      "registrationOpens": "2026-11-11T16:00",
+      "venueAddress": "Kaiser-Joseph-Straße 268, 79098 Freiburg im Breisgau, Germany",
+      "staff": [
+        "Brandi Guild",
+        "Jakub & Emeline",
+        "Semion & Maria",
+        "Joel & Chantelle",
+        "Daniel & Lauren",
+        "João & Savana",
+        "Zac & Maddy"
+      ]
     },
     "year": 2027
   },
   "x378": {
     "source": "http://www.d-townswing.com",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Boston Club"
+      "venueName": "Boston Club",
+      "venueAddress": "Vennhauser Allee 135, 40627 Düsseldorf, Germany",
+      "staff": [
+        "Jordan Frisbee & Tatiana Mollmann",
+        "Zack & Maddy Skinner",
+        "Maxime & Torri Zzaoui",
+        "Maxence Martin & Virginie Grondin",
+        "Ben Morris",
+        "Nicolas Handschuh (DJ)",
+        "Justin Petersen (DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Tier 1 (Neighbour pass)",
+          "price": 169,
+          "currency": "EUR",
+          "until": "2026-08-10"
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 2 (Neighbour pass)",
+          "price": 199,
+          "currency": "EUR",
+          "until": "2026-09-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 3 (Neighbour pass)",
+          "price": 209,
+          "currency": "EUR",
+          "until": "2027-01-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 4 (Neighbour pass)",
+          "price": 219,
+          "currency": "EUR",
+          "until": "2027-03-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 5 (Neighbour pass)",
+          "price": 229,
+          "currency": "EUR",
+          "until": "2027-06-10"
+        },
+        {
+          "kind": "Party",
+          "tier": "Tier 1 (Event pass)",
+          "price": 99,
+          "currency": "EUR",
+          "until": "2026-08-10"
+        },
+        {
+          "kind": "Party",
+          "tier": "Tier 2 (Event pass)",
+          "price": 119,
+          "currency": "EUR",
+          "until": "2026-09-30"
+        },
+        {
+          "kind": "Party",
+          "tier": "Tier 3 (Event pass)",
+          "price": 129,
+          "currency": "EUR",
+          "until": "2027-06-10"
+        }
+      ]
     },
     "year": 2027
   },
   "x412": {
     "source": "https://danceapp.net/en/events/199-Baltic_Swing_2027/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "4* Hotel Scandic Gdansk"
+      "venueName": "4* Hotel Scandic Gdansk",
+      "facebookUrl": "https://www.facebook.com/BalticSwing/"
     },
     "year": 2027
   },
   "x420": {
     "source": "https://infinite-swing.com",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "INFINITY Hotel Munich"
+      "venueName": "INFINITY Hotel Munich",
+      "instagramUrl": "https://www.instagram.com/infinite.swing/",
+      "venueAddress": "Andreas-Danzer-Weg 1-3, 85716 Unterschleißheim, Germany"
     },
     "year": 2027
   },
   "x379": {
     "source": "https://www.worldsdc.com/events/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Boston Club"
+      "venueName": "Boston Club",
+      "venueAddress": "Vennhauser Allee 135, 40627 Düsseldorf, Germany"
     },
     "year": 2027
+  },
+  "454": {
+    "source": "https://www.westiepinkcity.fr",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/events/967850272865091",
+      "venueName": "Hôtel NH Toulouse Airport",
+      "venueAddress": "15 Rue Charles Lindberg, 31700 Blagnac, France",
+      "staff": [
+        "Maxime & Torri Zzaoui",
+        "Arnaud Perga & Maïna Vila Cobarsi",
+        "Allan Thivoz & Alexandra Branco",
+        "Bret & Joëlle Navarre",
+        "Maxime Zzaoui (MC)",
+        "Torri Zzaoui (head judge)",
+        "Arnaud Perga (head DJ)"
+      ],
+      "eventSchedule": "https://www.westiepinkcity.fr/_files/ugd/0fef70_a0c7e8010a444e91abb957131eefd4e3.pdf",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early bird",
+          "price": 175,
+          "currency": "EUR",
+          "until": "2026-07-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Before Sept 30",
+          "price": 190,
+          "currency": "EUR",
+          "until": "2026-09-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Regular",
+          "price": 210,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    }
+  },
+  "w-swing-snow-2027": {
+    "source": "https://swingandsnow.ru/en/",
+    "on": "2026-10-08",
+    "info": {
+      "venueName": "Hotel New Peterhof",
+      "venueAddress": "Санкт-Петербургский проспект 34, Петергоф, Санкт-Петербург, Russia",
+      "staff": [
+        "Irina Puzanova",
+        "Artem Dmitriev",
+        "Ilmira Galieva"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Autumn prices",
+          "price": 15500,
+          "currency": "RUB",
+          "until": "2026-11-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Winter prices",
+          "price": 16500,
+          "currency": "RUB",
+          "until": "2027-01-29"
+        },
+        {
+          "kind": "Full",
+          "tier": "On site",
+          "price": 19000,
+          "currency": "RUB",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Autumn prices (Contest pass)",
+          "price": 11500,
+          "currency": "RUB",
+          "until": "2026-11-30"
+        },
+        {
+          "kind": "Party",
+          "tier": "Winter prices (Contest pass)",
+          "price": 12500,
+          "currency": "RUB",
+          "until": "2027-01-29"
+        },
+        {
+          "kind": "Party",
+          "tier": "On site (Contest pass)",
+          "price": 14000,
+          "currency": "RUB",
+          "until": null
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "x368": {
+    "source": "https://valentineswing.dance",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/events/37412783165035107",
+      "instagramUrl": "https://www.instagram.com/valentineswing.vs/",
+      "venueName": "Johannesbergs Slott",
+      "staff": [
+        "Wee Tze Yi & Dalena Lee",
+        "Zac & Maddy",
+        "Chuck Brown",
+        "Lisa Shirokova & Marcin Kowalczyk"
+      ]
+    },
+    "year": 2027
+  },
+  "x373": {
+    "source": "https://kingswing.pl",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/events/318752448822051",
+      "staff": [
+        "Robert Royston",
+        "Chuck Brown & Lauren Jones",
+        "Sean McKeever & Alyssa Glanville",
+        "PJ Turner & Karin Kakun",
+        "Browly Adjavon & Inga Kurcisa",
+        "Marta Nita & Piotr \"Badman\" Lenart"
+      ]
+    },
+    "year": 2027
+  },
+  "x391": {
+    "source": "https://www.fowcs.com",
+    "on": "2026-10-08",
+    "info": {
+      "instagramUrl": "https://www.instagram.com/frenchywestyevents/",
+      "venueName": "Van der Valk Hotel CDG Paris",
+      "venueAddress": "351 Avenue du Bois de la Pie, 95912 Roissy, France"
+    },
+    "year": 2027
+  },
+  "w-swing-valley-2027": {
+    "source": "https://www.swing-valley.com",
+    "on": "2026-10-08",
+    "info": {
+      "venueName": "Congress Centre Bad Hofgastein",
+      "venueAddress": "Tauernplatz 1, 5630 Bad Hofgastein, Austria",
+      "staff": [
+        "Daniel Pavlov & Lauren Jones",
+        "Marina Motronenko",
+        "Philippe Amar & Florencia Diaz",
+        "Leo Nguyen & Ardena Neumayr",
+        "Attila Kobori",
+        "Joshua Schubert & Rachel Schubert",
+        "Stella Maria Schletterer & Christopher Piffel",
+        "Marc Heldt & Sarah Latton",
+        "Tschen & Luisa Wang",
+        "Marc Heldt (head judge)",
+        "Lauren Jones (MC)",
+        "Justin Petersen (head DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super early bird",
+          "price": 179,
+          "currency": "EUR",
+          "until": "2026-11-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Early bird",
+          "price": 189,
+          "currency": "EUR",
+          "until": "2027-01-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Regular",
+          "price": 199,
+          "currency": "EUR",
+          "until": "2027-04-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Last call",
+          "price": 209,
+          "currency": "EUR",
+          "until": "2027-06-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Check-in",
+          "price": 219,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Super early bird",
+          "price": 129,
+          "currency": "EUR",
+          "until": "2026-11-01"
+        },
+        {
+          "kind": "Party",
+          "tier": "Early bird",
+          "price": 139,
+          "currency": "EUR",
+          "until": "2027-01-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "Regular",
+          "price": 149,
+          "currency": "EUR",
+          "until": "2027-04-30"
+        },
+        {
+          "kind": "Party",
+          "tier": "Last call",
+          "price": 159,
+          "currency": "EUR",
+          "until": "2027-06-30"
+        },
+        {
+          "kind": "Party",
+          "tier": "Check-in",
+          "price": 169,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "x437": {
+    "source": "http://www.uptownswing.se/venue.html",
+    "on": "2026-10-08",
+    "info": {
+      "venueName": "Scandic Infra City"
+    },
+    "year": 2027
+  },
+  "x337": {
+    "source": "https://www.west-in-lyon.fr/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/events/216178022449007/",
+      "venueName": "Complexe Moulin Carron",
+      "venueAddress": "42 chemin de Parsonge, 69570 Dardilly, France",
+      "staff": [
+        "Olivier Massart (MC)"
+      ]
+    },
+    "year": 2027
+  },
+  "x356": {
+    "source": "https://tanzhaus-bonn.de/swingin-festival/",
+    "on": "2026-10-08",
+    "info": {
+      "websiteUrl": "https://tanzhaus-bonn.de/swingin-festival/",
+      "venueName": "Tanzhaus Bonn",
+      "venueAddress": "Gerhardstraße 1, 53225 Bonn, Germany"
+    },
+    "year": 2027
+  },
+  "x409": {
+    "source": "https://www.swingofmusic.com/",
+    "on": "2026-10-08",
+    "info": {
+      "instagramUrl": "https://www.instagram.com/swingofmusic.austria/",
+      "venueName": "Hippmann 7 Dance School",
+      "venueAddress": "Pollheimerstraße 7, Wels, Austria"
+    },
+    "year": 2027
+  },
+  "x438": {
+    "source": "https://bavarianopen.com/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/BavarianOpenWCS",
+      "venueName": "Alte Kongresshalle",
+      "venueAddress": "Theresienhöhe 15, 80339 München, Germany"
+    },
+    "year": 2027
+  },
+  "x440": {
+    "source": "https://www.swingside-invitational.com/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/swingsideinvitational",
+      "instagramUrl": "https://www.instagram.com/swingside_invitational/"
+    },
+    "year": 2027
+  },
+  "x314": {
+    "source": "https://www.frenchywesty.com/westiesangels",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/profile.php?id=61557074185623",
+      "instagramUrl": "https://www.instagram.com/frenchywestyevents/",
+      "venueName": "Hotel Logis Est Beynost",
+      "staff": [
+        "Maxime & Torri Zzaoui",
+        "Maxence Martin & Virginie Grondin",
+        "Igor Pitangui & Fernanda Dubiel",
+        "Teddy Sanchez & Dianeva Poirson",
+        "Olivier Massart & Virginie Massart"
+      ]
+    },
+    "year": 2026
+  },
+  "x334": {
+    "source": "https://www.avignoncityswing.com/ticket",
+    "on": "2026-10-08",
+    "info": {
+      "venueName": "Grand Hôtel de Nîmes",
+      "venueAddress": "202 rue Nicolas Ledoux, 30900 Nîmes, France",
+      "instagramUrl": "https://www.instagram.com/avignoncityswing/",
+      "staff": [
+        "Thibault & Nicole",
+        "Philippe & Florencia",
+        "Philippe & Flore",
+        "Joshua & Maïna"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Early Bird",
+          "price": 165,
+          "currency": "EUR",
+          "until": "2026-10-03"
+        },
+        {
+          "kind": "Full",
+          "tier": "Early Bird",
+          "price": 175,
+          "currency": "EUR",
+          "until": "2026-12-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal",
+          "price": 185,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Super Early Bird",
+          "price": 115,
+          "currency": "EUR",
+          "until": "2026-10-03"
+        },
+        {
+          "kind": "Party",
+          "tier": "Early Bird",
+          "price": 125,
+          "currency": "EUR",
+          "until": "2026-12-01"
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal",
+          "price": 135,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "x395": {
+    "source": "https://www.medinswing.rocks/staff",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/MedInSwing/",
+      "instagramUrl": "https://www.instagram.com/med_in_swing/",
+      "venueName": "Résidence Club Odalys Les Océanides",
+      "venueAddress": "395 Boulevard Plage de l'Argentière, 83250 La Londe-les-Maures, France",
+      "staff": [
+        "Jordan Frisbee & Tatiana Mollmann",
+        "Maxime & Torri Zzaoui",
+        "Kyle Redd & Sarah Vann Drake",
+        "Arnaud Perga & Maïna VilaCobarsi",
+        "Bret & Joëlle Navarre",
+        "Paul Warden & Coleen Man",
+        "Michael Kielbasa & Marina Motronenko",
+        "Heejung Jung & Miquel Menendez",
+        "Igor Pitangui & Fernanda Dubiel"
+      ]
+    },
+    "year": 2027
+  },
+  "x335-2028": {
+    "source": "https://www.euro-dance-festival.com/rust",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/EURODANCEFESTIVAL/",
+      "instagramUrl": "https://www.instagram.com/eurodancefestival/",
+      "venueName": "Europa-Park Rust"
+    },
+    "year": 2028
+  },
+  "w-norway-westie-fest-2027": {
+    "source": "https://danceapp.net/en/events/169/register",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/norwaywestiefest",
+      "instagramUrl": "https://www.instagram.com/norwaywestiefest",
+      "venueName": "Quality Airport Hotel Værnes",
+      "venueAddress": "Kjøpmannsgate 20, 7500 Stjørdal, Norway",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early Bird",
+          "price": 1600,
+          "currency": "NOK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Bird",
+          "price": 1800,
+          "currency": "NOK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird",
+          "price": 2000,
+          "currency": "NOK",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Early Bird",
+          "price": 1200,
+          "currency": "NOK",
+          "until": "2026-12-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal Bird",
+          "price": 1400,
+          "currency": "NOK",
+          "until": null
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "x419": {
+    "source": "https://baroqueswing.com/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/profile.php?id=61568872950053",
+      "instagramUrl": "https://www.instagram.com/barockswing_ludwigsburg/",
+      "venueName": "ADTV Tanzschule MonRo",
+      "venueAddress": "Friedenstraße 88, 71636 Ludwigsburg, Germany"
+    },
+    "year": 2027
+  },
+  "x399": {
+    "source": "https://www.summernightswestival.com/",
+    "on": "2026-10-08",
+    "info": {
+      "instagramUrl": "https://www.instagram.com/summernightswestival/"
+    },
+    "year": 2027
+  },
+  "x444": {
+    "source": "https://www.midlandswingopen.com/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/msowcs/",
+      "instagramUrl": "https://www.instagram.com/midlandswingopen/"
+    },
+    "year": 2027
+  },
+  "x383-2028": {
+    "source": "https://springtimeswing.com/",
+    "on": "2026-10-08",
+    "info": {
+      "instagramUrl": "https://www.instagram.com/springtimeswing"
+    },
+    "year": 2028
+  },
+  "x330": {
+    "source": "http://www.flowstatefest.com/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/events/2043098322880875/",
+      "venueName": "Thistle Hotel Heathrow Terminal 5",
+      "venueAddress": "Bath Road, Longford, UB7 0EB London, United Kingdom",
+      "staff": [
+        "Jakub Jakoubek & Emeline Rochefeuille",
+        "Leo Lorenzo",
+        "Florian Hamm & Vanessa Bachmann",
+        "Lee & Fabienne Easton",
+        "Eulalie Maire"
+      ],
+      "eventSchedule": "https://flowstatefest.com/schedule/"
+    },
+    "year": 2026
+  },
+  "w-swing-in-paris-2027": {
+    "source": "https://swing-in-paris.com/en/registration",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/profile.php?id=61590406772553",
+      "instagramUrl": "https://www.instagram.com/swing_in_paris/",
+      "venueName": "Le Méridien Arc de Triomphe",
+      "venueAddress": "81 Boulevard Gouvion-Saint-Cyr, 75017 Paris, France",
+      "staff": [
+        "Thibault & Nicole",
+        "KP & Bryn",
+        "Brandi",
+        "Olivier & Virginie",
+        "Kyle & Melodie",
+        "Joel & Chantelle",
+        "Kevin & Natalyia",
+        "Phil & Flore",
+        "Estelle Bonnaire (head judge)",
+        "DJ Koichi (head DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Full Pass",
+          "price": 175,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass",
+          "price": 135,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "w-franconian-swing-project-2027": {
+    "source": "https://franconian-swing-project.de/registration/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/share/14oBpRmzKNj/",
+      "instagramUrl": "https://www.instagram.com/franconianswingproject",
+      "registrationOpens": "2026-08-12T12:00",
+      "venueName": "MyEventWorld",
+      "venueAddress": "Klingenhofstraße 40, 90411 Nürnberg, Germany",
+      "staff": [
+        "Lizzy Spann",
+        "Lauren & Daniel",
+        "Igor & Fernanda",
+        "Marc Heldt (head judge)",
+        "Lauren Jones (MC)",
+        "Koichi (head DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super early bird",
+          "price": 180,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Early bird",
+          "price": 190,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal bird",
+          "price": 200,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal bird",
+          "price": 140,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "x364": {
+    "source": "http://www.neverlandswing.com/",
+    "on": "2026-10-08",
+    "info": {
+      "instagramUrl": "https://www.instagram.com/neverlandswing/"
+    },
+    "year": 2027
+  },
+  "x360": {
+    "source": "https://lisbonwestiefest.com/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/LisbonWestieFestWCS",
+      "instagramUrl": "https://www.instagram.com/lisbonwestiefestwcs"
+    },
+    "year": 2027
+  },
+  "x335-2029": {
+    "source": "https://www.euro-dance-festival.com/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/EURODANCEFESTIVAL/",
+      "instagramUrl": "https://www.instagram.com/eurodancefestival/"
+    },
+    "year": 2029
+  },
+  "w-cosmic-connection-2027": {
+    "source": "https://www.thecosmic.dance/details/pricing",
+    "on": "2026-10-08",
+    "info": {
+      "websiteUrl": "https://www.thecosmic.dance/",
+      "registrationOpens": "2026-10-06T20:00",
+      "venueName": "Scandic Helsfyr",
+      "venueAddress": "Innspurten 7, 0663 Oslo, Norway",
+      "staff": [
+        "João & Savana",
+        "Lee & Fabienne Easton",
+        "Chuck Brown & Stefanie Tschom",
+        "Florian & Lotte",
+        "Chuck Brown (chief judge)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Nebula Early Bird (first 100 passes)",
+          "price": 1700,
+          "currency": "NOK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Orbit Normal Bird",
+          "price": 1900,
+          "currency": "NOK",
+          "until": "2026-12-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Supernova Late Bird",
+          "price": 2100,
+          "currency": "NOK",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass (50 passes)",
+          "price": 1500,
+          "currency": "NOK",
+          "until": null
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "x357": {
+    "source": "https://praguealchemyswing.cz/passes",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/PragueAlchemySwing",
+      "instagramUrl": "https://www.instagram.com/prague_alchemy_swing",
+      "venueName": "Clarion Congress Hotel Prague",
+      "venueAddress": "Freyova 945/33, 190 00 Prague 9-Vysočany, Czechia",
+      "staff": [
+        "Sean & Alyssa McKeever",
+        "Joao Parada & Savana Barreau",
+        "Paul Warden & Coleen Man",
+        "Philipp & Ekaterina Wolff",
+        "Attila Kobori",
+        "Paul Warden (chief judge)",
+        "Justin Petersen (head DJ)",
+        "Wayne Powell (MC)"
+      ],
+      "eventSchedule": "https://praguealchemyswing.cz/schedule",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Tier 1",
+          "price": 175,
+          "currency": "EUR",
+          "until": "2026-09-18"
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 2",
+          "price": 195,
+          "currency": "EUR",
+          "until": "2026-11-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Tier 3",
+          "price": 215,
+          "currency": "EUR",
+          "until": "2027-02-19"
+        },
+        {
+          "kind": "Party",
+          "tier": "Tier 1",
+          "price": 125,
+          "currency": "EUR",
+          "until": "2026-09-18"
+        },
+        {
+          "kind": "Party",
+          "tier": "Tier 2",
+          "price": 140,
+          "currency": "EUR",
+          "until": "2026-11-30"
+        },
+        {
+          "kind": "Party",
+          "tier": "Tier 3",
+          "price": 155,
+          "currency": "EUR",
+          "until": "2027-02-19"
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "x404": {
+    "source": "https://slovenianopen.dance/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/slovenianopen/",
+      "instagramUrl": "https://www.instagram.com/slovenian_open_wcs",
+      "venueName": "DoubleTree Hotel Ljubljana",
+      "venueAddress": "Dunajska cesta 154, 1000 Ljubljana, Slovenia"
+    },
+    "year": 2027
+  },
+  "x387": {
+    "source": "https://www.frenchconnectionwcs.com/inscriptions-tarifs",
+    "on": "2026-10-08",
+    "info": {
+      "registrationOpens": "2026-10-05T20:00",
+      "venueName": "Imperial Palace Annecy",
+      "venueAddress": "All. de l'Impérial, 74000 Annecy, France",
+      "staff": [
+        "Olivier Massart (chief judge)",
+        "Aurélie Bleuse (head DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super early bird (first 150 passes, 48h)",
+          "price": 160,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Phase 1",
+          "price": 170,
+          "currency": "EUR",
+          "until": "2026-12-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Phase 2",
+          "price": 180,
+          "currency": "EUR",
+          "until": "2027-03-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Phase 3",
+          "price": 190,
+          "currency": "EUR",
+          "until": "2027-05-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Phase 4",
+          "price": 200,
+          "currency": "EUR",
+          "until": "2027-06-30"
+        },
+        {
+          "kind": "Party",
+          "tier": "Super early bird (first 150 passes, 48h)",
+          "price": 110,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Phase 1",
+          "price": 120,
+          "currency": "EUR",
+          "until": "2026-12-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "Phase 2",
+          "price": 130,
+          "currency": "EUR",
+          "until": "2027-03-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "Phase 3",
+          "price": 140,
+          "currency": "EUR",
+          "until": "2027-05-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "Phase 4",
+          "price": 150,
+          "currency": "EUR",
+          "until": "2027-06-30"
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "x443": {
+    "source": "https://norwegianopen.no/",
+    "on": "2026-10-08",
+    "info": {
+      "instagramUrl": "https://www.instagram.com/norwegianopen_wcs"
+    },
+    "year": 2027
+  },
+  "x335-2030": {
+    "source": "https://www.euro-dance-festival.com/",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/EURODANCEFESTIVAL/",
+      "instagramUrl": "https://www.instagram.com/eurodancefestival/"
+    },
+    "year": 2030
   }
 }
