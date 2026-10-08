@@ -177,7 +177,16 @@ public sealed partial class NotifyPublisher(FirestoreDb firestore, FirestoreStor
         using var smtp = new MailKit.Net.Smtp.SmtpClient();
         await smtp.ConnectAsync("smtp.gmail.com", 465, MailKit.Security.SecureSocketOptions.SslOnConnect, ct);
         // App passwords are shown in groups of four; Gmail takes them with or without the spaces.
-        await smtp.AuthenticateAsync(user, password.Replace(" ", ""), ct);
+        try
+        {
+            await smtp.AuthenticateAsync(user.Trim(), password.Replace(" ", "").Trim(), ct);
+        }
+        catch (MailKit.Security.AuthenticationException ex)
+        {
+            // Never the values: their shape is enough to spot a placeholder, quotes or a short paste.
+            throw new MailKit.Security.AuthenticationException(
+                $"Gmail refused the login for an address at '{user.Trim().Split('@').LastOrDefault()}' with a {password.Replace(" ", "").Trim().Length}-character password (an app password has 16 letters).", ex);
+        }
         await smtp.SendAsync(message, ct);
         await smtp.DisconnectAsync(true, ct);
     }
