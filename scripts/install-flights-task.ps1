@@ -3,7 +3,9 @@
 # Remove it with: Unregister-ScheduledTask -TaskName "WCS Trips flights"
 
 $script = Join-Path $PSScriptRoot "flights-home.ps1"
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$script`""
+# conhost --headless: no console window at all, so nothing on screen to close by accident (closing
+# one stops the run). -WindowStyle Hidden alone still flashes a window that can stay open.
+$action = New-ScheduledTaskAction -Execute "conhost.exe" -Argument "--headless powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$script`""
 $trigger = New-ScheduledTaskTrigger -Daily -At 08:00
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -RunOnlyIfNetworkAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 1)
 
