@@ -248,3 +248,10 @@ tr.mine td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 .pill.done { color: #66bb6a; }
 .pill.later { color: var(--muted, #888); }
 .placings { margin: .25rem 0; padding-left: 1.5rem; }
+
+.star { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: .1rem .6rem; font-size: .85rem; border-radius: 999px; }
+.star.on { background: var(--accent); color: var(--accent-text); }
+.bell { background: none; border: none; padding: 0 .3rem; margin: 0; font-size: 1rem; cursor: pointer; opacity: .55; vertical-align: middle; }
+.bell.on { opacity: 1; }
+.leg + .bell { display: inline; }
+.starred { color: var(--accent); }

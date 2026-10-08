@@ -1,6 +1,7 @@
 import "./style.css";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth, isAdmin } from "./firebase";
+import { signIn } from "./me";
 import { html, type Raw } from "./html";
 import { stopListening } from "./live";
 import { dashboardPage, editPage, loginPage, logout, wireEdit, wireLogin } from "./pages/admin";
@@ -19,9 +20,14 @@ function show(content: Raw): void {
 }
 
 function renderNav(): void {
+  const user = auth.currentUser;
   nav.innerHTML = html`
     <a href="#/">Events</a>
-    ${admin ? html`<a href="#/admin">Admin</a> <button type="button" class="link" id="logout">Sign out</button>` : ""}`.value;
+    ${admin ? html`<a href="#/admin">Admin</a>` : ""}
+    ${user
+      ? html`<span class="muted small" title="${user.email ?? ""}">${user.displayName ?? user.email ?? ""}</span> <button type="button" class="link" id="logout">Sign out</button>`
+      : html`<button type="button" class="link" id="signin">Sign in</button>`}`.value;
+  document.getElementById("signin")?.addEventListener("click", () => void signIn().catch((e) => console.error(e)));
   document.getElementById("logout")?.addEventListener("click", async () => {
     await logout();
     location.hash = "#/";
@@ -104,8 +110,8 @@ async function route(): Promise<void> {
 
 onAuthStateChanged(auth, async (user: User | null) => {
   admin = user ? await isAdmin(user.uid).catch(() => false) : false;
-  if (user && !admin && location.hash.startsWith("#/admin")) {
-    await logout();
+  // A reader signed in with Google is not an admin; the admin pages ask for the admin login instead.
+  if (user && !admin && location.hash.startsWith("#/admin") && !location.hash.includes("failed")) {
     location.hash = "#/admin?failed";
   }
   authKnown = true;

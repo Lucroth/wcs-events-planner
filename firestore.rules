@@ -18,6 +18,26 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // A reader's own data: starred events and price-alert watches. Alerts are emailed to the
+    // stored address, so it must be the signed-in account's own, or anyone could point them at
+    // somebody else.
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.email == request.auth.token.email;
+
+      match /favourites/{eventId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /watches/{watchId} {
+        allow read, delete: if request.auth != null && request.auth.uid == uid;
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.kind in ["flight", "train"]
+          && request.resource.data.price is number;
+      }
+    }
+
     match /live/{id} {
       allow read: if true;
       allow write: if false;

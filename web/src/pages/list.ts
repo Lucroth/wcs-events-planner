@@ -1,9 +1,10 @@
-import { getCheapestTravel, getInfosForYear, getManualEvents, getYear, plnRates } from "../firebase";
+import { auth, getCheapestTravel, getInfosForYear, getManualEvents, getYear, plnRates } from "../firebase";
 import { date, level, money, month, range, today } from "../format";
 import { html, type Raw } from "../html";
 import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, sideOf, type Chip, type DanceRole, type Difficulty, type Info, type YearSummary } from "../model";
 import { findCity, flightKey, homeCities } from "../travel";
 import { mayBeLive, nowLine, watchLive } from "../live";
+import { favourites } from "../me";
 
 type Row = YearSummary["events"][number];
 
@@ -32,6 +33,8 @@ export type SortBy = (typeof sorts)[number][0];
 /** What the list is narrowed to and how it is ordered; kept in the URL so a view can be shared. */
 export interface ListFilter {
   all: boolean;
+  /** Only the reader's starred events. */
+  starred: boolean;
   /** Hide events that have already ended. */
   upcoming: boolean;
   division: string | null;
@@ -47,6 +50,7 @@ export function readFilter(params: URLSearchParams): ListFilter {
   const division = params.get("div");
   return {
     all: params.has("all"),
+    starred: params.has("starred"),
     upcoming: params.has("upcoming"),
     division: divisions.some(([d]) => d === division) ? division : null,
     role: (["leader", "follower"] as const).find((r) => r === params.get("role")) ?? null,
@@ -59,6 +63,7 @@ export function readFilter(params: URLSearchParams): ListFilter {
 function query(f: ListFilter): string {
   const parts: string[] = [];
   if (f.all) parts.push("all");
+  if (f.starred) parts.push("starred");
   if (f.upcoming) parts.push("upcoming");
   if (f.division) parts.push(`div=${f.division}`);
   if (f.role) parts.push(`role=${f.role}`);
@@ -77,7 +82,7 @@ interface Cost {
 
 export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
   const now = today();
-  const [summary, infos, manual] = await Promise.all([getYear(year), getInfosForYear(year), getManualEvents(year)]);
+  const [summary, infos, manual, stars] = await Promise.all([getYear(year), getInfosForYear(year), getManualEvents(year), favourites()]);
 
   const rows: Row[] = [
     ...(summary?.events ?? []),
@@ -86,10 +91,12 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
     .map((r) => (r.expected ? r : applyOverride(r, infos.get(r.id))))
     .filter((r) => isEurope(r.country))
     .filter((r) => filter.all || r.isWsdc)
+    .filter((r) => !filter.starred || stars.has(r.id))
     .filter((r) => !filter.upcoming || r.dateTo >= now)
     .filter((r) => matchesLevel(r.chips, filter.division, filter.levels, filter.role))
     .sort((a, b) => a.dateFrom.localeCompare(b.dateFrom));
 
+  starredIds = stars;
   const home = findCity(filter.from);
   const costs = filter.sort === "cost" ? await tripCosts(rows, infos, filter.from, now) : new Map<string, Cost>();
   const thisYear = new Date().getFullYear();
@@ -146,6 +153,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
             <select name="from">${homeCities.map((c) => html`<option value="${c.name}" ${c === home ? "selected" : ""}>${c.name}</option>`)}</select>
           </label>`
         : ""}
+      ${auth.currentUser ? html`<label><input type="checkbox" name="starred" ${filter.starred ? "checked" : ""} /> ★ starred only</label>` : ""}
       <label><input type="checkbox" name="upcoming" ${filter.upcoming ? "checked" : ""} /> hide finished events</label>
       <label><input type="checkbox" name="all" ${filter.all ? "checked" : ""} /> include events without WSDC points</label>
       ${filtered ? html`<a href="#/year/${year}${query({ ...filter, division: null, levels: [] })}">clear filter</a>` : ""}
@@ -194,6 +202,9 @@ function sortRows(rows: Row[], f: ListFilter, costs: Map<string, Cost>): Row[] {
   });
 }
 
+/** The reader's starred events, for the ★ on their cards; refreshed with every list render. */
+let starredIds = new Set<string>();
+
 function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: Cost | undefined): Raw {
   if (r.expected) return expectedCard(r, f);
   const full = currentPass(info?.passes, "Full", now);
@@ -207,7 +218,7 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
     <li class="${r.dateTo < now && !live ? "past" : ""}" ${live ? html`data-live="${r.id}"` : ""}>
       <a href="#/event/${r.id}" class="event-card">
         <span class="dates">${range(r.dateFrom, r.dateTo)}</span>
-        <span class="name">${r.name} ${r.announced ? html`<span class="tag" title="Announced by the organiser, not on scoring.dance yet">announced</span>` : ""} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
+        <span class="name">${starredIds.has(r.id) ? html`<span class="starred" title="Starred">★</span> ` : ""}${r.name} ${r.announced ? html`<span class="tag" title="Announced by the organiser, not on scoring.dance yet">announced</span>` : ""} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
         ${live ? html`<span class="now" hidden></span>` : ""}
         <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
         <span class="price">${price}</span>
@@ -267,6 +278,7 @@ export function wireList(year: number): void {
     const data = new FormData(form);
     const filter: ListFilter = {
       all: data.has("all"),
+      starred: data.has("starred"),
       upcoming: data.has("upcoming"),
       division: String(data.get("div") ?? "") || null,
       role: (String(data.get("role") ?? "") || null) as DanceRole | null,

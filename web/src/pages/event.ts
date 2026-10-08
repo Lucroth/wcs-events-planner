@@ -1,4 +1,5 @@
-import { getAllFlights, getEvent, getInfo, getScheduleImage, getTrains, getYear } from "../firebase";
+import { auth, getAllFlights, getEvent, getInfo, getScheduleImage, getTrains, getYear } from "../firebase";
+import { favourites, setFavourite, setWatch, signIn, watchKey, watches, type Watch } from "../me";
 import { isImageDataUrl } from "../image";
 import { date, duration, level, localDateTime, money, range, short, today } from "../format";
 import { html, safeUrl, type Raw } from "../html";
@@ -53,6 +54,7 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
       ${range(e.dateFrom, e.dateTo)} ${e.dateFrom.slice(0, 4)} · ${[e.city, e.country].filter(Boolean).join(", ")}
       ${info?.venueName ? html` · <a href="${mapsUrl(info.venueAddress || info.venueName)}" target="_blank" rel="noopener">${info.venueName}</a>` : scraped.announced?.venue ? html` · <a href="${mapsUrl(`${scraped.announced.venue}, ${e.city ?? ""}`)}" target="_blank" rel="noopener">${scraped.announced.venue}</a>` : ""}
       ${e.isWsdc ? html`<span class="tag">WSDC</span>` : ""}
+      <button type="button" class="star" id="fav" data-name="${e.name}" data-date="${e.dateFrom}" title="Star this event to get price alerts">☆ Star</button>
       ${admin ? html`<a class="button small" href="#/admin/event/${id}">Edit</a>` : ""}
     </p>
     ${info?.autofill ? html`<p class="notice small">Prices and details were copied automatically from <a href="${safeUrl(info.autofill.source) ?? "#"}" target="_blank" rel="noopener">the event's website</a> on ${date(info.autofill.on)} and not yet reviewed; check there before buying.</p>` : ""}
@@ -218,6 +220,7 @@ function trainsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: strin
     <p class="buttons">
       ${back.map((d) => html`<a class="button" target="_blank" rel="noopener" href="${koleoUrl(s.slug, city.koleoSlug, d, d === e.dateTo ? 12 : 6)}">Back: ${short(d)}</a>`)}
     </p>
+    <p class="alert-hint muted small" hidden>🔕 next to a train: click to get an email when it gets cheaper (checked every morning).</p>
     ${fares ? trainFares(fares, people, city, s.slug) : html`<p class="muted small">Fares appear here about a month before the event, when PKP Intercity starts selling. Until then, check koleo.pl.</p>`}`;
 }
 
@@ -255,6 +258,7 @@ function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: stri
       Direct Ryanair and Wizz Air fares per person, cabin bag only${flights ? `, checked ${date(flights.fetchedOn)}` : ""}. Flights from ${city.name}${city.airports.length ? "" : " (Warsaw)"} are marked.
     </p>
     <p class="buttons"><a class="button" target="_blank" rel="noopener" href="${google}">Google Flights (all airlines, connections)</a></p>
+    <p class="alert-hint muted small" hidden>🔕 next to a flight: click to get an email when it gets cheaper (checked every morning).</p>
     ${!flights
       ? html`<p class="muted">Fares not fetched yet: they refresh once a day.</p>`
       : !flights.combos.length
@@ -288,7 +292,7 @@ function leg(l: Leg, people: number, withPrice: boolean): Raw {
     ? html`<span class="muted">${l.times[0]}–${l.arrival} (${duration(l.durationMinutes)})</span>`
     : l.times.length ? html`<span class="muted">departs ${l.times.join(", ")}</span>` : "";
   return html`
-    <a href="${url}" target="_blank" rel="noopener" class="leg">
+    <a href="${url}" target="_blank" rel="noopener" class="leg" data-watch="${JSON.stringify({ kind: "flight", airline: l.airline, from: l.from, to: l.to, date: l.date, time: null, price: l.price, currency: l.currency })}">
       <span class="airline ${l.airline.toLowerCase()}">${l.airline === "Ryanair" ? "Ryanair" : "Wizz"}</span>
       ${l.from}→${l.to} · ${short(l.date)} ${times} <span class="muted">· direct</span>
       ${withPrice ? html`<strong> · ${money(l.price, l.currency)}</strong>` : ""}
@@ -297,7 +301,7 @@ function leg(l: Leg, people: number, withPrice: boolean): Raw {
 
 function trainFares(t: Trains, people: number, city: HomeCity, stationSlug: string): Raw {
   const row = (l: TrainLeg, from: string, to: string) => html`
-    <li><a class="leg" href="${koleoUrl(from, to, l.date, Number(l.departure.slice(0, 2)))}" target="_blank" rel="noopener">
+    <li><a class="leg" href="${koleoUrl(from, to, l.date, Number(l.departure.slice(0, 2)))}" target="_blank" rel="noopener" data-watch="${JSON.stringify({ kind: "train", airline: null, from: from === city.koleoSlug ? t.city : t.station, to: from === city.koleoSlug ? t.station : t.city, date: l.date, time: l.departure, price: l.price, currency: t.currency })}">
       ${short(l.date)} ${l.departure}–${l.arrival} <span class="muted">(${duration(l.durationMinutes)}, ${l.changes ? `${l.changes} change${l.changes > 1 ? "s" : ""}` : "direct"})</span>
       <strong> · ${money(l.price, t.currency)}</strong>
     </a></li>`;
@@ -334,6 +338,7 @@ function tiersTable(): Raw {
 }
 
 export function wireEvent(id: string): void {
+  void wireAlerts(id);
   const card = document.getElementById("live");
   if (card) {
     watchLive(id, (live) => {
@@ -375,4 +380,69 @@ async function nextEdition(id: string, year: number): Promise<Raw> {
       ${site ? html`· <a href="${site}" target="_blank" rel="noopener">event website</a>` : ""}
       <br /><span class="muted small">${a ? "Announced by the organiser, not on scoring.dance yet." : "Dates not announced yet."} Below: the latest edition, for passes, staff and how hard the competitions were.</span>
     </section>`;
+}
+
+/**
+ * The star, and once starred a bell beside every flight and train: a rung bell is a watch the daily
+ * fare check emails about when that connection gets cheaper. Starring needs a Google sign-in; a
+ * star clicked while signed out is remembered across the sign-in.
+ */
+async function wireAlerts(id: string): Promise<void> {
+  const star = document.getElementById("fav") as HTMLButtonElement | null;
+  if (!star) return;
+  const name = star.dataset.name!;
+  const dateFrom = star.dataset.date!;
+  let starred = auth.currentUser ? (await favourites()).has(id) : false;
+
+  if (auth.currentUser && !starred && sessionStorage.getItem("star-after-sign-in") === id) {
+    sessionStorage.removeItem("star-after-sign-in");
+    await setFavourite(id, true, name, dateFrom);
+    starred = true;
+  }
+
+  const watched = starred ? await watches(id) : new Map<string, Watch>();
+  const legs = [...document.querySelectorAll<HTMLElement>("[data-watch]")];
+  const watchOf = (el: HTMLElement): Watch => ({ ...JSON.parse(el.dataset.watch!), eventId: id, eventName: name });
+
+  const render = () => {
+    star.textContent = starred ? "★ Starred" : "☆ Star";
+    star.classList.toggle("on", starred);
+    for (const el of legs) {
+      let bell = el.nextElementSibling as HTMLButtonElement | null;
+      if (!bell?.classList.contains("bell")) {
+        bell = document.createElement("button");
+        bell.type = "button";
+        bell.className = "bell";
+        el.after(bell);
+        bell.addEventListener("click", async () => {
+          const w = watchOf(el);
+          const on = !watched.has(watchKey(w));
+          await setWatch(w, on);
+          if (on) watched.set(watchKey(w), w);
+          else watched.delete(watchKey(w));
+          render();
+        });
+      }
+      const on = watched.has(watchKey(watchOf(el)));
+      bell.hidden = !starred;
+      bell.classList.toggle("on", on);
+      bell.textContent = on ? "🔔" : "🔕";
+      bell.title = on ? "Emailing you when this gets cheaper. Click to stop." : "Email me when this gets cheaper";
+    }
+    document.querySelectorAll<HTMLElement>(".alert-hint").forEach((h) => (h.hidden = !starred));
+  };
+
+  star.addEventListener("click", async () => {
+    if (!auth.currentUser) {
+      sessionStorage.setItem("star-after-sign-in", id);
+      await signIn();
+      return;
+    }
+    starred = !starred;
+    await setFavourite(id, starred, name, dateFrom);
+    if (!starred) watched.clear();
+    render();
+  });
+
+  render();
 }
