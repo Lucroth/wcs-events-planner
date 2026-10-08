@@ -2784,7 +2784,11 @@
           "currency": "RUB",
           "until": null
         }
-      ]
+      ],
+      "override": {
+        "dateFrom": "2027-02-03",
+        "dateTo": "2027-02-07"
+      }
     },
     "year": 2027
   },
@@ -2942,7 +2946,11 @@
       "venueAddress": "42 chemin de Parsonge, 69570 Dardilly, France",
       "staff": [
         "Olivier Massart (MC)"
-      ]
+      ],
+      "override": {
+        "dateFrom": "2027-03-18",
+        "dateTo": "2027-03-21"
+      }
     },
     "year": 2027
   },
@@ -3231,7 +3239,11 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "override": {
+        "dateFrom": "2027-01-22",
+        "dateTo": "2027-01-24"
+      }
     },
     "year": 2027
   },
@@ -3281,7 +3293,11 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "override": {
+        "dateFrom": "2027-04-08",
+        "dateTo": "2027-04-12"
+      }
     },
     "year": 2027
   },
@@ -3526,7 +3542,11 @@
     "source": "https://norwegianopen.no/",
     "on": "2026-10-08",
     "info": {
-      "instagramUrl": "https://www.instagram.com/norwegianopen_wcs"
+      "instagramUrl": "https://www.instagram.com/norwegianopen_wcs",
+      "override": {
+        "dateFrom": "2027-10-08",
+        "dateTo": "2027-10-10"
+      }
     },
     "year": 2027
   },
