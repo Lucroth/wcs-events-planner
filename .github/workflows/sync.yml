@@ -66,6 +66,9 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
           ConnectionStrings__Db: Data Source=${{ github.workspace }}/wcs-events.db
           COMMANDS: ${{ steps.pick.outputs.commands }}
+          # Wizz refuses GitHub's network; its fares come from a daily run on a home PC
+          # (scripts/flights-home.ps1), and this job keeps them rather than asking Wizz.
+          WIZZ: reuse
         run: |
           dotnet build WcsEvents.Sync -c Release
           for c in $COMMANDS; do

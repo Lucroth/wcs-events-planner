@@ -12,6 +12,10 @@ public sealed record FlightResults(
 /// event, for the day before or of the start and the day of or after the end. Results are cached
 /// for six hours per route set: low-cost fares move slowly, and both APIs are unofficial enough that
 /// hammering them is the quickest way to lose them.
+/// <para>
+/// Wizz refuses requests from data-centre networks, so the cloud job passes the Wizz fares a run on
+/// a home connection last stored (<paramref name="knownWizz"/>) instead of asking Wizz itself.
+/// </para>
 /// </summary>
 public sealed partial class FlightSearch(
     RyanairClient ryanair, WizzClient wizz, Places places, IMemoryCache cache, ILogger<FlightSearch> logger)
@@ -19,19 +23,21 @@ public sealed partial class FlightSearch(
     public const string Currency = "PLN";
 
     public async Task<FlightResults> SearchAsync(
-        IReadOnlyList<string> home, IReadOnlyList<string> destinations, DateOnly start, DateOnly end, CancellationToken ct)
+        IReadOnlyList<string> home, IReadOnlyList<string> destinations, DateOnly start, DateOnly end, CancellationToken ct,
+        IReadOnlyList<FlightLeg>? knownWizz = null)
     {
-        var key = $"flights:{string.Join(',', home)}:{string.Join(',', destinations)}:{start}:{end}";
+        var key = $"flights:{string.Join(',', home)}:{string.Join(',', destinations)}:{start}:{end}:{knownWizz is null}";
 
         return await cache.GetOrCreateAsync(key, async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(6);
-            return await FetchAsync(home, destinations, start, end, ct);
+            return await FetchAsync(home, destinations, start, end, knownWizz, ct);
         }) ?? new FlightResults([], [], []);
     }
 
     private async Task<FlightResults> FetchAsync(
-        IReadOnlyList<string> home, IReadOnlyList<string> destinations, DateOnly start, DateOnly end, CancellationToken ct)
+        IReadOnlyList<string> home, IReadOnlyList<string> destinations, DateOnly start, DateOnly end,
+        IReadOnlyList<FlightLeg>? knownWizz, CancellationToken ct)
     {
         var outWindow = FlightCombos.OutboundWindow(start);
         var backWindow = FlightCombos.ReturnWindow(end);
@@ -51,16 +57,25 @@ public sealed partial class FlightSearch(
             backTasks.Add(Safe("ryanair", () => RyanairAsync(d, "pl", backWindow, ct)));
         }
 
-        var wizzRoutes = (await places.WizzMapAsync(ct)).ToDictionary(w => w.Airport.Iata, w => w.Connections);
         List<Task<(IReadOnlyList<FlightLeg> Out, IReadOnlyList<FlightLeg> Back)>> wizzTasks = [];
-
-        foreach (var h in home)
+        if (knownWizz is not null)
         {
-            foreach (var d in destinations)
+            bool In((DateOnly From, DateOnly To) w, FlightLeg l) => l.Date >= w.From && l.Date <= w.To;
+            wizzTasks.Add(Task.FromResult<(IReadOnlyList<FlightLeg>, IReadOnlyList<FlightLeg>)>((
+                [.. knownWizz.Where(l => In(outWindow, l))],
+                [.. knownWizz.Where(l => In(backWindow, l))])));
+        }
+        else
+        {
+            var wizzRoutes = (await places.WizzMapAsync(ct)).ToDictionary(w => w.Airport.Iata, w => w.Connections);
+            foreach (var h in home)
             {
-                if (wizzRoutes.TryGetValue(h, out var connections) && connections.Contains(d))
+                foreach (var d in destinations)
                 {
-                    wizzTasks.Add(SafePair(() => wizz.TimetableAsync(h, d, outWindow, backWindow, ct)));
+                    if (wizzRoutes.TryGetValue(h, out var connections) && connections.Contains(d))
+                    {
+                        wizzTasks.Add(SafePair(() => wizz.TimetableAsync(h, d, outWindow, backWindow, ct)));
+                    }
                 }
             }
         }

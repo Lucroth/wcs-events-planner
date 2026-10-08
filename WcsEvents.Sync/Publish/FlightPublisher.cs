@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.Json;
 using WcsEvents.Sync.Data;
 using WcsEvents.Sync.Scoring;
 using WcsEvents.Sync.Travel;
@@ -28,6 +30,10 @@ public sealed partial class FlightPublisher(
         var origins = HomeCities.All.Select(c => c.FlightOrigins).DistinctBy(HomeCities.Key).ToList();
         var searched = 0;
 
+        // WIZZ=reuse (the cloud job): keep the Wizz fares a home run stored rather than ask Wizz,
+        // which refuses data-centre networks.
+        var stored = Environment.GetEnvironmentVariable("WIZZ") is "reuse" ? await store.ReadAllAsync("flights", ct) : null;
+
         foreach (var (id, start, end, city, country, info) in upcoming)
         {
             var travel = await EventPublisher.TravelAsync(city, country, info, places, ct);
@@ -40,7 +46,9 @@ public sealed partial class FlightPublisher(
 
             foreach (var from in origins)
             {
-                var results = await search.SearchAsync(from, destinations, start, end, ct);
+                var path = $"{id}_{HomeCities.Key(from)}";
+                var knownWizz = stored is null ? null : StoredWizz(stored.TryGetValue(path, out var doc) ? doc : null);
+                var results = await search.SearchAsync(from, destinations, start, end, ct, knownWizz);
                 searched++;
 
                 await store.SetIfChangedAsync($"flights/{id}_{HomeCities.Key(from)}", new
@@ -60,6 +68,33 @@ public sealed partial class FlightPublisher(
         }
 
         LogPublished(logger, upcoming.Count, searched, store.Written, store.Skipped);
+    }
+
+    /// <summary>The Wizz legs a flights document holds, from its leg lists and its combinations.</summary>
+    internal static IReadOnlyList<FlightLeg> StoredWizz(JsonElement? doc)
+    {
+        if (doc is not { ValueKind: JsonValueKind.Object } d)
+        {
+            return [];
+        }
+
+        IEnumerable<JsonElement> Legs(string name) =>
+            d.TryGetProperty(name, out var list) && list.ValueKind is JsonValueKind.Array ? list.EnumerateArray() : [];
+
+        var fromCombos = Legs("combos").SelectMany(c => new[] { c.GetProperty("out"), c.GetProperty("back") });
+        return [.. Legs("out").Concat(Legs("back")).Concat(fromCombos)
+            .Where(l => l.GetProperty("airline").GetString() == nameof(Airline.Wizz))
+            .Select(l => new FlightLeg(
+                Airline.Wizz,
+                l.GetProperty("from").GetString()!,
+                l.GetProperty("to").GetString()!,
+                DateOnly.ParseExact(l.GetProperty("date").GetString()!, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+                [.. l.GetProperty("times").EnumerateArray().Select(t => TimeOnly.ParseExact(t.GetString()!, "HH:mm", CultureInfo.InvariantCulture))],
+                null,
+                null,
+                l.GetProperty("price").GetDecimal(),
+                l.GetProperty("currency").GetString()!))
+            .DistinctBy(l => (l.From, l.To, l.Date, l.Price))];
     }
 
     private static object Leg(FlightLeg l) => new
