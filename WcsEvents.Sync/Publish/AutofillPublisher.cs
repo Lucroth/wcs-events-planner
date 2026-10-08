@@ -84,7 +84,15 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
         Dictionary<string, object?> fields = [];
         foreach (var p in suggested.EnumerateObject())
         {
-            if (!Has(current, p.Name))
+            if (p.Value.ValueKind is JsonValueKind.Object && current is { ValueKind: JsonValueKind.Object } doc && doc.TryGetProperty(p.Name, out var existing) && existing.ValueKind is JsonValueKind.Object)
+            {
+                // An object the admin already started (an override with a corrected city) gets only its missing parts.
+                if (Missing(p.Value, existing) is { Count: > 0 } missing)
+                {
+                    fields[p.Name] = missing;
+                }
+            }
+            else if (!Has(current, p.Name))
             {
                 fields[p.Name] = FirestoreStore.ToValue(p.Value);
             }

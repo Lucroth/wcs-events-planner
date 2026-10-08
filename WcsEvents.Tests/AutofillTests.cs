@@ -20,4 +20,16 @@ public sealed class AutofillTests
         Assert.Equal(["venueName", "staff", "override"], fields.Keys);
         Assert.Equal(5, AutofillPublisher.Missing(suggested, null).Count);
     }
+
+    [Fact]
+    public void Missing_AddsOnlyTheMissingPartsOfAnOverrideTheAdminStarted()
+    {
+        var suggested = JsonDocument.Parse("""{ "override": { "dateFrom": "2027-10-08", "dateTo": "2027-10-10", "city": "Hamar" } }""").RootElement;
+        var current = JsonDocument.Parse("""{ "override": { "city": "Stavanger" } }""").RootElement;
+
+        var fields = AutofillPublisher.Missing(suggested, current);
+
+        var dates = Assert.IsType<Dictionary<string, object?>>(fields["override"]);
+        Assert.Equal(["dateFrom", "dateTo"], dates.Keys);
+    }
 }
