@@ -327,6 +327,13 @@
           "currency": "EUR",
           "until": null
         }
+      ],
+      "staff": [
+        "Alexandre & Christelle",
+        "Daniel & Lauren",
+        "Paul & Coleen",
+        "Olivier & Virginie",
+        "Ludovic & Karin"
       ]
     }
   },
@@ -439,7 +446,10 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "eventSchedule": "https://colognecallingwcs.com/schedule/",
+      "facebookUrl": "https://www.facebook.com/events/4425406641112551/",
+      "instagramUrl": "https://instagram.com/colognecalling.wcs"
     }
   },
   "453": {
@@ -490,7 +500,8 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "venueAddress": "Via Vittorio Padovani 38, 20099 Sesto San Giovanni (MI), Italy"
     }
   },
   "354": {
@@ -1961,7 +1972,8 @@
           "currency": "EUR",
           "until": "2026-11-01"
         }
-      ]
+      ],
+      "websiteUrl": "http://www.asc-budapest.com/"
     },
     "year": 2026
   },
@@ -2005,7 +2017,8 @@
           "currency": "NOK",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "http://www.winterwhite.no/"
     },
     "year": 2026
   },
@@ -2031,7 +2044,8 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "https://berlinswingrevolution.com/"
     },
     "year": 2026
   },
@@ -2090,7 +2104,8 @@
           "currency": "GBP",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "https://www.nysf.uk"
     },
     "year": 2026
   },
@@ -2167,7 +2182,9 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "eventSchedule": "https://wcs-budafest.com/schedule/",
+      "websiteUrl": "http://wcs-budafest.com/"
     },
     "year": 2027
   },
@@ -2199,7 +2216,8 @@
           "currency": "GBP",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "http://www.swingresolution.com/"
     },
     "year": 2027
   },
@@ -2249,7 +2267,8 @@
           "currency": "CHF",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "https://swingtzerland.com/"
     },
     "year": 2027
   },
@@ -2297,7 +2316,8 @@
           "currency": "GBP",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "http://www.trinityswing.com/"
     },
     "year": 2027
   },
@@ -2401,7 +2421,8 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "https://www.wintercoastswing.com"
     },
     "year": 2027
   },
@@ -2520,7 +2541,8 @@
           "currency": "GBP",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "https://www.detonationdance.com/"
     },
     "year": 2027
   },
@@ -2601,7 +2623,8 @@
         "Daniel & Lauren",
         "João & Savana",
         "Zac & Maddy"
-      ]
+      ],
+      "websiteUrl": "https://springtimeswing.com/"
     },
     "year": 2027
   },
@@ -2677,7 +2700,8 @@
           "currency": "EUR",
           "until": "2027-06-10"
         }
-      ]
+      ],
+      "websiteUrl": "http://www.d-townswing.com/"
     },
     "year": 2027
   },
@@ -2696,7 +2720,8 @@
     "info": {
       "venueName": "INFINITY Hotel Munich",
       "instagramUrl": "https://www.instagram.com/infinite.swing/",
-      "venueAddress": "Andreas-Danzer-Weg 1-3, 85716 Unterschleißheim, Germany"
+      "venueAddress": "Andreas-Danzer-Weg 1-3, 85716 Unterschleißheim, Germany",
+      "websiteUrl": "https://www.infinite-swing.com/"
     },
     "year": 2027
   },
@@ -2748,7 +2773,8 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "https://www.westiepinkcity.fr/"
     }
   },
   "w-swing-snow-2027": {
@@ -2950,7 +2976,8 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "https://www.swing-valley.com/"
     },
     "year": 2027
   },
@@ -3141,7 +3168,8 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "websiteUrl": "https://www.avignoncityswing.com/"
     },
     "year": 2027
   },
@@ -3279,7 +3307,8 @@
       "facebookUrl": "https://www.facebook.com/profile.php?id=61568872950053",
       "instagramUrl": "https://www.instagram.com/barockswing_ludwigsburg/",
       "venueName": "ADTV Tanzschule MonRo",
-      "venueAddress": "Friedenstraße 88, 71636 Ludwigsburg, Germany"
+      "venueAddress": "Friedenstraße 88, 71636 Ludwigsburg, Germany",
+      "websiteUrl": "https://baroqueswing.com/"
     },
     "year": 2027
   },
@@ -3298,7 +3327,8 @@
     "on": "2026-10-08",
     "info": {
       "facebookUrl": "https://www.facebook.com/msowcs/",
-      "instagramUrl": "https://www.instagram.com/midlandswingopen/"
+      "instagramUrl": "https://www.instagram.com/midlandswingopen/",
+      "websiteUrl": "https://www.midlandswingopen.com/"
     },
     "year": 2027
   },
@@ -3398,7 +3428,9 @@
       "override": {
         "dateFrom": "2027-01-22",
         "dateTo": "2027-01-24"
-      }
+      },
+      "eventSchedule": "http://swing-in-paris.com/en/planning",
+      "websiteUrl": "http://swing-in-paris.com/"
     },
     "year": 2027
   },
@@ -3452,7 +3484,8 @@
       "override": {
         "dateFrom": "2027-04-08",
         "dateTo": "2027-04-12"
-      }
+      },
+      "websiteUrl": "https://franconian-swing-project.de/"
     },
     "year": 2027
   },
@@ -3592,7 +3625,8 @@
           "currency": "EUR",
           "until": "2027-02-19"
         }
-      ]
+      ],
+      "websiteUrl": "https://praguealchemyswing.cz/"
     },
     "year": 2027
   },
@@ -3689,7 +3723,8 @@
           "currency": "EUR",
           "until": "2027-06-30"
         }
-      ]
+      ],
+      "websiteUrl": "http://frenchconnectionwcs.com/"
     },
     "year": 2027
   },
@@ -3701,7 +3736,9 @@
       "override": {
         "dateFrom": "2027-10-08",
         "dateTo": "2027-10-10"
-      }
+      },
+      "facebookUrl": "https://www.facebook.com/events/1877787939642101/",
+      "websiteUrl": "https://norwegianopen.no/"
     },
     "year": 2027
   },
