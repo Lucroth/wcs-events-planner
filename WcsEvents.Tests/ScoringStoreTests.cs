@@ -72,6 +72,37 @@ public sealed class ScoringStoreTests : IDisposable
     }
 
     [Fact]
+    public async Task InferRoles_IgnoresTheSameBibOnADifferentDancer()
+    {
+        // Westie Harbor 2026 numbered each division from 1: bib 5 is a leader in the Novice final and
+        // a follower in the Intermediate prelim. The final must not label the prelim table.
+        await using (var seed = NewContext())
+        {
+            ScoringRound Round(int id, string name, RoundKind kind) => new()
+            {
+                Id = id, ScoringEventId = 7, EventName = "Harbor", RoundName = name, DivisionAbbreviation = name[..3].ToUpperInvariant(),
+                IsJackAndJill = true, Kind = kind, EventDate = new DateOnly(2026, 10, 1),
+            };
+            seed.ScoringRounds.AddRange(Round(1, "Nov Jack&Jill final", RoundKind.Final), Round(2, "Int Jack&Jill prelim", RoundKind.Prelim));
+            seed.ScoringEntries.AddRange(
+                new ScoringEntry { RoundId = 1, Name = "Adam Lead", Bib = "5", Role = Role.Leader, Position = 1 },
+                new ScoringEntry { RoundId = 1, Name = "Ewa Follow", Role = Role.Follower, Position = 1 },
+                new ScoringEntry { RoundId = 2, Name = "Basia Follow", Bib = "5", Wscid = 9094, Position = 1 },
+                new ScoringEntry { RoundId = 2, Name = "Kasia Follow", Bib = "6", Position = 2 });
+            await seed.SaveChangesAsync(TestContext.Current.CancellationToken);
+        }
+
+        await SeedRoleHistoryAsync((9094, Role.Follower));
+
+        await using var db = NewContext();
+        await ScoringStore.InferRolesAsync(db, TestContext.Current.CancellationToken);
+
+        Assert.All(
+            await db.ScoringEntries.AsNoTracking().Where(e => e.RoundId == 2).ToListAsync(TestContext.Current.CancellationToken),
+            e => Assert.Equal(Role.Follower, e.Role));
+    }
+
+    [Fact]
     public async Task InferRoles_LeavesATableUnlabelledWhenTheMirrorGivesNoMajority()
     {
         await StorePrelimAsync();
