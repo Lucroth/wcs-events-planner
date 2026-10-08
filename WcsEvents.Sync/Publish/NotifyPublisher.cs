@@ -181,7 +181,7 @@ public sealed partial class NotifyPublisher(FirestoreDb firestore, FirestoreStor
         {
             await smtp.AuthenticateAsync(user.Trim(), password.Replace(" ", "").Trim(), ct);
         }
-        catch (MailKit.Security.AuthenticationException ex)
+        catch (Exception ex) when (ex is MailKit.Security.AuthenticationException or MailKit.Net.Smtp.SmtpProtocolException)
         {
             // Never the values: their shape is enough to spot a placeholder, quotes or a short paste.
             throw new MailKit.Security.AuthenticationException(
