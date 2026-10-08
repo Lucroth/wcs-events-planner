@@ -2096,9 +2096,10 @@
   },
   "x352": {
     "source": "https://socialdancer.org/en/event/2841/",
-    "on": "2026-10-06",
+    "on": "2026-10-08",
     "info": {
-      "venueName": "Scandic Infra City"
+      "venueName": "Scandic Infra City",
+      "venueAddress": "Kanalvägen 10, 194 61 Upplands Väsby, Sweden"
     },
     "year": 2026
   },
@@ -2820,7 +2821,9 @@
         "PJ Turner & Karin Kakun",
         "Browly Adjavon & Inga Kurcisa",
         "Marta Nita & Piotr \"Badman\" Lenart"
-      ]
+      ],
+      "venueName": "Qubus Hotel Kraków",
+      "venueAddress": "Nadwiślańska 6, 30-527 Kraków, Poland"
     },
     "year": 2027
   },
@@ -3165,7 +3168,9 @@
     "source": "https://www.summernightswestival.com/",
     "on": "2026-10-08",
     "info": {
-      "instagramUrl": "https://www.instagram.com/summernightswestival/"
+      "instagramUrl": "https://www.instagram.com/summernightswestival/",
+      "venueName": "Sound Garden Hotel",
+      "venueAddress": "Żwirki i Wigury 18, 02-092 Warszawa, Poland"
     },
     "year": 2027
   },
@@ -3558,5 +3563,151 @@
       "instagramUrl": "https://www.instagram.com/eurodancefestival/"
     },
     "year": 2030
+  },
+  "x369": {
+    "source": "https://yourdancebuddy.com",
+    "on": "2026-10-08",
+    "info": {
+      "venueName": "Hotel Asteria",
+      "venueAddress": "Maasheseweg 80A, 5804 AD Venray, Netherlands"
+    },
+    "year": 2027
+  },
+  "x361": {
+    "source": "https://danceapp.net/en/events/193/register",
+    "on": "2026-10-08",
+    "info": {
+      "venueName": "Hotel Carlos I Silgar",
+      "venueAddress": "Rúa de Vigo, 0, Sanxenxo, Spain",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early-Bird",
+          "price": 145,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Bird",
+          "price": 165,
+          "currency": "EUR",
+          "until": "2026-10-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird",
+          "price": 185,
+          "currency": "EUR",
+          "until": "2027-02-17",
+          "current": true
+        },
+        {
+          "kind": "Party",
+          "tier": "Early-Bird",
+          "price": 110,
+          "currency": "EUR",
+          "until": null,
+          "current": true
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal Bird",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    },
+    "year": 2027
+  },
+  "x338": {
+    "source": "https://yourdancebuddy.com/events/westy-nantes-2027",
+    "on": "2026-10-08",
+    "info": {
+      "venueName": "Sure Hotel by Best Western",
+      "venueAddress": "27 Rue du Chemin Rouge, 44300 Nantes, France"
+    },
+    "year": 2027
+  },
+  "x206": {
+    "source": "https://danceapp.net/en/events/174-Paris_Swing_Classic_2027_-_WSDC",
+    "on": "2026-10-08",
+    "info": {
+      "venueName": "Le Méridien Paris Arc de Triomphe",
+      "venueAddress": "81 Bd Gouvion-Saint-Cyr, 75017 Paris, France",
+      "staff": [
+        "Jakub Jakoubek & Emeline Rochefeuille",
+        "Thibault & Nicole Ramirez",
+        "Sean & Alyssa McKeever",
+        "KP Rutland & Bryn Anderson",
+        "Kevin & Nataliya Kane",
+        "Igor Pitangui & Fernanda Dubiel",
+        "Joshua Schubert & Maina Vila Cobarsi",
+        "Daniel Pavlov & Lauren Jones",
+        "Bret & Joelle Navarre"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Early-Bird",
+          "price": 170,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Early-Bird",
+          "price": 180,
+          "currency": "EUR",
+          "until": "2026-08-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Bird",
+          "price": 190,
+          "currency": "EUR",
+          "until": "2026-10-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird",
+          "price": 200,
+          "currency": "EUR",
+          "until": "2026-12-01",
+          "current": true
+        },
+        {
+          "kind": "Full",
+          "tier": "At-the door",
+          "price": 210,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Early-Bird",
+          "price": 130,
+          "currency": "EUR",
+          "until": null,
+          "current": true
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal Bird",
+          "price": 140,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Late Bird",
+          "price": 150,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
+    },
+    "year": 2027
   }
 }

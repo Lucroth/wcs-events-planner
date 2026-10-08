@@ -30,6 +30,10 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
 
   const e = applyOverride(scraped, info);
   const now = today();
+  // What this edition lacks, the previous edition may still say: shown as last year's, never as this year's.
+  const lacks = !info?.passes?.length || !info?.staff?.length || !info?.venueName || !info?.registrationOpens;
+  const before = lacks && scraped.previous ? await getInfo(scraped.previous.id) : undefined;
+  const last = before && scraped.previous ? { info: before, label: `${scraped.previous.dateFrom?.slice(0, 4) ?? "previous"} edition` } : undefined;
   const city = findCity(params.get("from"));
   const people = Math.min(12, Math.max(1, Number(params.get("people")) || 1));
   const upcoming = e.dateTo >= now;
@@ -54,6 +58,7 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
     <p class="lead">
       ${range(e.dateFrom, e.dateTo)} ${e.dateFrom.slice(0, 4)} · ${[e.city, e.country].filter(Boolean).join(", ")}
       ${info?.venueName ? html` · <a href="${mapsUrl(info.venueAddress || info.venueName)}" target="_blank" rel="noopener">${info.venueName}</a>` : scraped.announced?.venue ? html` · <a href="${mapsUrl(`${scraped.announced.venue}, ${e.city ?? ""}`)}" target="_blank" rel="noopener">${scraped.announced.venue}</a>` : ""}
+      ${!info?.venueName && !scraped.announced?.venue && last?.info.venueName ? html` · <span class="muted" title="Not announced yet for this edition">${last.label}: ${last.info.venueName}</span>` : ""}
       ${e.isWsdc ? html`<span class="tag">WSDC</span>` : ""}
       <button type="button" class="star" id="fav" data-name="${e.name}" data-date="${e.dateFrom}" title="Star this event to get price alerts">☆ Star</button>
       ${admin ? html`<a class="button small" href="#/admin/event/${id}">Edit</a>` : ""}
@@ -62,10 +67,13 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
     <section class="links">${links(scraped, info)}</section>
     ${(mayBeLive(e.dateFrom, e.dateTo, now) || params.has("live")) && /^\d+$/.test(id) ? html`<section class="card live-card" id="live" data-id="${id}" hidden><h2><span class="tag live">LIVE</span> Competitions</h2><div id="live-body"></div></section>` : ""}
     <div class="grid">
-      ${passesCard(info, now)}
+      ${passesCard(info, now, last)}
       <section class="card">
         <h2>Staff</h2>
-        ${info?.staff?.length ? html`<ul class="staff">${info.staff.map((s) => html`<li>${s}</li>`)}</ul>` : html`<p class="muted">No staff list yet.</p>`}
+        ${info?.staff?.length
+          ? html`<ul class="staff">${info.staff.map((s) => html`<li>${s}</li>`)}</ul>`
+          : html`<p class="muted">No staff list yet.</p>
+            ${last?.info.staff?.length ? html`<p class="muted small">${last.label}:</p><ul class="staff last">${last.info.staff.map((s) => html`<li>${s}</li>`)}</ul>` : ""}`}
       </section>
     </div>
     <div class="grid">
@@ -89,7 +97,18 @@ function links(e: ScrapedEvent, info: Info | undefined): Raw {
   return html`${list.filter(([, u]) => u).map(([label, u]) => html`<a class="button" href="${u}" target="_blank" rel="noopener">${label}</a>`)}`;
 }
 
-function passesCard(info: Info | undefined, now: string): Raw {
+/** One line per pass kind for the previous edition: what it cost, from the cheapest tier to the dearest. */
+function lastPrices(info: Info): string[] {
+  return (["Full", "Party"] as const).flatMap((kind) => {
+    const prices = (info.passes ?? []).filter((p) => p.kind === kind).map((p) => p.price);
+    const currency = (info.passes ?? []).find((p) => p.kind === kind)?.currency;
+    return prices.length && currency
+      ? [`${kind} pass ${prices.length > 1 && Math.min(...prices) !== Math.max(...prices) ? `${money(Math.min(...prices), currency)} to ${money(Math.max(...prices), currency)}` : money(prices[0], currency)}`]
+      : [];
+  });
+}
+
+function passesCard(info: Info | undefined, now: string, last?: { info: Info; label: string }): Raw {
   const passes = [...(info?.passes ?? [])].sort((a, b) => a.kind.localeCompare(b.kind) || (a.until ?? "9999").localeCompare(b.until ?? "9999"));
   const current = new Set<Pass | null>([currentPass(passes, "Full", now), currentPass(passes, "Party", now)]);
   const opens = info?.registrationOpens;
@@ -105,13 +124,19 @@ function passesCard(info: Info | undefined, now: string): Raw {
               ${passes.map((p) => html`
                 <tr class="${current.has(p) ? "current" : p.until && p.until < now ? "gone" : ""}">
                   <td>${p.kind} pass</td>
-                  <td>${p.tier} ${current.has(p) ? html`<span class="tag">now</span>` : ""}</td>
+                  <td>${p.tier} ${current.has(p) ? html`<span class="tag">now</span>` : ""} ${p.soldOut ? html`<span class="tag" title="Sold out: the seller offers a waiting list">sold out</span>` : ""}</td>
                   <td class="num">${money(p.price, p.currency)}</td>
                   <td>${p.until ? date(p.until) : "—"}</td>
                 </tr>`)}
             </tbody>
           </table>`
         : html`<p class="muted">No pricing yet.</p>`}
+      ${!passes.length && last && lastPrices(last.info).length
+        ? html`<p class="muted small">${last.label}: ${lastPrices(last.info).join(", ")}, depending on when you bought. A rough guide until this edition's prices are out.</p>`
+        : ""}
+      ${!opens && last?.info.registrationOpens
+        ? html`<p class="muted small">Registration for the ${last.label} opened ${localDateTime(last.info.registrationOpens)}.</p>`
+        : ""}
     </section>`;
 }
 

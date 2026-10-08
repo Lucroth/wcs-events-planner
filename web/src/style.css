@@ -259,3 +259,4 @@ tr.mine td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 .card-star.on, .card-star:hover { color: var(--accent); }
 .flight-filters { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin-bottom: .75rem; }
 .legs li.mine { box-shadow: inset 3px 0 0 var(--accent); padding-left: .4rem; }
+.staff.last { opacity: .75; }

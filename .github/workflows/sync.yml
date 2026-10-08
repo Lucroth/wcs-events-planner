@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       commands:
-        description: "Space-separated: sweep refresh scoring autofill publish flights trains notify"
+        description: "Space-separated: sweep refresh scoring autofill tickets publish flights trains notify"
         default: "scoring publish flights"
       wizz:
         description: "Wizz fares: live (ask Wizz) or reuse (keep the stored ones)"
@@ -44,13 +44,13 @@ jobs:
           REQUESTED: ${{ inputs.commands }}
         run: |
           case "$SCHEDULE" in
-            "0 4 * * *") c="autofill publish flights trains notify" ;;
+            "0 4 * * *") c="autofill tickets publish flights trains notify" ;;
             "0 2 * * 1") c="scoring publish" ;;
             "0 0 3 * *") c="refresh scoring publish" ;;
             *) c="$REQUESTED" ;;
           esac
           for x in $c; do
-            case "$x" in sweep|refresh|scoring|autofill|publish|flights|trains|notify) ;; *) echo "Unknown command: $x"; exit 1 ;; esac
+            case "$x" in sweep|refresh|scoring|autofill|tickets|publish|flights|trains|notify) ;; *) echo "Unknown command: $x"; exit 1 ;; esac
           done
           echo "commands=$c" >> "$GITHUB_OUTPUT"
 

@@ -9,6 +9,15 @@ const pass = (kind: Pass["kind"], tier: string, until: string | null): Pass => (
 describe("currentPass", () => {
   const passes = [pass("Full", "Early", "2026-10-01"), pass("Full", "Regular", "2026-10-20"), pass("Full", "Late", null), pass("Party", "Early", "2026-10-10")];
 
+  it("trusts the seller's marker over the dates", () => {
+    const passes: Pass[] = [
+      { kind: "Full", tier: "Normal", price: 190, currency: "EUR", until: "2026-10-01" },
+      { kind: "Full", tier: "Late", price: 200, currency: "EUR", until: null, current: true },
+      { kind: "Full", tier: "Door", price: 210, currency: "EUR", until: "2027-02-20" },
+    ];
+    expect(currentPass(passes, "Full", "2026-10-08")?.tier).toBe("Late");
+  });
+
   it("picks the nearest deadline not yet passed, then the door price", () => {
     expect(currentPass(passes, "Full", "2026-10-06")?.tier).toBe("Regular");
     expect(currentPass(passes, "Full", "2026-10-21")?.tier).toBe("Late");

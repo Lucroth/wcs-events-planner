@@ -101,6 +101,10 @@ export interface Pass {
   currency: string;
   /** Last day on sale, yyyy-MM-dd; null for the tier sold until the door. */
   until: string | null;
+  /** The tier on sale now, as the ticket seller says; set by the DanceApp scraper, which the dates cannot always tell. */
+  current?: boolean;
+  /** No tickets left: the seller offers a waiting list. */
+  soldOut?: boolean;
 }
 
 export interface Override {
@@ -215,7 +219,7 @@ export function applyOverride<T extends EventView>(e: T, info: Info | undefined)
 export function currentPass(passes: Pass[] | undefined, kind: PassKind, today: string): Pass | null {
   const ofKind = (passes ?? []).filter((p) => p.kind === kind);
   const dated = ofKind.filter((p) => p.until && p.until >= today).sort((a, b) => a.until!.localeCompare(b.until!));
-  return dated[0] ?? ofKind.find((p) => !p.until) ?? null;
+  return ofKind.find((p) => p.current) ?? dated[0] ?? ofKind.find((p) => !p.until) ?? null;
 }
 
 /** Country names as scoring.dance spells them, the same list as Countries.IsEuropean in the sync. */
