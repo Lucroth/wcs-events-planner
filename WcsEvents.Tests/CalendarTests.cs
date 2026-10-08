@@ -22,7 +22,7 @@ public sealed class CalendarTests
         Assert.Equal((new DateOnly(2027, 2, 25), new DateOnly(2027, 3, 1)), (paris.From, paris.To));
         Assert.Equal("France", paris.Country);
         Assert.Equal("Paris", paris.City);
-        Assert.Equal("149 Bd Anatole France, 93200 Saint-Denis, France, Paris", paris.Address);
+        Assert.Equal("149 Bd Anatole France, 93200 Saint-Denis, France", paris.Address);
         Assert.Equal("https://parisswingclassic.com/", paris.WebsiteUrl);
 
         // The event on hiatus is on the calendar but not happening; an empty country is read off the street.

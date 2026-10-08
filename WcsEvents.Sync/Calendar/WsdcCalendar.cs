@@ -100,12 +100,21 @@ public sealed partial class WsdcCalendar(HttpClient http, IMemoryCache cache, IL
         return new CalendarEvent(name, from, Date(e, "endDate") ?? from, CleanUrl(Str(e, "url")), city, country, FullAddress(street, city, country));
     }
 
-    /// <summary>The street, city and country as one line to geocode; parts the street already names are not repeated.</summary>
+    /// <summary>
+    /// The street, city and country as one line to geocode. A street that already ends with its
+    /// country ("149 Bd Anatole France, 93200 Saint-Denis, France") is complete: adding the calendar's
+    /// city ("Paris") would pull the geocoder to the wrong place.
+    /// </summary>
     internal static string? FullAddress(string? street, string? city, string? country)
     {
         if (street is not { Length: > 0 })
         {
             return null;
+        }
+
+        if (country is { Length: > 0 } && street.EndsWith(country, StringComparison.OrdinalIgnoreCase))
+        {
+            return street;
         }
 
         List<string> parts = [street];
