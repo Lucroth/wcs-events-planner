@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Net;
-using System.Net.Mail;
 using System.Text;
 using System.Text.Json;
 using Google.Cloud.Firestore;
@@ -29,7 +28,8 @@ public sealed partial class NotifyPublisher(FirestoreDb firestore, FirestoreStor
 
         var fares = Fares(await store.ReadAllAsync("flights", ct), await store.ReadAllAsync("trains", ct));
         var today = DateOnly.FromDateTime(time.GetUtcNow().UtcDateTime).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-        Dictionary<string, List<Drop>> drops = [];
+        Dictionary<string, List<(DocumentReference Ref, Drop Drop)>> drops = [];
+        List<(DocumentReference Ref, decimal Now)> unchanged = [];
 
         foreach (var doc in watches.Documents)
         {
@@ -39,26 +39,53 @@ public sealed partial class NotifyPublisher(FirestoreDb firestore, FirestoreStor
                 continue;
             }
 
-            Dictionary<string, object> update = new() { ["price"] = (double)now, ["checkedOn"] = today };
             if (now < w.Price - 0.5m)
             {
                 var uid = doc.Reference.Parent.Parent!.Id;
-                (drops.TryGetValue(uid, out var list) ? list : drops[uid] = []).Add(new Drop(w, now));
-                update["previousPrice"] = (double)w.Price;
-                update["droppedOn"] = today;
+                (drops.TryGetValue(uid, out var list) ? list : drops[uid] = []).Add((doc.Reference, new Drop(w, now)));
             }
-
-            await doc.Reference.UpdateAsync(update, cancellationToken: ct);
+            else
+            {
+                unchanged.Add((doc.Reference, now));
+            }
         }
 
+        foreach (var (reference, now) in unchanged)
+        {
+            await reference.UpdateAsync(new Dictionary<string, object> { ["price"] = (double)now, ["checkedOn"] = today }, cancellationToken: ct);
+        }
+
+        // A drop is only recorded once its email went out; a failed send keeps the old price, so
+        // the next run reports it again.
         var sent = 0;
         foreach (var (uid, list) in drops)
         {
             var user = await firestore.Document($"users/{uid}").GetSnapshotAsync(ct);
-            if (user.TryGetValue<string>("email", out var email) && !string.IsNullOrWhiteSpace(email))
+            if (!user.TryGetValue<string>("email", out var email) || string.IsNullOrWhiteSpace(email))
             {
-                await SendAsync(email, list, ct);
+                continue;
+            }
+
+            try
+            {
+                await SendAsync(email, [.. list.Select(x => x.Drop)], ct);
                 sent++;
+            }
+            catch (Exception ex) when (ex is MailKit.Net.Smtp.SmtpCommandException or MailKit.Net.Smtp.SmtpProtocolException or MailKit.Security.AuthenticationException or IOException)
+            {
+                LogSendFailed(logger, uid, ex);
+                continue;
+            }
+
+            foreach (var (reference, drop) in list)
+            {
+                await reference.UpdateAsync(new Dictionary<string, object>
+                {
+                    ["price"] = (double)drop.Now,
+                    ["previousPrice"] = (double)drop.Watch.Price,
+                    ["droppedOn"] = today,
+                    ["checkedOn"] = today,
+                }, cancellationToken: ct);
             }
         }
 
@@ -137,18 +164,22 @@ public sealed partial class NotifyPublisher(FirestoreDb firestore, FirestoreStor
         var user = Environment.GetEnvironmentVariable("GMAIL_USER") ?? throw new InvalidOperationException("GMAIL_USER is not set.");
         var password = Environment.GetEnvironmentVariable("GMAIL_APP_PASSWORD") ?? throw new InvalidOperationException("GMAIL_APP_PASSWORD is not set.");
 
-        using var smtp = new SmtpClient("smtp.gmail.com", 587) { EnableSsl = true, Credentials = new NetworkCredential(user, password) };
-        using var mail = new MailMessage(new MailAddress(user, "WCS Trips"), new MailAddress(to))
+        var message = new MimeKit.MimeMessage
         {
             Subject = drops.Count == 1
                 ? $"Cheaper: {Describe(drops[0].Watch)} for {drops[0].Watch.EventName}"
                 : $"{drops.Count} connections got cheaper",
-            Body = Body(drops),
-            IsBodyHtml = true,
-            BodyEncoding = Encoding.UTF8,
+            Body = new MimeKit.TextPart(MimeKit.Text.TextFormat.Html) { Text = Body(drops) },
         };
+        message.From.Add(new MimeKit.MailboxAddress("WCS Trips", user));
+        message.To.Add(MimeKit.MailboxAddress.Parse(to));
 
-        await smtp.SendMailAsync(mail, ct);
+        using var smtp = new MailKit.Net.Smtp.SmtpClient();
+        await smtp.ConnectAsync("smtp.gmail.com", 465, MailKit.Security.SecureSocketOptions.SslOnConnect, ct);
+        // App passwords are shown in groups of four; Gmail takes them with or without the spaces.
+        await smtp.AuthenticateAsync(user, password.Replace(" ", ""), ct);
+        await smtp.SendAsync(message, ct);
+        await smtp.DisconnectAsync(true, ct);
     }
 
     internal static string Describe(Watch w) =>
@@ -162,6 +193,9 @@ public sealed partial class NotifyPublisher(FirestoreDb firestore, FirestoreStor
         return $"<p>Prices dropped on connections you watch:</p><ul>{rows}</ul>" +
                $"<p style=\"color:#888\">Fares change fast; check before buying. Manage alerts on the event page in <a href=\"{Site}\">WCS Trips</a>.</p>";
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Price alert email to user {Uid} failed; the drop is kept for the next run")]
+    private static partial void LogSendFailed(ILogger logger, string uid, Exception ex);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Price alerts: {Drops} drops, {Emails} emails sent")]
     private static partial void LogDone(ILogger logger, int drops, int emails);
