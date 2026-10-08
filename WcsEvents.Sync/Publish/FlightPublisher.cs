@@ -16,7 +16,7 @@ public sealed partial class FlightPublisher(
     AppDbContext db, CalendarPlanner planner, Places places, FlightSearch search, FirestoreStore store, TimeProvider time, ILogger<FlightPublisher> logger)
 {
     /// <summary>Airlines rarely sell further ahead than this, and searching further only spends requests.</summary>
-    private const int HorizonDays = 240;
+    private const int HorizonDays = 420;
 
     public async Task PublishAsync(CancellationToken ct)
     {
