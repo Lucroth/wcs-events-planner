@@ -4,7 +4,7 @@ import { html, type Raw } from "../html";
 import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, sideOf, type Chip, type DanceRole, type Difficulty, type Info, type YearSummary } from "../model";
 import { findCity, flightKey, homeCities } from "../travel";
 import { mayBeLive, nowLine, watchLive } from "../live";
-import { favourites } from "../me";
+import { favourites, setFavourite, signIn } from "../me";
 
 type Row = YearSummary["events"][number];
 
@@ -218,7 +218,7 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
     <li class="${r.dateTo < now && !live ? "past" : ""}" ${live ? html`data-live="${r.id}"` : ""}>
       <a href="#/event/${r.id}" class="event-card">
         <span class="dates">${range(r.dateFrom, r.dateTo)}</span>
-        <span class="name">${starredIds.has(r.id) ? html`<span class="starred" title="Starred">★</span> ` : ""}${r.name} ${r.announced ? html`<span class="tag" title="Announced by the organiser, not on scoring.dance yet">announced</span>` : ""} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
+        <span class="name"><button type="button" class="card-star ${starredIds.has(r.id) ? "on" : ""}" data-star="${r.id}" data-name="${r.name}" data-date="${r.dateFrom}" title="${starredIds.has(r.id) ? "Starred: click to unstar" : "Star this event"}">${starredIds.has(r.id) ? "★" : "☆"}</button> ${r.name} ${r.announced ? html`<span class="tag" title="Announced by the organiser, not on scoring.dance yet">announced</span>` : ""} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
         ${live ? html`<span class="now" hidden></span>` : ""}
         <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
         <span class="price">${price}</span>
@@ -260,6 +260,32 @@ function chips(list: Chip[], mine: string | null, role: DanceRole | null): Raw {
 }
 
 export function wireList(year: number): void {
+  // Stars on the cards. Signed out, the star is remembered across the Google sign-in, which
+  // re-renders the list, and applied then.
+  const pending = sessionStorage.getItem("star-after-sign-in");
+  document.querySelectorAll<HTMLButtonElement>("button.card-star").forEach((b) => {
+    const toggle = async (on: boolean) => {
+      await setFavourite(b.dataset.star!, on, b.dataset.name!, b.dataset.date!);
+      b.classList.toggle("on", on);
+      b.textContent = on ? "★" : "☆";
+      b.title = on ? "Starred: click to unstar" : "Star this event";
+    };
+    if (auth.currentUser && pending === b.dataset.star && !b.classList.contains("on")) {
+      sessionStorage.removeItem("star-after-sign-in");
+      void toggle(true);
+    }
+    b.addEventListener("click", async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (!auth.currentUser) {
+        sessionStorage.setItem("star-after-sign-in", b.dataset.star!);
+        await signIn();
+        return;
+      }
+      await toggle(!b.classList.contains("on"));
+    });
+  });
+
   // An event shows as live once scoring.dance has its schedule; the line then follows the floor.
   document.querySelectorAll<HTMLElement>("li[data-live]").forEach((li) =>
     watchLive(li.dataset.live!, (live) => {

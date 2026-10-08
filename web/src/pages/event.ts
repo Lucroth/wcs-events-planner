@@ -6,6 +6,7 @@ import { html, safeUrl, type Raw } from "../html";
 import { liveCard, mayBeLive, watchLive } from "../live";
 import { applyOverride, currentPass, tierFor, tiers, type Flights, type Info, type Leg, type Pass, type ScrapedEvent, type TrainLeg, type Trains } from "../model";
 import {
+  polishAirports,
   addDays,
   airbnbUrl,
   bookingUrl,
@@ -246,6 +247,9 @@ function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: stri
   const destinations = scraped.airports ?? [];
   const google = googleFlightsUrl(city.airports.length ? city.name : "Warsaw", e.city ?? destinations[0]?.name ?? "", addDays(e.dateFrom, -1), e.dateTo);
 
+  airportNames = { ...polishAirports, ...Object.fromEntries(destinations.map((a) => [a.iata, a.name])) };
+  flightView = flights ? { flights, people, home } : null;
+
   if (!destinations.length) {
     return html`<h3>Flights</h3><p class="muted">No nearby airports known${scraped.city ? "" : " (the event has no city)"}. An admin can add them.</p>`;
   }
@@ -264,19 +268,9 @@ function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: stri
       : !flights.combos.length
         ? html`<p class="muted">No direct Ryanair or Wizz Air flights in this window. Try Google Flights.</p>`
         : html`
-          <h4>Cheapest return combinations, any Polish airport</h4>
-          <table class="flights">
-            <thead><tr><th>Out</th><th>Back</th><th class="num">Per person</th>${people > 1 ? html`<th class="num">Total (${people})</th>` : ""}</tr></thead>
-            <tbody>
-              ${flights.combos.map((c) => html`
-                <tr class="${home.has(c.out.from) ? "mine" : ""}">
-                  <td>${leg(c.out, people, false)}</td>
-                  <td>${leg(c.back, people, false)}</td>
-                  <td class="num"><strong>${money(c.perPerson, flights.currency)}</strong></td>
-                  ${people > 1 ? html`<td class="num">${money(c.perPerson * people, flights.currency)}</td>` : ""}
-                </tr>`)}
-            </tbody>
-          </table>
+          <h4>Cheapest return combinations</h4>
+          <div id="flight-filters" class="flight-filters">${flightFilters(flights)}</div>
+          <div id="combos"></div>
           <details>
             <summary>All flights found (${flights.out.length + flights.back.length})</summary>
             <div class="grid">
@@ -292,7 +286,7 @@ function leg(l: Leg, people: number, withPrice: boolean): Raw {
     ? html`<span class="muted">${l.times[0]}–${l.arrival} (${duration(l.durationMinutes)})</span>`
     : l.times.length ? html`<span class="muted">departs ${l.times.join(", ")}</span>` : "";
   return html`
-    <a href="${url}" target="_blank" rel="noopener" class="leg" data-watch="${JSON.stringify({ kind: "flight", airline: l.airline, from: l.from, to: l.to, date: l.date, time: null, price: l.price, currency: l.currency })}">
+    <a href="${url}" target="_blank" rel="noopener" class="leg" title="${airportNames[l.from] ?? l.from} → ${airportNames[l.to] ?? l.to}" data-watch="${JSON.stringify({ kind: "flight", airline: l.airline, from: l.from, to: l.to, date: l.date, time: null, price: l.price, currency: l.currency })}">
       <span class="airline ${l.airline.toLowerCase()}">${l.airline === "Ryanair" ? "Ryanair" : "Wizz"}</span>
       ${l.from}→${l.to} · ${short(l.date)} ${times} <span class="muted">· direct</span>
       ${withPrice ? html`<strong> · ${money(l.price, l.currency)}</strong>` : ""}
@@ -338,6 +332,7 @@ function tiersTable(): Raw {
 }
 
 export function wireEvent(id: string): void {
+  wireFlightFilters();
   void wireAlerts(id);
   const card = document.getElementById("live");
   if (card) {
@@ -401,13 +396,12 @@ async function wireAlerts(id: string): Promise<void> {
   }
 
   const watched = starred ? await watches(id) : new Map<string, Watch>();
-  const legs = [...document.querySelectorAll<HTMLElement>("[data-watch]")];
   const watchOf = (el: HTMLElement): Watch => ({ ...JSON.parse(el.dataset.watch!), eventId: id, eventName: name });
 
   const render = () => {
     star.textContent = starred ? "★ Starred" : "☆ Star";
     star.classList.toggle("on", starred);
-    for (const el of legs) {
+    for (const el of document.querySelectorAll<HTMLElement>("[data-watch]")) {
       let bell = el.nextElementSibling as HTMLButtonElement | null;
       if (!bell?.classList.contains("bell")) {
         bell = document.createElement("button");
@@ -431,6 +425,7 @@ async function wireAlerts(id: string): Promise<void> {
     }
     document.querySelectorAll<HTMLElement>(".alert-hint").forEach((h) => (h.hidden = !starred));
   };
+  refreshBells = render;
 
   star.addEventListener("click", async () => {
     if (!auth.currentUser) {
@@ -445,4 +440,72 @@ async function wireAlerts(id: string): Promise<void> {
   });
 
   render();
+}
+
+/** IATA code to airport name, for flight tooltips; set when the flights card renders. */
+let airportNames: Record<string, string> = {};
+
+/** The fares on the page, for the filters to pair client-side. */
+let flightView: { flights: Flights; people: number; home: Set<string> } | null = null;
+
+/** Re-applies the alert bells after the combinations are redrawn; set by wireAlerts. */
+let refreshBells = () => {};
+
+const weekday = (date: string) => new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+
+/**
+ * Chips for the outbound and return days and the airports at each end, built from the flights found.
+ * All start ticked; unticking one drops the flights it names.
+ */
+function flightFilters(f: Flights): Raw {
+  const sorted = (xs: string[]) => [...new Set(xs)].sort();
+  const group = (name: string, label: string, values: string[], text: (v: string) => string) => html`
+    <fieldset class="levels"><legend>${label}</legend>
+      ${values.map((v) => html`<label class="chip on-level" title="${airportNames[v] ?? ""}"><input type="checkbox" name="${name}" value="${v}" checked /> ${text(v)}</label>`)}
+    </fieldset>`;
+  return html`
+    ${group("outDay", "Out", sorted(f.out.map((l) => l.date)), weekday)}
+    ${group("backDay", "Back", sorted(f.back.map((l) => l.date)), weekday)}
+    ${group("home", "Polish airport", sorted([...f.out.map((l) => l.from), ...f.back.map((l) => l.to)]), (v) => v)}
+    ${group("away", "Event airport", sorted([...f.out.map((l) => l.to), ...f.back.map((l) => l.from)]), (v) => v)}`;
+}
+
+/** Pairs the ticked outbound and return flights, cheapest first, as the sync does: any with any. */
+function wireFlightFilters(): void {
+  const form = document.getElementById("flight-filters");
+  const target = document.getElementById("combos");
+  if (!form || !target || !flightView) return;
+  const { flights, people, home } = flightView;
+
+  const draw = () => {
+    const on = (name: string) => new Set([...form.querySelectorAll<HTMLInputElement>(`input[name=${name}]:checked`)].map((i) => i.value));
+    const [outDay, backDay, homes, aways] = [on("outDay"), on("backDay"), on("home"), on("away")];
+    form.querySelectorAll<HTMLInputElement>("input").forEach((i) => i.parentElement!.classList.toggle("on-level", i.checked));
+
+    const outs = flights.out.filter((l) => outDay.has(l.date) && homes.has(l.from) && aways.has(l.to) && l.currency === flights.currency);
+    const backs = flights.back.filter((l) => backDay.has(l.date) && aways.has(l.from) && homes.has(l.to) && l.currency === flights.currency);
+    const combos = outs.flatMap((o) => backs.map((b) => ({ out: o, back: b, perPerson: o.price + b.price })))
+      .sort((a, b) => a.perPerson - b.perPerson || a.out.date.localeCompare(b.out.date))
+      .slice(0, 15);
+
+    target.innerHTML = (combos.length
+      ? html`
+        <table class="flights">
+          <thead><tr><th>Out</th><th>Back</th><th class="num">Per person</th>${people > 1 ? html`<th class="num">Total (${people})</th>` : ""}</tr></thead>
+          <tbody>
+            ${combos.map((c) => html`
+              <tr class="${home.has(c.out.from) ? "mine" : ""}">
+                <td>${leg(c.out, people, false)}</td>
+                <td>${leg(c.back, people, false)}</td>
+                <td class="num"><strong>${money(c.perPerson, flights.currency)}</strong></td>
+                ${people > 1 ? html`<td class="num">${money(c.perPerson * people, flights.currency)}</td>` : ""}
+              </tr>`)}
+          </tbody>
+        </table>`
+      : html`<p class="muted">No direct flights match these filters.</p>`).value;
+    refreshBells();
+  };
+
+  form.addEventListener("change", draw);
+  draw();
 }

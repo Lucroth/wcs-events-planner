@@ -22,6 +22,13 @@ export const homeCities: HomeCity[] = [
   { name: "Olsztyn", koleoSlug: "olsztyn", airports: ["SZY"] },
 ];
 
+/** Polish airports the fare search flies from, for tooltips. */
+export const polishAirports: Record<string, string> = {
+  WAW: "Warsaw Chopin", WMI: "Warsaw Modlin", KRK: "Kraków", KTW: "Katowice", GDN: "Gdańsk", WRO: "Wrocław",
+  POZ: "Poznań", LCJ: "Łódź", SZZ: "Szczecin", LUZ: "Lublin", RZE: "Rzeszów", BZG: "Bydgoszcz", SZY: "Olsztyn-Mazury",
+  RDO: "Radom", IEG: "Zielona Góra",
+};
+
 export const findCity = (name: string | null): HomeCity => homeCities.find((c) => c.name === name) ?? homeCities[0];
 
 /** A city with no airport of its own flies from Warsaw. */
