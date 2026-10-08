@@ -265,19 +265,11 @@ function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: stri
     <p class="alert-hint muted small" hidden>🔕 next to a flight: click to get an email when it gets cheaper (checked every morning).</p>
     ${!flights
       ? html`<p class="muted">Fares not fetched yet: they refresh once a day.</p>`
-      : !flights.combos.length
+      : !flights.out.length && !flights.back.length
         ? html`<p class="muted">No direct Ryanair or Wizz Air flights in this window. Try Google Flights.</p>`
         : html`
-          <h4>Cheapest return combinations</h4>
           <div id="flight-filters" class="flight-filters">${flightFilters(flights)}</div>
-          <div id="combos"></div>
-          <details>
-            <summary>All flights found (${flights.out.length + flights.back.length})</summary>
-            <div class="grid">
-              <div><h4>Out</h4><ul class="legs">${flights.out.map((l) => html`<li>${leg(l, people, true)}</li>`)}</ul></div>
-              <div><h4>Back</h4><ul class="legs">${flights.back.map((l) => html`<li>${leg(l, people, true)}</li>`)}</ul></div>
-            </div>
-          </details>`}`;
+          <div id="combos"></div>`}`;
 }
 
 function leg(l: Leg, people: number, withPrice: boolean): Raw {
@@ -484,25 +476,19 @@ function wireFlightFilters(): void {
 
     const outs = flights.out.filter((l) => outDay.has(l.date) && homes.has(l.from) && aways.has(l.to) && l.currency === flights.currency);
     const backs = flights.back.filter((l) => backDay.has(l.date) && aways.has(l.from) && homes.has(l.to) && l.currency === flights.currency);
-    const combos = outs.flatMap((o) => backs.map((b) => ({ out: o, back: b, perPerson: o.price + b.price })))
-      .sort((a, b) => a.perPerson - b.perPerson || a.out.date.localeCompare(b.out.date))
-      .slice(0, 15);
+    const cheapest = outs.length && backs.length
+      ? Math.min(...outs.map((l) => l.price)) + Math.min(...backs.map((l) => l.price))
+      : null;
+    const list = (legs: Leg[]) => legs.length
+      ? html`<ul class="legs">${[...legs].sort((a, b) => a.price - b.price).map((l) => html`<li class="${home.has(l.from) || home.has(l.to) ? "mine" : ""}">${leg(l, people, true)}</li>`)}</ul>`
+      : html`<p class="muted">None match these filters.</p>`;
 
-    target.innerHTML = (combos.length
-      ? html`
-        <table class="flights">
-          <thead><tr><th>Out</th><th>Back</th><th class="num">Per person</th>${people > 1 ? html`<th class="num">Total (${people})</th>` : ""}</tr></thead>
-          <tbody>
-            ${combos.map((c) => html`
-              <tr class="${home.has(c.out.from) ? "mine" : ""}">
-                <td>${leg(c.out, people, false)}</td>
-                <td>${leg(c.back, people, false)}</td>
-                <td class="num"><strong>${money(c.perPerson, flights.currency)}</strong></td>
-                ${people > 1 ? html`<td class="num">${money(c.perPerson * people, flights.currency)}</td>` : ""}
-              </tr>`)}
-          </tbody>
-        </table>`
-      : html`<p class="muted">No direct flights match these filters.</p>`).value;
+    target.innerHTML = html`
+      ${cheapest != null ? html`<p>Cheapest return with these filters: <strong>${money(cheapest, flights.currency)}</strong> per person${people > 1 ? html`, <strong>${money(cheapest * people, flights.currency)}</strong> for ${people}` : ""}.</p>` : ""}
+      <div class="grid">
+        <div><h4>Out (${outs.length})</h4>${list(outs)}</div>
+        <div><h4>Back (${backs.length})</h4>${list(backs)}</div>
+      </div>`.value;
     refreshBells();
   };
 
