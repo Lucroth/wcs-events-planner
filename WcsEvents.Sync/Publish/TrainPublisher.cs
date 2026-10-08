@@ -1,3 +1,4 @@
+using WcsEvents.Sync.Calendar;
 using WcsEvents.Sync.Data;
 using WcsEvents.Sync.Travel;
 
@@ -9,21 +10,21 @@ namespace WcsEvents.Sync.Publish;
 /// the end, like flights. Events further ahead are skipped: PKP Intercity does not sell them yet.
 /// </summary>
 public sealed partial class TrainPublisher(
-    AppDbContext db, Places places, KoleoClient koleo, FirestoreStore store, TimeProvider time, ILogger<TrainPublisher> logger)
+    AppDbContext db, CalendarPlanner planner, Places places, KoleoClient koleo, FirestoreStore store, TimeProvider time, ILogger<TrainPublisher> logger)
 {
     private const int HorizonDays = 35;
 
     public async Task PublishAsync(CancellationToken ct)
     {
         var today = DateOnly.FromDateTime(time.GetUtcNow().UtcDateTime);
-        var trips = await Trip.LoadAsync(db, store, ct);
+        var trips = await Trip.LoadAsync(db, store, planner, ct);
 
         var upcoming = trips.Where(t => t.Country is "Poland" && t.Start > today && t.Start <= today.AddDays(HorizonDays)).ToList();
         var searched = 0;
 
         foreach (var trip in upcoming)
         {
-            var travel = await EventPublisher.TravelAsync(trip.City, trip.Country, trip.Info, places, ct);
+            var travel = await EventPublisher.TravelAsync(trip.City, trip.Country, trip.Info, places, ct, trip.Address);
             if (travel.Station is not { } station)
             {
                 continue;

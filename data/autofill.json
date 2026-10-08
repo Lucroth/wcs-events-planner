@@ -1893,5 +1893,173 @@
         }
       ]
     }
+  },
+  "x325": {
+    "source": "https://thedanceatlas.com/events/autumn-swing-challenge-2026-wsdc-rising-star-tour-event/131787",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Verdi Budapest Aquincum"
+    },
+    "year": 2026
+  },
+  "x342": {
+    "source": "https://danceapp.net/en/events/147/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Scandic Oslo Airport"
+    },
+    "year": 2026
+  },
+  "x347": {
+    "source": "https://berlinswingrevolution.com/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Werk36"
+    },
+    "year": 2026
+  },
+  "x339": {
+    "source": "https://danceapp.net/en/events/187/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Radisson RED Hotel London Heathrow"
+    },
+    "year": 2026
+  },
+  "x352": {
+    "source": "https://socialdancer.org/en/event/2841/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Scandic Infra City"
+    },
+    "year": 2026
+  },
+  "x354": {
+    "source": "http://wcs-budafest.com",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Hotel InterContinental Budapest"
+    },
+    "year": 2027
+  },
+  "x336": {
+    "source": "https://swingresolution.com/pages/hotel-travel",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Radisson Blu Hotel, Royal Mile"
+    },
+    "year": 2027
+  },
+  "x363": {
+    "source": "https://swingtzerland.com/en/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Tanzwerk101"
+    },
+    "year": 2027
+  },
+  "x362": {
+    "source": "https://www.trinityswing.com/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Carrickdale Hotel & Spa"
+    },
+    "year": 2027
+  },
+  "x335": {
+    "source": "https://www.euro-dance-festival.com/rust",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Europa-Park"
+    },
+    "year": 2027
+  },
+  "x366": {
+    "source": "https://www.wintercoastswing.com/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Vesileppis - Hiihtoareena"
+    },
+    "year": 2027
+  },
+  "x381": {
+    "source": "https://westiespringthing.com",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Verdi Budapest Aquincum"
+    },
+    "year": 2027
+  },
+  "x382": {
+    "source": "https://danceapp.net/events/221-UK_West_Coast_Swing_Championships_2027/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Radisson RED Hotel"
+    },
+    "year": 2027
+  },
+  "x291": {
+    "source": "https://swingincapital.com/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Hotel Capannelle"
+    },
+    "year": 2027
+  },
+  "x389": {
+    "source": "https://detonationdance.com/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Hilton Hotel, Outwood Ln, Manchester M90 4WP"
+    },
+    "year": 2027
+  },
+  "x372": {
+    "source": "https://danceapp.net/events/192-BeeMAD_2027/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Hotel Eurostars Puerta Madrid"
+    },
+    "year": 2027
+  },
+  "x383": {
+    "source": "https://springtimeswing.com/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "M.A.K. Studios"
+    },
+    "year": 2027
+  },
+  "x378": {
+    "source": "http://www.d-townswing.com",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Boston Club"
+    },
+    "year": 2027
+  },
+  "x412": {
+    "source": "https://danceapp.net/en/events/199-Baltic_Swing_2027/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "4* Hotel Scandic Gdansk"
+    },
+    "year": 2027
+  },
+  "x420": {
+    "source": "https://infinite-swing.com",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "INFINITY Hotel Munich"
+    },
+    "year": 2027
+  },
+  "x379": {
+    "source": "https://www.worldsdc.com/events/",
+    "on": "2026-10-06",
+    "info": {
+      "venueName": "Boston Club"
+    },
+    "year": 2027
   }
 }

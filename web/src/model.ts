@@ -22,6 +22,8 @@ export interface ScrapedEvent {
   manual?: boolean;
   /** An edition the organiser announced before scoring.dance lists it; replaced once it does. */
   announced?: { venue: string | null; source: string | null } | null;
+  /** The venue's street address from the WSDC calendar, when it lists the event. */
+  venueAddress?: string | null;
 }
 
 export interface EditionRef {

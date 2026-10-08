@@ -1,3 +1,4 @@
+using WcsEvents.Sync.Calendar;
 using System.Globalization;
 using System.Text.Json;
 using WcsEvents.Sync.Data;
@@ -12,7 +13,7 @@ namespace WcsEvents.Sync.Publish;
 /// itself, since neither allows cross-origin requests.
 /// </summary>
 public sealed partial class FlightPublisher(
-    AppDbContext db, Places places, FlightSearch search, FirestoreStore store, TimeProvider time, ILogger<FlightPublisher> logger)
+    AppDbContext db, CalendarPlanner planner, Places places, FlightSearch search, FirestoreStore store, TimeProvider time, ILogger<FlightPublisher> logger)
 {
     /// <summary>Airlines rarely sell further ahead than this, and searching further only spends requests.</summary>
     private const int HorizonDays = 240;
@@ -20,7 +21,7 @@ public sealed partial class FlightPublisher(
     public async Task PublishAsync(CancellationToken ct)
     {
         var today = DateOnly.FromDateTime(time.GetUtcNow().UtcDateTime);
-        var trips = await Trip.LoadAsync(db, store, ct);
+        var trips = await Trip.LoadAsync(db, store, planner, ct);
 
         var upcoming = trips
             .Where(t => t.Start > today && t.Start <= today.AddDays(HorizonDays))
@@ -34,9 +35,9 @@ public sealed partial class FlightPublisher(
         // which refuses data-centre networks.
         var stored = Environment.GetEnvironmentVariable("WIZZ") is "reuse" ? await store.ReadAllAsync("flights", ct) : null;
 
-        foreach (var (id, start, end, city, country, info) in upcoming)
+        foreach (var (id, start, end, city, country, info, address) in upcoming)
         {
-            var travel = await EventPublisher.TravelAsync(city, country, info, places, ct);
+            var travel = await EventPublisher.TravelAsync(city, country, info, places, ct, address);
             if (travel.Airports.Count is 0)
             {
                 continue;

@@ -70,6 +70,17 @@ public static class Countries
         : ByCode.TryGetValue(codeOrName.Trim(), out var name) ? name
         : codeOrName.Trim();
 
+    /// <summary>One spelling per country: sources differ on "Czechia" and "Czech Republic", "Netherlands" and "The Netherlands", "United Kingdom" and "Great Britain".</summary>
+    public static string? Canonical(string? codeOrName) =>
+        Name(codeOrName) switch
+        {
+            "Czech Republic" => "Czechia",
+            "The Netherlands" => "Netherlands",
+            "Great Britain" => "United Kingdom",
+            "United States" => "United States of America",
+            var name => name,
+        };
+
     public static bool IsEuropean(string? country) =>
         Name(country) is { } name && European.Contains(name);
 }

@@ -2,6 +2,7 @@ using System.Globalization;
 using Google.Cloud.Firestore;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using WcsEvents.Sync.Calendar;
 using WcsEvents.Sync.Crawl;
 using WcsEvents.Sync.Data;
 using WcsEvents.Sync.Metrics;
@@ -10,13 +11,14 @@ using WcsEvents.Sync.Scoring;
 using WcsEvents.Sync.Travel;
 using WcsEvents.Sync.Wsdc;
 
-// Usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill|live|notify> [--minutes N]
+// Usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill|live|notify|calendar> [--minutes N]
 //   sweep / refresh  mirror the WSDC registry into the local SQLite file (resumable; stops after N minutes)
 //   scoring          mirror scoring.dance (run after the registry, or prelim roles stay unknown)
 //   publish          write events, strengths and results to Firestore
 //   flights          write Ryanair/Wizz fares for upcoming events abroad to Firestore
 //   trains           write koleo train fares for upcoming events in Poland to Firestore
 //   autofill         fill empty admin fields from data/autofill.json (details read off event websites)
+//   calendar         print how the WSDC calendar's European editions map onto the app's events (JSON)
 //   notify           email readers whose watched connections got cheaper (after flights and trains)
 //   live             follow today's events on scoring.dance into live/{id}, once a minute, for N minutes
 // Firestore needs FIREBASE_PROJECT_ID and GOOGLE_APPLICATION_CREDENTIALS (or FIRESTORE_EMULATOR_HOST).
@@ -24,7 +26,7 @@ using WcsEvents.Sync.Wsdc;
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
-if (args.FirstOrDefault() is not ("sweep" or "refresh" or "scoring" or "publish" or "flights" or "trains" or "autofill" or "live" or "notify") || args.Length is not (1 or 3))
+if (args.FirstOrDefault() is not ("sweep" or "refresh" or "scoring" or "publish" or "flights" or "trains" or "autofill" or "live" or "notify" or "calendar") || args.Length is not (1 or 3))
 {
     Console.Error.WriteLine("usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill|live|notify> [--minutes N]");
     return 2;
@@ -112,6 +114,14 @@ builder.Services.AddHttpClient("nominatim", http =>
     http.Timeout = TimeSpan.FromSeconds(20);
 });
 
+builder.Services.AddHttpClient<WsdcCalendar>(http =>
+{
+    http.BaseAddress = new Uri("https://worldsdc.com/");
+    http.DefaultRequestHeaders.UserAgent.ParseAdd(BrowserAgent);
+    http.Timeout = TimeSpan.FromMinutes(1);
+}).AddHttpMessageHandler<PoliteHttpHandler>();
+builder.Services.AddScoped<CalendarPlanner>();
+
 builder.Services.AddSingleton<Places>();
 builder.Services.AddScoped<FlightSearch>();
 builder.Services.AddScoped<ScoringSync>();
@@ -169,6 +179,15 @@ switch (command)
         break;
     case "trains":
         await services.GetRequiredService<TrainPublisher>().PublishAsync(stop.Token);
+        break;
+    case "calendar":
+        var known = await db.ScoringEvents.AsNoTracking().Where(e => e.DateFrom != null && e.Name != "").ToListAsync(stop.Token);
+        var report = await services.GetRequiredService<CalendarPlanner>().PlanAsync(known, stop.Token) is { } plan
+            ? plan.Matched.Select(m => (object)new { id = m.Key.ToString(), kind = "listed", scoringId = (int?)m.Key, name = m.Value.Name, from = m.Value.From, to = m.Value.To, city = m.Value.City, country = m.Value.Country, url = m.Value.WebsiteUrl, address = m.Value.Address })
+                .Concat(plan.Added.Select(a => new { id = a.Id, kind = a.Latest is null ? "new" : "next", scoringId = a.Latest?.Id, name = a.Name, from = a.Entry.From, to = a.Entry.To, city = a.Entry.City, country = a.Country, url = a.Entry.WebsiteUrl, address = a.Address }))
+            : throw new InvalidOperationException("The WSDC calendar could not be read.");
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
         break;
     case "notify":
         await services.GetRequiredService<NotifyPublisher>().PublishAsync(stop.Token);

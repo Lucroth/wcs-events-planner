@@ -85,6 +85,13 @@ public static partial class EventMatching
         return trimmed.Replace("westcoastswing", "wcs");
     }
 
+    /// <summary>The name without its edition markers ("Budafest 2026" and "SwingVester 2026/27 WSDC" give "Budafest" and "SwingVester").</summary>
+    public static string SeriesName(string name) =>
+        Spaces().Replace(EditionMarkers().Replace(name, " "), " ").Trim();
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex Spaces();
+
     [GeneratedRegex(@"(?<!\d)(19|20)\d{2}(\s*[/-]\s*((19|20)\d{2}|\d{2}))?(?!\d)|\bWSDC\b|\bTrial\s+Event\b", RegexOptions.IgnoreCase)]
     private static partial Regex EditionMarkers();
 

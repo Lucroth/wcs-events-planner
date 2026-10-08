@@ -49,7 +49,7 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
       </span>
     </nav>
     ${params.has("next") ? await nextEdition(id, Number(params.get("next"))) : ""}
-    ${scraped.announced ? html`<p class="notice small">Announced by the organiser${safeUrl(scraped.announced.source) ? html` (<a href="${safeUrl(scraped.announced.source)!}" target="_blank" rel="noopener">source</a>)` : ""}, not on scoring.dance yet. Competition level is from the latest edition; this page switches to the real listing once scoring.dance has it.</p>` : ""}
+    ${scraped.announced ? html`<p class="notice small">On the <a href="${safeUrl(scraped.announced.source) ?? "https://worldsdc.com/events/"}" target="_blank" rel="noopener">WSDC calendar</a>, not on scoring.dance yet. ${scraped.strengthsFrom ? "Competition level is from the series' latest edition. " : "No results exist for this event yet. "}This page switches to the scoring.dance listing once there is one.</p>` : ""}
     <h1>${e.name}</h1>
     <p class="lead">
       ${range(e.dateFrom, e.dateTo)} ${e.dateFrom.slice(0, 4)} · ${[e.city, e.country].filter(Boolean).join(", ")}
@@ -175,7 +175,8 @@ function resultsCard(e: ScrapedEvent): Raw {
 
 function travelCard(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string; city: string | null; country: string | null }, info: Info | undefined, city: HomeCity, people: number, flights: Flights | undefined, trains: Trains | undefined): Raw {
   const coords = info?.lat != null && info?.lng != null ? { lat: info.lat, lng: info.lng } : scraped.coords;
-  const place = info?.venueAddress || [e.city, e.country].filter(Boolean).join(", ");
+  const venueAddress = info?.venueAddress || scraped.venueAddress;
+  const place = venueAddress || [e.city, e.country].filter(Boolean).join(", ");
   const checkOut = addDays(e.dateTo, 1);
 
   return html`
@@ -190,7 +191,7 @@ function travelCard(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: string
       </form>
 
       <h3>Accommodation</h3>
-      <p class="muted small">${date(e.dateFrom)} – ${date(checkOut)}, ${people} ${people === 1 ? "person" : "people"}. ${info?.lat != null || (info?.venueAddress && scraped.coords) ? "Sorted by distance from the venue." : info?.venueAddress ? "Venue address could not be placed on a map yet: searching around the city." : "Venue not set: searching around the city."}</p>
+      <p class="muted small">${date(e.dateFrom)} – ${date(checkOut)}, ${people} ${people === 1 ? "person" : "people"}. ${info?.lat != null || (venueAddress && scraped.coords) ? "Sorted by distance from the venue." : venueAddress ? "Venue address could not be placed on a map yet: searching around the city." : "Venue not set: searching around the city."}</p>
       <p class="buttons">
         <a class="button" target="_blank" rel="noopener" href="${bookingUrl(place, coords, e.dateFrom, checkOut, people)}">Booking.com</a>
         <a class="button" target="_blank" rel="noopener" href="${airbnbUrl(place, coords, e.dateFrom, checkOut, people)}">Airbnb</a>

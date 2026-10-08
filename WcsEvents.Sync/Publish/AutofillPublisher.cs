@@ -40,7 +40,11 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
 
             if (fields.Count > 0)
             {
-                if (!Has(current, "year") && years.TryGetValue(entry.Name, out var year))
+                // The year the event list files the info under: the entry's own for an event only the
+                // WSDC calendar has, else the scoring.dance event's.
+                var knownYear = entry.Value.TryGetProperty("year", out var y) && y.TryGetInt32(out var given) ? given
+                    : years.TryGetValue(entry.Name, out var scored) ? scored : (int?)null;
+                if (!Has(current, "year") && knownYear is { } year)
                 {
                     fields["year"] = (long)year;
                 }
