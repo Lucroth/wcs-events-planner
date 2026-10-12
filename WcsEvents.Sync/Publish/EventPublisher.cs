@@ -84,6 +84,7 @@ public sealed partial class EventPublisher(
                 Strengths = StrengthDocs(facts.Strengths),
                 StrengthsFrom = facts.StrengthsFrom is { } p ? new { id = p.Id.ToString(), p.Name, DateFrom = Iso(p.DateFrom) } : null,
                 Previous = Edition(Editions(e, all).LastOrDefault(o => o.DateFrom < e.DateFrom)),
+                First = IsFirstEdition(e, all) ? true : (bool?)null,
                 Next = nextOf.TryGetValue(e.Id, out var next)
                     ? new { id = next.Id, name = next.Name, dateFrom = Iso(next.Entry.From) }
                     : Edition(Editions(e, all).FirstOrDefault(o => o.DateFrom > e.DateFrom)),
@@ -128,6 +129,7 @@ public sealed partial class EventPublisher(
                         : new { id = latest.Event.Id.ToString(), latest.Event.Name, DateFrom = Iso(latest.Event.DateFrom) }
                     : null,
                 Previous = p.Latest is null ? null : Edition(p.Latest),
+                First = p.Latest is null ? true : (bool?)null,
                 Next = (object?)null,
                 Results = Array.Empty<object>(),
                 Announced = new { Venue = (string?)null, Source = WsdcCalendar.PageUrl },
@@ -151,7 +153,7 @@ public sealed partial class EventPublisher(
             }
         }
 
-        var rows = all.Select(Row.Listed).Concat(expected).Concat(planned.Select(p => Row.Planned(p, where[p.Id].City, p.Latest is { } l ? factsOf.GetValueOrDefault(l.Id) : null)));
+        var rows = all.Select(f => Row.Listed(f) with { IsFirst = IsFirstEdition(f.Event, all) }).Concat(expected).Concat(planned.Select(p => Row.Planned(p, where[p.Id].City, p.Latest is { } l ? factsOf.GetValueOrDefault(l.Id) : null) with { IsFirst = p.Latest is null }));
 
         foreach (var year in rows.GroupBy(r => r.From.Year))
         {
@@ -168,6 +170,7 @@ public sealed partial class EventPublisher(
                     r.IsWsdc,
                     Chips = Chips(r.Strengths),
                     Expected = r.IsExpected ? true : (bool?)null,
+                    First = r.IsFirst ? true : (bool?)null,
                     Announced = r.WebsiteUrl is not null || r.IsAnnounced ? new { Venue = (string?)null, WebsiteUrl = r.WebsiteUrl, Source = WsdcCalendar.PageUrl } : null,
                 }),
             }, ct);
@@ -291,7 +294,7 @@ public sealed partial class EventPublisher(
     /// <summary>One line of a year summary: a listed event, a series' guessed next edition, or an edition only the WSDC calendar lists.</summary>
     internal sealed record Row(
         string Id, string Name, DateOnly From, DateOnly To, string? City, string? Country, bool IsWsdc,
-        IReadOnlyList<DivisionStrength> Strengths, bool IsExpected, bool IsAnnounced, string? WebsiteUrl)
+        IReadOnlyList<DivisionStrength> Strengths, bool IsExpected, bool IsAnnounced, string? WebsiteUrl, bool IsFirst = false)
     {
         public static Row Listed(EventFacts f) =>
             new(f.Event.Id.ToString(), f.Event.Name, f.Event.DateFrom!.Value, f.Event.DateTo ?? f.Event.DateFrom!.Value, f.Event.City, f.Event.Country, f.IsWsdc, f.Strengths, false, false, null);
@@ -306,6 +309,10 @@ public sealed partial class EventPublisher(
         public static Row Planned(PlannedEvent p, string? city, EventFacts? latest) =>
             new(p.Id, p.Name, p.Entry.From, p.Entry.To, city, p.Country, true, latest?.Strengths ?? [], false, true, p.Entry.WebsiteUrl);
     }
+
+    /// <summary>No earlier edition is known. The data starts in 2018, so an older-looking first is not one.</summary>
+    internal static bool IsFirstEdition(ScoringEvent e, IEnumerable<EventFacts> all) =>
+        e.DateFrom is { Year: > 2018 } && !Editions(e, all).Any(o => o.DateFrom < e.DateFrom);
 
     /// <summary>The other published editions of an event's series, oldest first.</summary>
     internal static IEnumerable<ScoringEvent> Editions(ScoringEvent e, IEnumerable<EventFacts> all) =>

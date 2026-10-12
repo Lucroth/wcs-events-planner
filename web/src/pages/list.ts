@@ -214,7 +214,7 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
     <li class="${r.dateTo < now && !live ? "past" : ""}" ${live ? html`data-live="${r.id}"` : ""}>
       <a href="#/event/${r.id}" class="event-card">
         <span class="dates">${range(r.dateFrom, r.dateTo)}</span>
-        <span class="name"><button type="button" class="card-star ${starredIds.has(r.id) ? "on" : ""}" data-star="${r.id}" data-name="${r.name}" data-date="${r.dateFrom}" title="${starredIds.has(r.id) ? "Starred: click to unstar" : "Star this event"}">${starredIds.has(r.id) ? "★" : "☆"}</button> ${r.name} ${r.announced ? html`<span class="tag" title="Announced by the organiser, not on scoring.dance yet">announced</span>` : ""} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
+        <span class="name"><button type="button" class="card-star ${starredIds.has(r.id) ? "on" : ""}" data-star="${r.id}" data-name="${r.name}" data-date="${r.dateFrom}" title="${starredIds.has(r.id) ? "Starred: click to unstar" : "Star this event"}">${starredIds.has(r.id) ? "★" : "☆"}</button> ${r.name} ${r.first ? html`<span class="tag trial" title="First edition: a trial event">trial</span>` : ""} ${r.announced ? html`<span class="tag" title="Announced by the organiser, not on scoring.dance yet">announced</span>` : ""} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
         ${live ? html`<span class="now" hidden></span>` : ""}
         <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
         <span class="price">${price}</span>

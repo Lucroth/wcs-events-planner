@@ -53,4 +53,18 @@ public sealed class EventLogicTests
 
         Assert.Equal([2, 3, 5], expected);
     }
+
+    [Fact]
+    public void IsFirstEdition_NeedsNoEarlierEditionAndDataThatStartsBeforeIt()
+    {
+        static EventFacts Facts(int id, string name, int year) =>
+            new(new ScoringEvent { Id = id, Name = name, DateFrom = new DateOnly(year, 5, 10) }, true, [], null, []);
+
+        List<EventFacts> all = [Facts(1, "Budafest 2025", 2025), Facts(2, "Budafest 2026", 2026), Facts(3, "Newcomer 2026", 2026), Facts(4, "Oldtimer 2018", 2018)];
+
+        Assert.True(EventPublisher.IsFirstEdition(all[0].Event, all));
+        Assert.False(EventPublisher.IsFirstEdition(all[1].Event, all));
+        Assert.True(EventPublisher.IsFirstEdition(all[2].Event, all));
+        Assert.False(EventPublisher.IsFirstEdition(all[3].Event, all));
+    }
 }

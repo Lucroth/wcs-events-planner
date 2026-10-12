@@ -15,6 +15,8 @@ export interface ScrapedEvent {
   strengths: Strength[];
   strengthsFrom: { id: string; name: string; dateFrom: string | null } | null;
   /** Neighbouring editions of the same series; absent on documents published before they existed. */
+  /** The series has no earlier edition: the first one, a trial. */
+  first?: boolean | null;
   previous?: EditionRef | null;
   next?: EditionRef | null;
   results: DivisionResult[];
@@ -67,6 +69,8 @@ export interface YearSummary {
     chips: Chip[];
     /** Not listed yet: the series' latest edition (whose id this is) moved a year on. */
     expected?: boolean | null;
+    /** The first edition of its series. */
+    first?: boolean | null;
     /** Dates the organiser has announced for an expected edition, before scoring.dance lists it. */
     announced?: { venue: string | null; websiteUrl: string | null; source: string | null } | null;
   }[];

@@ -60,6 +60,7 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
       ${info?.venueName ? html` · <a href="${mapsUrl(info.venueAddress || info.venueName)}" target="_blank" rel="noopener">${info.venueName}</a>` : scraped.announced?.venue ? html` · <a href="${mapsUrl(`${scraped.announced.venue}, ${e.city ?? ""}`)}" target="_blank" rel="noopener">${scraped.announced.venue}</a>` : ""}
       ${!info?.venueName && !scraped.announced?.venue && last?.info.venueName ? html` · <span class="muted" title="Not announced yet for this edition">${last.label}: ${last.info.venueName}</span>` : ""}
       ${e.isWsdc ? html`<span class="tag">WSDC</span>` : ""}
+      ${scraped.first ? html`<span class="tag trial" title="First edition: a trial event">trial</span>` : ""}
       <button type="button" class="star" id="fav" data-name="${e.name}" data-date="${e.dateFrom}" title="Star this event to get price alerts">☆ Star</button>
       ${admin ? html`<a class="button small" href="#/admin/event/${id}">Edit</a>` : ""}
     </p>

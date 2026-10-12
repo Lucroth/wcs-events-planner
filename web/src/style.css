@@ -125,6 +125,7 @@ button.link { background: none; border: none; color: var(--accent); padding: 0; 
 .chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 .tag { background: var(--line); border: none; }
 .tag.pl { background: #dc143c; color: #fff; }
+.tag.trial { background: #7c4dff; color: #fff; }
 .diff-easy { border-color: var(--easy); color: var(--easy); }
 .diff-medium { border-color: var(--medium); color: var(--medium); }
 .diff-hard { border-color: var(--hard); color: var(--hard); }
