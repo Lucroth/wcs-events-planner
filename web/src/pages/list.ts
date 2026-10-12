@@ -26,6 +26,7 @@ const sorts = [
   ["hard", "hardest first"],
   ["easy", "easiest first"],
   ["cost", "cheapest trip first"],
+  ["travel", "cheapest transport first"],
 ] as const;
 
 export type SortBy = (typeof sorts)[number][0];
@@ -69,7 +70,7 @@ function query(f: ListFilter): string {
   if (f.role) parts.push(`role=${f.role}`);
   if (f.levels.length) parts.push(`level=${f.levels.join(",")}`);
   if (f.sort !== "date") parts.push(`sort=${f.sort}`);
-  if (f.sort === "cost" && f.from) parts.push(`from=${encodeURIComponent(f.from)}`);
+  if ((f.sort === "cost" || f.sort === "travel") && f.from) parts.push(`from=${encodeURIComponent(f.from)}`);
   return parts.length ? `?${parts.join("&")}` : "";
 }
 
@@ -98,7 +99,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
 
   starredIds = stars;
   const home = findCity(filter.from);
-  const costs = filter.sort === "cost" ? await tripCosts(rows, infos, filter.from, now) : new Map<string, Cost>();
+  const costs = filter.sort === "cost" || filter.sort === "travel" ? await tripCosts(rows, infos, filter.from, now) : new Map<string, Cost>();
   const thisYear = new Date().getFullYear();
   const years = Array.from({ length: thisYear + 2 - firstYear + 1 }, (_, i) => thisYear + 2 - i);
   const filtered = filter.division !== null || filter.levels.length > 0;
@@ -148,7 +149,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
       <label>Sort
         <select name="sort">${sorts.map(([v, label]) => html`<option value="${v}" ${filter.sort === v ? "selected" : ""}>${label}</option>`)}</select>
       </label>
-      ${filter.sort === "cost"
+      ${filter.sort === "cost" || filter.sort === "travel"
         ? html`<label>From
             <select name="from">${homeCities.map((c) => html`<option value="${c.name}" ${c === home ? "selected" : ""}>${c.name}</option>`)}</select>
           </label>`
@@ -161,6 +162,9 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
     ${filtered ? html`<p class="muted small">${filterNote(filter)} Events with no results yet, for this or an earlier edition, have no level and are hidden.</p>` : ""}
     ${filter.sort === "hard" || filter.sort === "easy"
       ? html`<p class="muted small">Ordered by ${filter.division ? "your division's" : "the average"} level, using the strongest quarter of the field. Events without a level come last.</p>`
+      : ""}
+    ${filter.sort === "travel"
+      ? html`<p class="muted small">Ordered by the cheapest direct return flight or train from ${home.name}, in PLN; the pass price is not counted. Events without known fares (too far ahead, or no airport known) come last.</p>`
       : ""}
     ${filter.sort === "cost"
       ? html`<p class="muted small">Trip cost per person from ${home.name}: the cheapest direct return flight or train, plus the full pass on sale today, converted to PLN at today's NBP rate (* = pass price unknown). Accommodation is not included: Booking and Airbnb publish no prices. Events without known fares (too far ahead, or no airport known) come last.</p>`
@@ -191,7 +195,7 @@ async function tripCosts(rows: Row[], infos: Map<string, Info>, from: string | n
 }
 
 function sortRows(rows: Row[], f: ListFilter, costs: Map<string, Cost>): Row[] {
-  const value = (r: Row): number | null => (f.sort === "cost" ? costs.get(r.id)?.total ?? null : levelScore(r.chips, f.division, f.role));
+  const value = (r: Row): number | null => (f.sort === "cost" ? costs.get(r.id)?.total ?? null : f.sort === "travel" ? costs.get(r.id)?.travel ?? null : levelScore(r.chips, f.division, f.role));
   const dir = f.sort === "hard" ? -1 : 1;
 
   return [...rows].sort((a, b) => {
