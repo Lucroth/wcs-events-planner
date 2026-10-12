@@ -1,4 +1,4 @@
-import { auth, getCheapestTravel, getInfosForYear, getManualEvents, getYear, plnRates } from "../firebase";
+import { auth, getCheapestTravel, getInfosForYear, getManualEvents, getYear } from "../firebase";
 import { date, level, money, month, range, today } from "../format";
 import { html, type Raw } from "../html";
 import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, sideOf, type Chip, type DanceRole, type Difficulty, type Info, type YearSummary } from "../model";
@@ -25,7 +25,6 @@ const sorts = [
   ["date", "by date"],
   ["hard", "hardest first"],
   ["easy", "easiest first"],
-  ["cost", "cheapest trip first"],
   ["travel", "cheapest transport first"],
 ] as const;
 
@@ -43,7 +42,7 @@ export interface ListFilter {
   role: DanceRole | null;
   levels: Difficulty[];
   sort: SortBy;
-  /** Home city for the cost sort. */
+  /** Home city for the transport-cost sort. */
   from: string | null;
 }
 
@@ -70,15 +69,13 @@ function query(f: ListFilter): string {
   if (f.role) parts.push(`role=${f.role}`);
   if (f.levels.length) parts.push(`level=${f.levels.join(",")}`);
   if (f.sort !== "date") parts.push(`sort=${f.sort}`);
-  if ((f.sort === "cost" || f.sort === "travel") && f.from) parts.push(`from=${encodeURIComponent(f.from)}`);
+  if (f.sort === "travel" && f.from) parts.push(`from=${encodeURIComponent(f.from)}`);
   return parts.length ? `?${parts.join("&")}` : "";
 }
 
 interface Cost {
-  total: number;
+  /** Cheapest direct return flight or train from home, per person, in PLN. */
   travel: number;
-  /** Full pass in PLN; null when no price is known. */
-  pass: number | null;
 }
 
 export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
@@ -99,7 +96,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
 
   starredIds = stars;
   const home = findCity(filter.from);
-  const costs = filter.sort === "cost" || filter.sort === "travel" ? await tripCosts(rows, infos, filter.from, now) : new Map<string, Cost>();
+  const costs = filter.sort === "travel" ? await tripCosts(rows, filter.from) : new Map<string, Cost>();
   const thisYear = new Date().getFullYear();
   const years = Array.from({ length: thisYear + 2 - firstYear + 1 }, (_, i) => thisYear + 2 - i);
   const filtered = filter.division !== null || filter.levels.length > 0;
@@ -149,7 +146,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
       <label>Sort
         <select name="sort">${sorts.map(([v, label]) => html`<option value="${v}" ${filter.sort === v ? "selected" : ""}>${label}</option>`)}</select>
       </label>
-      ${filter.sort === "cost" || filter.sort === "travel"
+      ${filter.sort === "travel"
         ? html`<label>From
             <select name="from">${homeCities.map((c) => html`<option value="${c.name}" ${c === home ? "selected" : ""}>${c.name}</option>`)}</select>
           </label>`
@@ -166,17 +163,14 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
     ${filter.sort === "travel"
       ? html`<p class="muted small">Ordered by the cheapest direct return flight or train from ${home.name}, in PLN; the pass price is not counted. Events without known fares (too far ahead, or no airport known) come last.</p>`
       : ""}
-    ${filter.sort === "cost"
-      ? html`<p class="muted small">Trip cost per person from ${home.name}: the cheapest direct return flight or train, plus the full pass on sale today, converted to PLN at today's NBP rate (* = pass price unknown). Accommodation is not included: Booking and Airbnb publish no prices. Events without known fares (too far ahead, or no airport known) come last.</p>`
-      : ""}
     ${list}
     <p class="muted small">Chips: how hard each division's field was (green easy, amber medium, red hard), ranked by the strongest quarter of the field at the latest edition with results. Updated ${date(now)}.</p>`;
 }
 
-/** Per person, in PLN: cheapest return travel from home plus the full pass on sale today. Only events with a known fare get one. */
-async function tripCosts(rows: Row[], infos: Map<string, Info>, from: string | null, now: string): Promise<Map<string, Cost>> {
+/** Per person, in PLN: cheapest return travel from home. Only events with a known fare get one. */
+async function tripCosts(rows: Row[], from: string | null): Promise<Map<string, Cost>> {
   const city = findCity(from);
-  const [travel, rates] = await Promise.all([getCheapestTravel(flightKey(city), city.koleoSlug), plnRates()]);
+  const travel = await getCheapestTravel(flightKey(city), city.koleoSlug);
   const costs = new Map<string, Cost>();
 
   for (const r of rows) {
@@ -185,17 +179,14 @@ async function tripCosts(rows: Row[], infos: Map<string, Info>, from: string | n
     const fare = local ? 0 : travel.get(r.id);
     if (fare === undefined) continue;
 
-    const pass = currentPass(infos.get(r.id)?.passes, "Full", now);
-    const rate = pass ? rates.get(pass.currency) : undefined;
-    const passPln = pass && rate ? pass.price * rate : null;
-    costs.set(r.id, { total: fare + (passPln ?? 0), travel: fare, pass: passPln });
+    costs.set(r.id, { travel: fare });
   }
 
   return costs;
 }
 
 function sortRows(rows: Row[], f: ListFilter, costs: Map<string, Cost>): Row[] {
-  const value = (r: Row): number | null => (f.sort === "cost" ? costs.get(r.id)?.total ?? null : f.sort === "travel" ? costs.get(r.id)?.travel ?? null : levelScore(r.chips, f.division, f.role));
+  const value = (r: Row): number | null => (f.sort === "travel" ? costs.get(r.id)?.travel ?? null : levelScore(r.chips, f.division, f.role));
   const dir = f.sort === "hard" ? -1 : 1;
 
   return [...rows].sort((a, b) => {
@@ -213,9 +204,7 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
   if (r.expected) return expectedCard(r, f);
   const full = currentPass(info?.passes, "Full", now);
   const party = currentPass(info?.passes, "Party", now);
-  const price = cost
-    ? html`<span title="travel ${money(Math.round(cost.travel), "PLN")}${cost.pass != null ? ` + pass ${money(Math.round(cost.pass), "PLN")}` : ", pass price unknown"}">≈ <strong>${money(Math.round(cost.total), "PLN")}</strong>${cost.pass == null ? "*" : ""}</span>`
-    : html`${full ? html`<span>Full ${money(full.price, full.currency)}</span>` : ""}${party ? html`<span>Party ${money(party.price, party.currency)}</span>` : ""}`;
+  const price = html`${cost ? html`<span title="Cheapest direct return flight or train from your city">Transport ≈ <strong>${money(Math.round(cost.travel), "PLN")}</strong></span>` : ""}${full ? html`<span>Full ${money(full.price, full.currency)}</span>` : ""}${party ? html`<span>Party ${money(party.price, party.currency)}</span>` : ""}`;
 
   const live = mayBeLive(r.dateFrom, r.dateTo, now) && /^\d+$/.test(r.id);
   return html`

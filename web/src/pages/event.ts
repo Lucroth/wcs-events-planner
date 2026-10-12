@@ -247,7 +247,7 @@ function trainsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: strin
     <p class="buttons">
       ${back.map((d) => html`<a class="button" target="_blank" rel="noopener" href="${koleoUrl(s.slug, city.koleoSlug, d, d === e.dateTo ? 12 : 6)}">Back: ${short(d)}</a>`)}
     </p>
-    <p class="alert-hint muted small" hidden>🔕 next to a train: click to get an email when it gets cheaper (checked every morning).</p>
+    <p class="alert-hint muted small">🔕 next to a train: click to get an email when it gets cheaper (checked every morning).</p>
     ${fares ? trainFares(fares, people, city, s.slug) : html`<p class="muted small">Fares appear here about a month before the event, when PKP Intercity starts selling. Until then, check koleo.pl.</p>`}`;
 }
 
@@ -288,7 +288,7 @@ function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: stri
       Direct Ryanair and Wizz Air fares per person, cabin bag only${flights ? `, checked ${date(flights.fetchedOn)}` : ""}. Flights from ${city.name}${city.airports.length ? "" : " (Warsaw)"} are marked.
     </p>
     <p class="buttons"><a class="button" target="_blank" rel="noopener" href="${google}">Google Flights (all airlines, connections)</a></p>
-    <p class="alert-hint muted small" hidden>🔕 next to a flight: click to get an email when it gets cheaper (checked every morning).</p>
+    <p class="alert-hint muted small">🔕 next to a flight: click to get an email when it gets cheaper (checked every morning).</p>
     ${!flights
       ? html`<p class="muted">Fares not fetched yet: they refresh once a day.</p>`
       : !flights.out.length && !flights.back.length
@@ -396,9 +396,9 @@ async function nextEdition(id: string, year: number): Promise<Raw> {
 }
 
 /**
- * The star, and once starred a bell beside every flight and train: a rung bell is a watch the daily
- * fare check emails about when that connection gets cheaper. Starring needs a Google sign-in; a
- * star clicked while signed out is remembered across the sign-in.
+ * The star, and a bell beside every flight and train: a rung bell is a watch the daily fare check
+ * emails about when that connection gets cheaper. A bell does not need the event starred. Starring
+ * and ringing a bell need a Google sign-in; a star clicked while signed out is remembered across it.
  */
 async function wireAlerts(id: string): Promise<void> {
   const star = document.getElementById("fav") as HTMLButtonElement | null;
@@ -413,7 +413,7 @@ async function wireAlerts(id: string): Promise<void> {
     starred = true;
   }
 
-  const watched = starred ? await watches(id) : new Map<string, Watch>();
+  let watched = auth.currentUser ? await watches(id) : new Map<string, Watch>();
   const watchOf = (el: HTMLElement): Watch => ({ ...JSON.parse(el.dataset.watch!), eventId: id, eventName: name, url: (el as HTMLAnchorElement).href || null });
 
   const render = () => {
@@ -427,6 +427,11 @@ async function wireAlerts(id: string): Promise<void> {
         bell.className = "bell";
         el.after(bell);
         bell.addEventListener("click", async () => {
+          if (!auth.currentUser) {
+            await signIn();
+            starred = (await favourites()).has(id);
+            watched = await watches(id);
+          }
           const w = watchOf(el);
           const on = !watched.has(watchKey(w));
           await setWatch(w, on);
@@ -436,12 +441,10 @@ async function wireAlerts(id: string): Promise<void> {
         });
       }
       const on = watched.has(watchKey(watchOf(el)));
-      bell.hidden = !starred;
       bell.classList.toggle("on", on);
       bell.textContent = on ? "🔔" : "🔕";
-      bell.title = on ? "Emailing you when this gets cheaper. Click to stop." : "Email me when this gets cheaper";
+      bell.title = on ? "Emailing you when this gets cheaper. Click to stop." : auth.currentUser ? "Email me when this gets cheaper" : "Sign in with Google to get an email when this gets cheaper";
     }
-    document.querySelectorAll<HTMLElement>(".alert-hint").forEach((h) => (h.hidden = !starred));
   };
   refreshBells = render;
 
@@ -453,7 +456,6 @@ async function wireAlerts(id: string): Promise<void> {
     }
     starred = !starred;
     await setFavourite(id, starred, name, dateFrom);
-    if (!starred) watched.clear();
     render();
   });
 
