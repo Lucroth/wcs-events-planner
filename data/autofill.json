@@ -2443,7 +2443,8 @@
     "source": "https://danceapp.net/events/221-UK_West_Coast_Swing_Championships_2027/",
     "on": "2026-10-06",
     "info": {
-      "venueName": "Radisson RED Hotel"
+      "venueName": "Radisson RED Hotel",
+      "websiteUrl": "https://www.ukwcschamps.com/"
     },
     "year": 2027
   },
@@ -2602,7 +2603,9 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "venueAddress": "Calle Juan Rizi 5, Madrid, Spain",
+      "websiteUrl": "https://beemadwcs.com/"
     },
     "year": 2027
   },
@@ -2710,7 +2713,9 @@
     "on": "2026-10-08",
     "info": {
       "venueName": "4* Hotel Scandic Gdansk",
-      "facebookUrl": "https://www.facebook.com/BalticSwing/"
+      "facebookUrl": "https://www.facebook.com/BalticSwing/",
+      "venueAddress": "Podwale Grodzkie 9, Gdańsk, Poland",
+      "websiteUrl": "https://www.balticswing.com/"
     },
     "year": 2027
   },
@@ -2835,7 +2840,9 @@
       "override": {
         "dateFrom": "2027-02-03",
         "dateTo": "2027-02-07"
-      }
+      },
+      "eventSchedule": "https://swingandsnow.ru/schedule",
+      "websiteUrl": "https://swingandsnow.ru/"
     },
     "year": 2027
   },
@@ -3493,7 +3500,10 @@
     "source": "http://www.neverlandswing.com/",
     "on": "2026-10-08",
     "info": {
-      "instagramUrl": "https://www.instagram.com/neverlandswing/"
+      "instagramUrl": "https://www.instagram.com/neverlandswing/",
+      "venueName": "CanDance Studio",
+      "venueAddress": "Isolatorweg 28, Amsterdam, Netherlands",
+      "websiteUrl": "https://www.neverlandswing.com/"
     },
     "year": 2027
   },
@@ -3908,7 +3918,14 @@
           "currency": "EUR",
           "until": null
         }
-      ]
+      ],
+      "override": {
+        "dateFrom": "2027-02-25",
+        "dateTo": "2027-02-28"
+      },
+      "eventSchedule": "https://parisswingclassic.com/schedule",
+      "instagramUrl": "https://www.instagram.com/parisswingclassic/",
+      "websiteUrl": "https://parisswingclassic.com/"
     },
     "year": 2027
   },
@@ -3959,6 +3976,14 @@
       "venueName": "Safmar Lesnaya",
       "venueAddress": "ul. Lesnaya 15, Moscow, Russia",
       "websiteUrl": "https://westiefest.ru/"
+    }
+  },
+  "x447": {
+    "source": "https://mooselandswing.com/",
+    "on": "2026-10-12",
+    "info": {
+      "venueName": "Hotell Gamla Teatern",
+      "websiteUrl": "https://mooselandswing.com/"
     }
   }
 }
