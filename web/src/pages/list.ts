@@ -48,14 +48,15 @@ export interface ListFilter {
 
 export function readFilter(params: URLSearchParams): ListFilter {
   const division = params.get("div");
+  const sort = sorts.find(([s]) => s === params.get("sort"))?.[0] ?? "date";
   return {
     all: params.has("all"),
     starred: params.has("starred"),
     upcoming: params.has("upcoming"),
     division: divisions.some(([d]) => d === division) ? division : null,
-    role: (["leader", "follower"] as const).find((r) => r === params.get("role")) ?? null,
+    role: sort === "hard" || sort === "easy" ? (["leader", "follower"] as const).find((r) => r === params.get("role")) ?? null : null,
     levels: (params.get("level") ?? "").split(",").filter((l): l is Difficulty => levels.includes(l as Difficulty)),
-    sort: sorts.find(([s]) => s === params.get("sort"))?.[0] ?? "date",
+    sort,
     from: params.get("from"),
   };
 }
@@ -132,13 +133,15 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
           ${divisions.map(([d, name]) => html`<option value="${d}" ${d === filter.division ? "selected" : ""}>${name}</option>`)}
         </select>
       </label>
-      <label>I dance as
-        <select name="role">
-          <option value="">either role</option>
-          <option value="leader" ${filter.role === "leader" ? "selected" : ""}>leader</option>
-          <option value="follower" ${filter.role === "follower" ? "selected" : ""}>follower</option>
-        </select>
-      </label>
+      ${filter.sort === "hard" || filter.sort === "easy"
+        ? html`<label>I dance as
+            <select name="role">
+              <option value="">either role</option>
+              <option value="leader" ${filter.role === "leader" ? "selected" : ""}>leader</option>
+              <option value="follower" ${filter.role === "follower" ? "selected" : ""}>follower</option>
+            </select>
+          </label>`
+        : ""}
       <fieldset class="levels">
         <legend>Level</legend>
         ${levels.map((l) => html`<label class="chip diff-${level(l)} ${filter.levels.includes(l) ? "on-level" : ""}"><input type="checkbox" name="level" value="${l}" ${filter.levels.includes(l) ? "checked" : ""} /> ${level(l)}</label>`)}
