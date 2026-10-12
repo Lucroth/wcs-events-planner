@@ -23,8 +23,8 @@ const levels: Difficulty[] = ["Easy", "Medium", "Hard"];
 
 const sorts = [
   ["date", "date"],
-  ["easy", "difficulty"],
   ["travel", "transport"],
+  ["easy", "difficulty"],
 ] as const;
 
 export type SortBy = (typeof sorts)[number][0];
@@ -52,9 +52,9 @@ export function readFilter(params: URLSearchParams): ListFilter {
     all: params.has("all"),
     starred: params.has("starred"),
     upcoming: params.has("upcoming"),
-    division: divisions.some(([d]) => d === division) ? division : null,
+    division: sort === "easy" && divisions.some(([d]) => d === division) ? division : null,
     role: sort === "easy" ? (["leader", "follower"] as const).find((r) => r === params.get("role")) ?? null : null,
-    levels: (params.get("level") ?? "").split(",").filter((l): l is Difficulty => levels.includes(l as Difficulty)),
+    levels: sort === "easy" ? (params.get("level") ?? "").split(",").filter((l): l is Difficulty => levels.includes(l as Difficulty)) : [],
     sort,
     from: params.get("from"),
   };
@@ -126,25 +126,27 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
       </nav>
     </div>
     <form class="filters" id="list-filter">
+      ${filter.sort === "easy"
+        ? html`
       <label>My division
         <select name="div">
           <option value="">any</option>
           ${divisions.map(([d, name]) => html`<option value="${d}" ${d === filter.division ? "selected" : ""}>${name}</option>`)}
         </select>
       </label>
-      ${filter.sort === "easy"
-        ? html`<label>I dance as
+      <label>I dance as
             <select name="role">
               <option value="">either role</option>
               <option value="leader" ${filter.role === "leader" ? "selected" : ""}>leader</option>
               <option value="follower" ${filter.role === "follower" ? "selected" : ""}>follower</option>
             </select>
-          </label>`
-        : ""}
+          </label>
       <fieldset class="levels">
         <legend>Level</legend>
         ${levels.map((l) => html`<label class="chip diff-${level(l)} ${filter.levels.includes(l) ? "on-level" : ""}"><input type="checkbox" name="level" value="${l}" ${filter.levels.includes(l) ? "checked" : ""} /> ${level(l)}</label>`)}
       </fieldset>
+        `
+        : ""}
       <label>Sort
         <select name="sort">${sorts.map(([v, label]) => html`<option value="${v}" ${filter.sort === v ? "selected" : ""}>${label}</option>`)}</select>
       </label>
