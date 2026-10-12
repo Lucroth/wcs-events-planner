@@ -151,9 +151,9 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
             <select name="from">${homeCities.map((c) => html`<option value="${c.name}" ${c === home ? "selected" : ""}>${c.name}</option>`)}</select>
           </label>`
         : ""}
-      ${auth.currentUser ? html`<label><input type="checkbox" name="starred" ${filter.starred ? "checked" : ""} /> ★ starred only</label>` : ""}
       <label><input type="checkbox" name="upcoming" ${filter.upcoming ? "checked" : ""} /> hide finished events</label>
       <label><input type="checkbox" name="all" ${filter.all ? "checked" : ""} /> include events without WSDC points</label>
+      ${auth.currentUser ? html`<label><input type="checkbox" name="starred" ${filter.starred ? "checked" : ""} /> ★ starred only</label>` : ""}
       ${filtered ? html`<a href="#/year/${year}${query({ ...filter, division: null, levels: [] })}">clear filter</a>` : ""}
     </form>
     ${filtered ? html`<p class="muted small">${filterNote(filter)} Events with no results yet, for this or an earlier edition, have no level and are hidden.</p>` : ""}
