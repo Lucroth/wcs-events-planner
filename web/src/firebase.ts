@@ -55,6 +55,15 @@ export const getInfo = (id: string) => read<Info>(C.info, id);
 export const getAllFlights = async (eventId: string) =>
   (await getDocs(query(collection(db, C.flights), where("eventId", "==", eventId)))).docs.map((d) => d.data() as Flights);
 
+/** When the sync last searched fares ("flights" or "trains"), whether or not any fare changed; null before the first run. */
+export async function getChecked(what: "flights" | "trains"): Promise<Date | null> {
+  try {
+    return (await getDoc(doc(db, "status", what))).get("checkedAt")?.toDate() ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export const getTrains = (eventId: string, citySlug: string) => read<Trains>(C.trains, `${eventId}_${citySlug}`);
 
 /** Cheapest return fare per event for one home city, flights and trains together, keyed by event id. */

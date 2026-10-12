@@ -67,6 +67,7 @@ public sealed partial class TrainPublisher(
             }
         }
 
+        await store.StampAsync("status/trains", ct);
         LogPublished(logger, upcoming.Count, searched, store.Written, store.Skipped);
     }
 

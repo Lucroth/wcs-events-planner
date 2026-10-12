@@ -18,6 +18,10 @@ public sealed partial class FirestoreStore(FirestoreDb firestore, AppDbContext d
 
     public int Written { get; private set; }
 
+    /// <summary>Records that a search ran now, even when it changed no document: the fares'' own dates only move when they change.</summary>
+    public Task StampAsync(string path, CancellationToken ct) =>
+        firestore.Document(path).SetAsync(new Dictionary<string, object> { ["checkedAt"] = FieldValue.ServerTimestamp }, cancellationToken: ct);
+
     public int Skipped { get; private set; }
 
     public async Task SetIfChangedAsync(string path, object document, CancellationToken ct)

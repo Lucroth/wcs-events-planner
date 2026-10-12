@@ -49,6 +49,10 @@ service cloud.firestore {
     }
 
     // Scraped events are the sync's; admins may only create and edit hand-made ones ("m-" ids).
+    match /status/{id} {
+      allow read: if true;
+    }
+
     match /events/{id} {
       allow read: if true;
       allow write: if isAdmin() && id.matches('m-.*') && request.resource.data.manual == true;

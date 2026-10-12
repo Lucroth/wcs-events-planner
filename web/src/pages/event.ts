@@ -1,7 +1,7 @@
-import { auth, getAllFlights, getEvent, getInfo, getScheduleImage, getTrains, getYear } from "../firebase";
+import { auth, getAllFlights, getChecked, getEvent, getInfo, getScheduleImage, getTrains, getYear } from "../firebase";
 import { favourites, setFavourite, setWatch, signIn, watchKey, watches, type Watch } from "../me";
 import { isImageDataUrl } from "../image";
-import { date, duration, level, localDateTime, money, range, short, today } from "../format";
+import { checkedAt, date, duration, level, localDateTime, money, range, short, today } from "../format";
 import { html, safeUrl, type Raw } from "../html";
 import { liveCard, mayBeLive, watchLive } from "../live";
 import { applyOverride, currentPass, tierFor, tiers, type Flights, type Info, type Leg, type Pass, type ScrapedEvent, type TrainLeg, type Trains } from "../model";
@@ -37,12 +37,14 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
   const city = findCity(params.get("from"));
   const people = Math.min(12, Math.max(1, Number(params.get("people")) || 1));
   const upcoming = e.dateTo >= now;
-  const [flights, trains, eventImage, compImage] = await Promise.all([
+  const [flights, trains, eventImage, compImage, checked] = await Promise.all([
     upcoming && e.country !== "Poland" ? getAllFlights(id).then(mergeFlights) : undefined,
     upcoming && e.country === "Poland" ? getTrains(id, city.koleoSlug) : undefined,
     info?.eventScheduleImage ? getScheduleImage(id, "event") : undefined,
     info?.compScheduleImage ? getScheduleImage(id, "comp") : undefined,
+    upcoming ? getChecked(e.country === "Poland" ? "trains" : "flights") : null,
   ]);
+  lastChecked = checked;
 
   return html`
     <nav class="back editions">
@@ -252,6 +254,9 @@ function trainsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: strin
     ${fares ? trainFares(fares, people, city, s.slug) : html`<p class="muted small">Fares appear here about a month before the event, when PKP Intercity starts selling. Until then, check koleo.pl.</p>`}`;
 }
 
+/** When the sync last searched the fares this page shows; set as the page loads. */
+let lastChecked: Date | null = null;
+
 /** One view over every home city's fares: combos and legs pooled, duplicates dropped, cheapest first. */
 function mergeFlights(all: Flights[]): Flights | undefined {
   if (!all.length) return undefined;
@@ -286,7 +291,7 @@ function flightsBlock(scraped: ScrapedEvent, e: { dateFrom: string; dateTo: stri
     <p class="muted small">
       From ${origins.join(", ")} to ${destinations.map((a) => `${a.iata} (${a.name})`).join(", ")} ·
       out ${short(addDays(e.dateFrom, -1))}–${short(e.dateFrom)}, back ${short(e.dateTo)}–${short(addDays(e.dateTo, 1))}.
-      Direct Ryanair and Wizz Air fares per person, cabin bag only${flights ? `, checked ${date(flights.fetchedOn)}` : ""}. Flights from ${city.name}${city.airports.length ? "" : " (Warsaw)"} are marked.
+      Direct Ryanair and Wizz Air fares per person, cabin bag only${flights ? `, last checked ${checkedAt(lastChecked, flights.fetchedOn)}` : ""}. Flights from ${city.name}${city.airports.length ? "" : " (Warsaw)"} are marked.
     </p>
     <p class="buttons"><a class="button" target="_blank" rel="noopener" href="${google}">Google Flights (all airlines, connections)</a></p>
     <p class="alert-hint muted small">🔕 next to a flight: click to get an email when it gets cheaper (checked every morning).</p>
@@ -326,7 +331,7 @@ function trainFares(t: Trains, people: number, city: HomeCity, stationSlug: stri
       <div><h4>There</h4>${t.out.length ? html`<ul class="legs">${t.out.map((l) => row(l, city.koleoSlug, stationSlug))}</ul>` : html`<p class="muted">Not on sale yet.</p>`}</div>
       <div><h4>Back</h4>${t.back.length ? html`<ul class="legs">${t.back.map((l) => row(l, stationSlug, city.koleoSlug))}</ul>` : html`<p class="muted">Not on sale yet.</p>`}</div>
     </div>
-    <p class="muted small">Standard one-way fares per adult from koleo.pl, checked ${date(t.fetchedOn)}; discounts (students, ISIC, Big Family Card) not included.</p>`;
+    <p class="muted small">Standard one-way fares per adult from koleo.pl, last checked ${checkedAt(lastChecked, t.fetchedOn)}; discounts (students, ISIC, Big Family Card) not included.</p>`;
 }
 
 function tierCell(fieldSize: number): Raw {

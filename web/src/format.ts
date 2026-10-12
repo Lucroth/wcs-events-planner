@@ -14,6 +14,10 @@ export const today = (): string => {
 
 export const date = (iso: string | null | undefined) => (iso ? full.format(utc(iso)) : "?");
 
+/** "12 Oct 2026, 06:41" in the reader's time; the day alone when only that is known. */
+export const checkedAt = (at: Date | null, fallbackDay: string): string =>
+  at ? `${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(at)}` : date(fallbackDay);
+
 export const short = (iso: string) => weekday.format(utc(iso));
 
 export const month = (m: number) => monthName.format(new Date(Date.UTC(2000, m - 1, 1)));

@@ -68,6 +68,7 @@ public sealed partial class FlightPublisher(
             }
         }
 
+        await store.StampAsync("status/flights", ct);
         LogPublished(logger, upcoming.Count, searched, store.Written, store.Skipped);
     }
 
