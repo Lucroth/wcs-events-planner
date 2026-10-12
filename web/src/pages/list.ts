@@ -23,7 +23,6 @@ const levels: Difficulty[] = ["Easy", "Medium", "Hard"];
 
 const sorts = [
   ["date", "by date"],
-  ["hard", "hardest first"],
   ["easy", "easiest first"],
   ["travel", "cheapest transport first"],
 ] as const;
@@ -54,7 +53,7 @@ export function readFilter(params: URLSearchParams): ListFilter {
     starred: params.has("starred"),
     upcoming: params.has("upcoming"),
     division: divisions.some(([d]) => d === division) ? division : null,
-    role: sort === "hard" || sort === "easy" ? (["leader", "follower"] as const).find((r) => r === params.get("role")) ?? null : null,
+    role: sort === "easy" ? (["leader", "follower"] as const).find((r) => r === params.get("role")) ?? null : null,
     levels: (params.get("level") ?? "").split(",").filter((l): l is Difficulty => levels.includes(l as Difficulty)),
     sort,
     from: params.get("from"),
@@ -133,7 +132,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
           ${divisions.map(([d, name]) => html`<option value="${d}" ${d === filter.division ? "selected" : ""}>${name}</option>`)}
         </select>
       </label>
-      ${filter.sort === "hard" || filter.sort === "easy"
+      ${filter.sort === "easy"
         ? html`<label>I dance as
             <select name="role">
               <option value="">either role</option>
@@ -160,7 +159,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
       ${filtered ? html`<a href="#/year/${year}${query({ ...filter, division: null, levels: [] })}">clear filter</a>` : ""}
     </form>
     ${filtered ? html`<p class="muted small">${filterNote(filter)} Events with no results yet, for this or an earlier edition, have no level and are hidden.</p>` : ""}
-    ${filter.sort === "hard" || filter.sort === "easy"
+    ${filter.sort === "easy"
       ? html`<p class="muted small">Ordered by ${filter.division ? "your division's" : "the average"} level, using the strongest quarter of the field. Events without a level come last.</p>`
       : ""}
     ${filter.sort === "travel"
@@ -190,13 +189,12 @@ async function tripCosts(rows: Row[], from: string | null): Promise<Map<string, 
 
 function sortRows(rows: Row[], f: ListFilter, costs: Map<string, Cost>): Row[] {
   const value = (r: Row): number | null => (f.sort === "travel" ? costs.get(r.id)?.travel ?? null : levelScore(r.chips, f.division, f.role));
-  const dir = f.sort === "hard" ? -1 : 1;
 
   return [...rows].sort((a, b) => {
     const va = value(a);
     const vb = value(b);
     if (va === null || vb === null) return va === vb ? a.dateFrom.localeCompare(b.dateFrom) : va === null ? 1 : -1;
-    return (va - vb) * dir || a.dateFrom.localeCompare(b.dateFrom);
+    return (va - vb) || a.dateFrom.localeCompare(b.dateFrom);
   });
 }
 
