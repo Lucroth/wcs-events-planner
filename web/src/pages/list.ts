@@ -89,7 +89,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
     .map((r) => (r.expected ? r : applyOverride(r, infos.get(r.id))))
     .filter((r) => isEurope(r.country))
     .filter((r) => filter.all || r.isWsdc)
-    .filter((r) => !filter.starred || stars.has(r.id))
+    .filter((r) => !filter.starred || stars.has(starKey(r)))
     .filter((r) => !filter.upcoming || r.dateTo >= now)
     .filter((r) => matchesLevel(r.chips, filter.division, filter.levels, filter.role))
     .sort((a, b) => a.dateFrom.localeCompare(b.dateFrom));
@@ -200,6 +200,9 @@ function sortRows(rows: Row[], f: ListFilter, costs: Map<string, Cost>): Row[] {
   });
 }
 
+/** What a star is stored under: an expected edition is not the event whose id its row carries, so it gets its own key. */
+const starKey = (r: Row): string => (r.expected ? `next-${r.id}-${r.dateFrom.slice(0, 4)}` : r.id);
+
 /** The reader's starred events, for the ★ on their cards; refreshed with every list render. */
 let starredIds = new Set<string>();
 
@@ -230,7 +233,7 @@ function expectedCard(r: Row, f: ListFilter): Raw {
     <li class="expected">
       <a href="#/event/${r.id}?next=${r.dateFrom.slice(0, 4)}" class="event-card" title="Not listed yet. Opens the latest edition, ${r.name}.">
         <span class="dates">~ ${month(Number(r.dateFrom.slice(5, 7)))}</span>
-        <span class="name">${name} <span class="tag">expected</span> ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
+        <span class="name"><button type="button" class="card-star ${starredIds.has(starKey(r)) ? "on" : ""}" data-star="${starKey(r)}" data-name="${name} (expected)" data-date="${r.dateFrom}" title="${starredIds.has(starKey(r)) ? "Starred: click to unstar" : "Star this event"}">${starredIds.has(starKey(r)) ? "★" : "☆"}</button> ${name} <span class="tag">expected</span> ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
         <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
         <span class="price muted small">dates not announced</span>
         ${chips(r.chips, f.division, f.role)}
