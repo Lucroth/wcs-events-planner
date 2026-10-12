@@ -80,6 +80,8 @@ interface Cost {
 
 export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
   const now = today();
+  const currentYear = Number(now.slice(0, 4));
+  const thisYear = year === currentYear;
   const [summary, infos, manual, stars] = await Promise.all([getYear(year), getInfosForYear(year), getManualEvents(year), favourites()]);
 
   const rows: Row[] = [
@@ -90,15 +92,14 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
     .filter((r) => isEurope(r.country))
     .filter((r) => filter.all || r.isWsdc)
     .filter((r) => !filter.starred || stars.has(starKey(r)))
-    .filter((r) => !filter.upcoming || r.dateTo >= now)
+    .filter((r) => !(filter.upcoming && thisYear) || r.dateTo >= now)
     .filter((r) => matchesLevel(r.chips, filter.division, filter.levels, filter.role))
     .sort((a, b) => a.dateFrom.localeCompare(b.dateFrom));
 
   starredIds = stars;
   const home = findCity(filter.from);
   const costs = filter.sort === "travel" ? await tripCosts(rows, filter.from) : new Map<string, Cost>();
-  const thisYear = new Date().getFullYear();
-  const years = Array.from({ length: thisYear + 2 - firstYear + 1 }, (_, i) => thisYear + 2 - i);
+  const years = Array.from({ length: currentYear + 2 - firstYear + 1 }, (_, i) => currentYear + 2 - i);
   const filtered = filter.division !== null || filter.levels.length > 0;
 
   const byMonth = new Map<number, Row[]>();
@@ -144,7 +145,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
           <legend>Level</legend>
           ${levels.map((l) => html`<label class="chip diff-${level(l)} ${filter.levels.includes(l) ? "on-level" : ""}"><input type="checkbox" name="level" value="${l}" ${filter.levels.includes(l) ? "checked" : ""} /> ${level(l)}</label>`)}
         </fieldset>
-        <label><input type="checkbox" name="upcoming" ${filter.upcoming ? "checked" : ""} /> hide finished events</label>
+        ${thisYear ? html`<label><input type="checkbox" name="upcoming" ${filter.upcoming ? "checked" : ""} /> hide finished events</label>` : ""}
         ${auth.currentUser ? html`<label><input type="checkbox" name="starred" ${filter.starred ? "checked" : ""} /> ★ starred only</label>` : ""}
         ${filtered ? html`<a href="#/year/${year}${query({ ...filter, division: null, levels: [] })}">clear filter</a>` : ""}
       </div>
