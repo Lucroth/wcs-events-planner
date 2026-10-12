@@ -82,12 +82,15 @@ export async function getCheapestTravel(flightKey: string, citySlug: string): Pr
 
 let rates: Promise<Map<string, number>> | undefined;
 
-/** PLN per unit of each currency, NBP table A; fetched once per page load. */
+/** PLN per unit of each currency, NBP tables A and B (B carries the rouble and other less common ones); fetched once per page load. */
 export function plnRates(): Promise<Map<string, number>> {
-  rates ??= fetch("https://api.nbp.pl/api/exchangerates/tables/a/?format=json")
-    .then((r) => r.json() as Promise<{ rates: { code: string; mid: number }[] }[]>)
-    .then((t) => new Map([["PLN", 1], ...t[0].rates.map((r) => [r.code, r.mid] as [string, number])]))
-    .catch(() => new Map([["PLN", 1]]));
+  type Table = { rates: { code: string; mid: number }[] }[];
+  const table = (name: "a" | "b") =>
+    fetch(`https://api.nbp.pl/api/exchangerates/tables/${name}/?format=json`)
+      .then((r) => r.json() as Promise<Table>)
+      .then((t) => t[0].rates.map((r) => [r.code, r.mid] as [string, number]))
+      .catch(() => [] as [string, number][]);
+  rates ??= Promise.all([table("b"), table("a")]).then(([b, a]) => new Map<string, number>([["PLN", 1], ...b, ...a]));
   return rates;
 }
 
