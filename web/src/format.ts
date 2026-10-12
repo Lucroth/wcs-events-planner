@@ -30,8 +30,17 @@ export function localDateTime(value: string): string {
   return t ? `${date(d)}, ${t.slice(0, 5)}` : date(d);
 }
 
+let rates = new Map<string, number>();
+
+/** PLN per unit of each currency; set before a page renders, so every price shows in PLN. */
+export const setRates = (r: Map<string, number>) => (rates = r);
+
+/** An amount in PLN at today's rate; an amount in a currency without a rate stays as it was. */
 export function money(amount: number, currency: string): string {
-  return `${new Intl.NumberFormat("en-GB", { maximumFractionDigits: amount % 1 ? 2 : 0, minimumFractionDigits: amount % 1 ? 2 : 0 }).format(amount)} ${currency}`;
+  const rate = rates.get(currency);
+  const [value, unit] = rate && currency !== "PLN" ? [Math.round(amount * rate), "PLN"] : [amount, currency];
+  const fraction = value % 1 ? 2 : 0;
+  return `${new Intl.NumberFormat("en-GB", { maximumFractionDigits: fraction, minimumFractionDigits: fraction }).format(value)} ${unit}`;
 }
 
 export const duration = (minutes: number) => `${Math.floor(minutes / 60)}h ${String(minutes % 60).padStart(2, "0")}m`;

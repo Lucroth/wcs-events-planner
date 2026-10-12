@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { money, setRates } from "./format";
 import { html, safeUrl } from "./html";
 import { isImageDataUrl } from "./image";
 import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, tierFor, type Pass } from "./model";
@@ -146,5 +147,14 @@ describe("isImageDataUrl", () => {
     expect(isImageDataUrl("data:image/svg+xml;base64,PHN2Zz4=")).toBe(false);
     expect(isImageDataUrl("javascript:alert(1)")).toBe(false);
     expect(isImageDataUrl(undefined)).toBe(false);
+  });
+});
+
+describe("money", () => {
+  it("shows every price in PLN when the rate is known and leaves other currencies as they are", () => {
+    setRates(new Map([["PLN", 1], ["EUR", 4.25]]));
+    expect(money(200, "EUR")).toBe("850 PLN");
+    expect(money(99.5, "PLN")).toBe("99.50 PLN");
+    expect(money(2050, "SEK")).toBe("2,050 SEK");
   });
 });
