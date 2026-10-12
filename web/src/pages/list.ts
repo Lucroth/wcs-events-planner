@@ -22,9 +22,9 @@ const divisions: [string, string][] = [
 const levels: Difficulty[] = ["Easy", "Medium", "Hard"];
 
 const sorts = [
-  ["date", "by date"],
-  ["easy", "easiest first"],
-  ["travel", "cheapest transport first"],
+  ["date", "date"],
+  ["easy", "difficulty"],
+  ["travel", "transport"],
 ] as const;
 
 export type SortBy = (typeof sorts)[number][0];
