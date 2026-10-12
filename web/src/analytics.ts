@@ -1,5 +1,5 @@
 /** The site code from yourcode.goatcounter.com; while empty nothing is loaded or sent. */
-const code = "";
+const code = "lucroth";
 
 interface GoatCounter {
   count(vars: { path: string; title?: string }): void;
