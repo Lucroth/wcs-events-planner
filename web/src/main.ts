@@ -1,5 +1,6 @@
 import "./style.css";
 import { onAuthStateChanged, type User } from "firebase/auth";
+import { countPage } from "./analytics";
 import { setRates } from "./format";
 import { auth, isAdmin, plnRates } from "./firebase";
 import { signIn } from "./me";
@@ -64,6 +65,7 @@ async function route(): Promise<void> {
     return;
   }
   const mine = ++renderId;
+  countPage();
   setRates(await plnRates());
   stopListening();
   const [path, search = ""] = location.hash.replace(/^#/, "").split("?");
