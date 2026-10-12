@@ -52,9 +52,9 @@ export function readFilter(params: URLSearchParams): ListFilter {
     all: params.has("all"),
     starred: params.has("starred"),
     upcoming: params.has("upcoming"),
-    division: sort === "easy" && divisions.some(([d]) => d === division) ? division : null,
-    role: sort === "easy" ? (["leader", "follower"] as const).find((r) => r === params.get("role")) ?? null : null,
-    levels: sort === "easy" ? (params.get("level") ?? "").split(",").filter((l): l is Difficulty => levels.includes(l as Difficulty)) : [],
+    division: divisions.some(([d]) => d === division) ? division : null,
+    role: (["leader", "follower"] as const).find((r) => r === params.get("role")) ?? null,
+    levels: (params.get("level") ?? "").split(",").filter((l): l is Difficulty => levels.includes(l as Difficulty)),
     sort,
     from: params.get("from"),
   };
@@ -125,40 +125,40 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
         ${years.map((y) => html`<a href="#/year/${y}${query(filter)}" class="${y === year ? "chip on" : "chip"}">${y}</a>`)}
       </nav>
     </div>
-    <form class="filters" id="list-filter">
-      ${filter.sort === "easy"
-        ? html`
-      <label>My division
-        <select name="div">
-          <option value="">any</option>
-          ${divisions.map(([d, name]) => html`<option value="${d}" ${d === filter.division ? "selected" : ""}>${name}</option>`)}
-        </select>
-      </label>
-      <label>I dance as
-            <select name="role">
-              <option value="">either role</option>
-              <option value="leader" ${filter.role === "leader" ? "selected" : ""}>leader</option>
-              <option value="follower" ${filter.role === "follower" ? "selected" : ""}>follower</option>
-            </select>
-          </label>
-      <fieldset class="levels">
-        <legend>Level</legend>
-        ${levels.map((l) => html`<label class="chip diff-${level(l)} ${filter.levels.includes(l) ? "on-level" : ""}"><input type="checkbox" name="level" value="${l}" ${filter.levels.includes(l) ? "checked" : ""} /> ${level(l)}</label>`)}
-      </fieldset>
-        `
-        : ""}
-      <label>Sort
-        <select name="sort">${sorts.map(([v, label]) => html`<option value="${v}" ${filter.sort === v ? "selected" : ""}>${label}</option>`)}</select>
-      </label>
-      ${filter.sort === "travel"
-        ? html`<label>From
-            <select name="from">${homeCities.map((c) => html`<option value="${c.name}" ${c === home ? "selected" : ""}>${c.name}</option>`)}</select>
-          </label>`
-        : ""}
-      <label><input type="checkbox" name="upcoming" ${filter.upcoming ? "checked" : ""} /> hide finished events</label>
-      <label><input type="checkbox" name="all" ${filter.all ? "checked" : ""} /> include events without WSDC points</label>
-      ${auth.currentUser ? html`<label><input type="checkbox" name="starred" ${filter.starred ? "checked" : ""} /> ★ starred only</label>` : ""}
-      ${filtered ? html`<a href="#/year/${year}${query({ ...filter, division: null, levels: [] })}">clear filter</a>` : ""}
+    <form id="list-filter">
+      <div class="filters">
+        <label>My division
+          <select name="div">
+            <option value="">any</option>
+            ${divisions.map(([d, name]) => html`<option value="${d}" ${d === filter.division ? "selected" : ""}>${name}</option>`)}
+          </select>
+        </label>
+        <label>I dance as
+          <select name="role">
+            <option value="">either role</option>
+            <option value="leader" ${filter.role === "leader" ? "selected" : ""}>leader</option>
+            <option value="follower" ${filter.role === "follower" ? "selected" : ""}>follower</option>
+          </select>
+        </label>
+        <fieldset class="levels">
+          <legend>Level</legend>
+          ${levels.map((l) => html`<label class="chip diff-${level(l)} ${filter.levels.includes(l) ? "on-level" : ""}"><input type="checkbox" name="level" value="${l}" ${filter.levels.includes(l) ? "checked" : ""} /> ${level(l)}</label>`)}
+        </fieldset>
+        <label><input type="checkbox" name="upcoming" ${filter.upcoming ? "checked" : ""} /> hide finished events</label>
+        <label><input type="checkbox" name="all" ${filter.all ? "checked" : ""} /> include events without WSDC points</label>
+        ${auth.currentUser ? html`<label><input type="checkbox" name="starred" ${filter.starred ? "checked" : ""} /> ★ starred only</label>` : ""}
+        ${filtered ? html`<a href="#/year/${year}${query({ ...filter, division: null, levels: [] })}">clear filter</a>` : ""}
+      </div>
+      <div class="filters">
+        <label>Sort
+          <select name="sort">${sorts.map(([v, label]) => html`<option value="${v}" ${filter.sort === v ? "selected" : ""}>${label}</option>`)}</select>
+        </label>
+        ${filter.sort === "travel"
+          ? html`<label>From
+              <select name="from">${homeCities.map((c) => html`<option value="${c.name}" ${c === home ? "selected" : ""}>${c.name}</option>`)}</select>
+            </label>`
+          : ""}
+      </div>
     </form>
     ${filtered ? html`<p class="muted small">${filterNote(filter)} Events with no results yet, for this or an earlier edition, have no level and are hidden.</p>` : ""}
     ${filter.sort === "easy"
