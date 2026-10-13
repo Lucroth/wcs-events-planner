@@ -1909,7 +1909,7 @@
   },
   "x342": {
     "source": "https://danceapp.net/en/events/147/",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "venueName": "Scandic Oslo Airport",
       "facebookUrl": "https://www.facebook.com/winterwhitewcs",
@@ -1935,17 +1935,26 @@
         },
         {
           "kind": "Full",
+          "tier": "Normal Bird",
+          "price": 2500,
+          "currency": "NOK",
+          "until": "2026-09-01"
+        },
+        {
+          "kind": "Full",
           "tier": "Late Bird",
           "price": 2800,
           "currency": "NOK",
-          "until": null
+          "until": null,
+          "current": true
         },
         {
           "kind": "Party",
           "tier": "Social Pass",
           "price": 1900,
           "currency": "NOK",
-          "until": null
+          "until": null,
+          "current": true
         }
       ],
       "websiteUrl": "http://www.winterwhite.no/"
@@ -1954,7 +1963,7 @@
   },
   "x347": {
     "source": "https://berlinswingrevolution.com/",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "venueName": "Werk36",
       "facebookUrl": "https://www.facebook.com/BerlinSwingRevolution",
@@ -1973,6 +1982,13 @@
           "price": 180,
           "currency": "EUR",
           "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Full Pass (higher)",
+          "price": 200,
+          "currency": "EUR",
+          "until": null
         }
       ],
       "websiteUrl": "https://berlinswingrevolution.com/"
@@ -1981,7 +1997,7 @@
   },
   "x339": {
     "source": "https://danceapp.net/en/events/187/",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "venueName": "Radisson RED Hotel London Heathrow",
       "facebookUrl": "https://www.facebook.com/people/New-Years-Swing-Fling/61574429602584/",
@@ -2001,38 +2017,61 @@
       "passes": [
         {
           "kind": "Full",
-          "tier": "Tier 1",
-          "price": 125,
+          "tier": "Super Early-Bird",
+          "price": 135,
+          "currency": "GBP",
+          "until": "2026-05-08"
+        },
+        {
+          "kind": "Full",
+          "tier": "Early-Bird",
+          "price": 145,
           "currency": "GBP",
           "until": "2026-07-08"
         },
         {
           "kind": "Full",
-          "tier": "Tier 2",
-          "price": 145,
+          "tier": "Normal Bird",
+          "price": 165,
           "currency": "GBP",
           "until": "2026-10-08"
         },
         {
           "kind": "Full",
-          "tier": "Tier 3",
-          "price": 165,
+          "tier": "Late Bird",
+          "price": 185,
           "currency": "GBP",
-          "until": null
+          "until": "2026-12-08",
+          "current": true
         },
         {
           "kind": "Party",
-          "tier": "Early bird",
+          "tier": "Super Early-Bird",
           "price": 115,
           "currency": "GBP",
-          "until": null
+          "until": "2026-05-08"
         },
         {
           "kind": "Party",
-          "tier": "Late bird",
-          "price": 135,
+          "tier": "Early-Bird",
+          "price": 125,
           "currency": "GBP",
-          "until": null
+          "until": "2026-07-08"
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal Bird",
+          "price": 145,
+          "currency": "GBP",
+          "until": "2026-10-08"
+        },
+        {
+          "kind": "Party",
+          "tier": "Late Bird",
+          "price": 165,
+          "currency": "GBP",
+          "until": null,
+          "current": true
         }
       ],
       "websiteUrl": "https://www.nysf.uk"
@@ -2253,7 +2292,7 @@
   },
   "x335": {
     "source": "https://www.euro-dance-festival.com/rust",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "venueName": "Europa-Park",
       "facebookUrl": "https://www.facebook.com/EURODANCEFESTIVAL/",
@@ -2300,6 +2339,49 @@
           "price": 699,
           "currency": "EUR",
           "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "WCS Event Pass",
+          "price": 99,
+          "currency": "EUR",
+          "until": "2026-10-31",
+          "current": true
+        },
+        {
+          "kind": "Party",
+          "tier": "WCS Event Pass Nov",
+          "price": 103,
+          "currency": "EUR",
+          "until": "2026-11-30"
+        },
+        {
+          "kind": "Party",
+          "tier": "WCS Event Pass Dec",
+          "price": 106,
+          "currency": "EUR",
+          "until": "2026-12-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "WCS Event Pass Jan",
+          "price": 109,
+          "currency": "EUR",
+          "until": "2027-01-31"
+        },
+        {
+          "kind": "Party",
+          "tier": "WCS Event Pass Feb",
+          "price": 115,
+          "currency": "EUR",
+          "until": "2027-02-03"
+        },
+        {
+          "kind": "Party",
+          "tier": "Box Office",
+          "price": 125,
+          "currency": "EUR",
+          "until": null
         }
       ],
       "staff": [
@@ -2324,7 +2406,7 @@
   },
   "x366": {
     "source": "https://www.wintercoastswing.com/",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "venueName": "Vesileppis - Hiihtoareena",
       "facebookUrl": "https://www.facebook.com/wintercoastswing",
@@ -2339,17 +2421,33 @@
       "passes": [
         {
           "kind": "Full",
-          "tier": "International Winter Pass",
-          "price": 150,
+          "tier": "Early-Bird",
+          "price": 170,
           "currency": "EUR",
-          "until": null
+          "until": "2026-09-07"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Bird",
+          "price": 185,
+          "currency": "EUR",
+          "until": "2026-10-10"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird",
+          "price": 190,
+          "currency": "EUR",
+          "until": null,
+          "current": true
         },
         {
           "kind": "Party",
           "tier": "Party Pass",
           "price": 130,
           "currency": "EUR",
-          "until": null
+          "until": null,
+          "current": true
         }
       ],
       "websiteUrl": "https://www.wintercoastswing.com"
@@ -2809,7 +2907,7 @@
   },
   "x368": {
     "source": "https://valentineswing.dance",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "facebookUrl": "https://www.facebook.com/events/37412783165035107",
       "instagramUrl": "https://www.instagram.com/valentineswing.vs/",
@@ -2820,7 +2918,30 @@
         "Chuck Brown",
         "Lisa Shirokova & Marcin Kowalczyk"
       ],
-      "websiteUrl": "https://valentineswing.dance/"
+      "websiteUrl": "https://valentineswing.dance/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early bird",
+          "price": 1800,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal bird",
+          "price": 2000,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Late bird",
+          "price": 2200,
+          "currency": "SEK",
+          "until": null
+        }
+      ]
     },
     "year": 2027
   },
@@ -2959,7 +3080,7 @@
   },
   "x337": {
     "source": "https://www.west-in-lyon.fr/",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "facebookUrl": "https://www.facebook.com/events/216178022449007/",
       "venueName": "Complexe Moulin Carron",
@@ -2974,14 +3095,15 @@
       "passes": [
         {
           "kind": "Full",
-          "tier": "Early bird",
+          "tier": "Early",
           "price": 160,
           "currency": "EUR",
-          "until": "2026-10-31"
+          "until": "2026-10-31",
+          "current": true
         },
         {
           "kind": "Full",
-          "tier": "Regular",
+          "tier": "Normal",
           "price": 170,
           "currency": "EUR",
           "until": "2026-12-31"
@@ -2994,15 +3116,23 @@
           "until": null
         },
         {
-          "kind": "Party",
-          "tier": "Early bird",
-          "price": 120,
+          "kind": "Full",
+          "tier": "At the venue",
+          "price": 200,
           "currency": "EUR",
-          "until": "2026-10-31"
+          "until": null
         },
         {
           "kind": "Party",
-          "tier": "Regular",
+          "tier": "Early",
+          "price": 120,
+          "currency": "EUR",
+          "until": "2026-10-31",
+          "current": true
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal",
           "price": 130,
           "currency": "EUR",
           "until": "2026-12-31"
@@ -3011,6 +3141,13 @@
           "kind": "Party",
           "tier": "Late",
           "price": 140,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "At the venue",
+          "price": 160,
           "currency": "EUR",
           "until": null
         }
@@ -3060,7 +3197,7 @@
   },
   "x334": {
     "source": "https://www.avignoncityswing.com/ticket",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "venueName": "Grand Hôtel de Nîmes",
       "venueAddress": "202 rue Nicolas Ledoux, 30900 Nîmes, France",
@@ -3074,42 +3211,44 @@
       "passes": [
         {
           "kind": "Full",
-          "tier": "Super Early Bird",
+          "tier": "Super Early-Bird",
           "price": 165,
           "currency": "EUR",
           "until": "2026-10-03"
         },
         {
           "kind": "Full",
-          "tier": "Early Bird",
+          "tier": "Early-Bird",
           "price": 175,
           "currency": "EUR",
-          "until": "2026-12-01"
+          "until": "2026-12-01",
+          "current": true
         },
         {
           "kind": "Full",
-          "tier": "Normal",
+          "tier": "Normal Bird",
           "price": 185,
           "currency": "EUR",
           "until": null
         },
         {
           "kind": "Party",
-          "tier": "Super Early Bird",
+          "tier": "Super Early-Bird",
           "price": 115,
           "currency": "EUR",
           "until": "2026-10-03"
         },
         {
           "kind": "Party",
-          "tier": "Early Bird",
+          "tier": "Early-Bird",
           "price": 125,
           "currency": "EUR",
-          "until": "2026-12-01"
+          "until": "2026-12-01",
+          "current": true
         },
         {
           "kind": "Party",
-          "tier": "Normal",
+          "tier": "Normal Bird",
           "price": 135,
           "currency": "EUR",
           "until": null
@@ -3121,7 +3260,7 @@
   },
   "x395": {
     "source": "https://www.medinswing.rocks/staff",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "facebookUrl": "https://www.facebook.com/MedInSwing/",
       "instagramUrl": "https://www.instagram.com/med_in_swing/",
@@ -3158,7 +3297,8 @@
           "tier": "Sep 22 - Dec 14",
           "price": 195,
           "currency": "EUR",
-          "until": "2026-12-14"
+          "until": "2026-12-14",
+          "current": true
         },
         {
           "kind": "Full",
@@ -3178,6 +3318,49 @@
           "kind": "Full",
           "tier": "From Apr 27",
           "price": 230,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Until Aug 11",
+          "price": 110,
+          "currency": "EUR",
+          "until": "2026-08-11"
+        },
+        {
+          "kind": "Party",
+          "tier": "Aug 12 - Sep 21",
+          "price": 120,
+          "currency": "EUR",
+          "until": "2026-09-21"
+        },
+        {
+          "kind": "Party",
+          "tier": "Sep 22 - Dec 14",
+          "price": 130,
+          "currency": "EUR",
+          "until": "2026-12-14",
+          "current": true
+        },
+        {
+          "kind": "Party",
+          "tier": "Dec 15 - Mar 8",
+          "price": 140,
+          "currency": "EUR",
+          "until": "2027-03-08"
+        },
+        {
+          "kind": "Party",
+          "tier": "Mar 9 - Apr 26",
+          "price": 150,
+          "currency": "EUR",
+          "until": "2027-04-26"
+        },
+        {
+          "kind": "Party",
+          "tier": "From Apr 27",
+          "price": 160,
           "currency": "EUR",
           "until": null
         }
@@ -3382,7 +3565,7 @@
   },
   "w-franconian-swing-project-2027": {
     "source": "https://franconian-swing-project.de/registration/",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "facebookUrl": "https://www.facebook.com/share/14oBpRmzKNj/",
       "instagramUrl": "https://www.instagram.com/franconianswingproject",
@@ -3400,31 +3583,33 @@
       "passes": [
         {
           "kind": "Full",
-          "tier": "Super early bird",
+          "tier": "Super Early Bird",
           "price": 180,
           "currency": "EUR",
-          "until": null
+          "until": "2026-08-30"
         },
         {
           "kind": "Full",
-          "tier": "Early bird",
+          "tier": "Early Bird",
           "price": 190,
           "currency": "EUR",
-          "until": null
+          "until": "2026-11-01",
+          "current": true
         },
         {
           "kind": "Full",
-          "tier": "Normal bird",
+          "tier": "Normal Bird",
           "price": 200,
           "currency": "EUR",
           "until": null
         },
         {
           "kind": "Party",
-          "tier": "Normal bird",
+          "tier": "Normal Bird",
           "price": 140,
           "currency": "EUR",
-          "until": null
+          "until": null,
+          "current": true
         }
       ],
       "override": {
@@ -3927,7 +4112,7 @@
   },
   "455": {
     "source": "https://thedanceatlas.com/events/autumn-swing-challenge-2026-wsdc-rising-star-tour-event/131787",
-    "on": "2026-10-08",
+    "on": "2026-10-13",
     "info": {
       "venueName": "Verdi Budapest Aquincum",
       "facebookUrl": "https://www.facebook.com/events/1312687787648965",
@@ -3950,45 +4135,53 @@
       "passes": [
         {
           "kind": "Full",
-          "tier": "Quick bird",
+          "tier": "Quick Bird",
           "price": 160,
           "currency": "EUR",
-          "until": "2026-08-15"
+          "until": "2026-08-15",
+          "soldOut": true
         },
         {
           "kind": "Full",
-          "tier": "Normal bird",
+          "tier": "Normal Bird",
           "price": 180,
           "currency": "EUR",
-          "until": "2026-09-15"
+          "until": "2026-09-15",
+          "soldOut": true
         },
         {
           "kind": "Full",
-          "tier": "Late bird",
+          "tier": "Late Bird",
           "price": 190,
           "currency": "EUR",
-          "until": "2026-11-01"
+          "until": "2026-11-01",
+          "soldOut": true,
+          "current": true
         },
         {
           "kind": "Party",
-          "tier": "Quick bird",
+          "tier": "Quick Bird",
           "price": 120,
           "currency": "EUR",
-          "until": "2026-08-15"
+          "until": "2026-08-15",
+          "soldOut": true
         },
         {
           "kind": "Party",
-          "tier": "Normal bird",
+          "tier": "Normal Bird",
           "price": 130,
           "currency": "EUR",
-          "until": "2026-09-15"
+          "until": "2026-09-15",
+          "soldOut": true
         },
         {
           "kind": "Party",
-          "tier": "Late bird",
+          "tier": "Late Bird",
           "price": 140,
           "currency": "EUR",
-          "until": "2026-11-01"
+          "until": "2026-11-01",
+          "soldOut": true,
+          "current": true
         }
       ],
       "websiteUrl": "http://www.asc-budapest.com/"
