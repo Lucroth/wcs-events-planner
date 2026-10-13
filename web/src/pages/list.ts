@@ -144,8 +144,6 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
           <legend>Level</legend>
           ${levels.map((l) => html`<label class="chip diff-${level(l)} ${filter.levels.includes(l) ? "on-level" : ""}"><input type="checkbox" name="level" value="${l}" ${filter.levels.includes(l) ? "checked" : ""} /> ${level(l)}</label>`)}
         </fieldset>
-        ${thisYear ? html`<label><input type="checkbox" name="upcoming" ${filter.upcoming ? "checked" : ""} /> hide finished events</label>` : ""}
-        ${auth.currentUser ? html`<label><input type="checkbox" name="starred" ${filter.starred ? "checked" : ""} /> ★ starred only</label>` : ""}
         ${filtered ? html`<a href="#/year/${year}${query({ ...filter, division: null, levels: [] })}">clear filter</a>` : ""}
       </div>
       <div class="filters">
@@ -157,6 +155,8 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
               <select name="from">${homeCities.map((c) => html`<option value="${c.name}" ${c === home ? "selected" : ""}>${c.name}</option>`)}</select>
             </label>`
           : ""}
+        ${thisYear ? html`<label><input type="checkbox" name="upcoming" ${filter.upcoming ? "checked" : ""} /> hide finished events</label>` : ""}
+        ${auth.currentUser ? html`<label><input type="checkbox" name="starred" ${filter.starred ? "checked" : ""} /> ★ starred only</label>` : ""}
       </div>
     </form>
     ${filtered ? html`<p class="muted small">${filterNote(filter)} Events with no results yet, for this or an earlier edition, have no level and are hidden.</p>` : ""}
