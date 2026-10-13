@@ -32,4 +32,18 @@ public sealed class AutofillTests
         var dates = Assert.IsType<Dictionary<string, object?>>(fields["override"]);
         Assert.Equal(["dateFrom", "dateTo"], dates.Keys);
     }
+
+    [Fact]
+    public void Missing_CorrectsFieldsTheNoteSaysWereAutofilledButNotTheAdminsOwn()
+    {
+        var suggested = JsonDocument.Parse("""{ "passes": [{ "kind": "Party", "price": 140 }], "venueName": "Hall", "websiteUrl": "https://site" }""").RootElement;
+        var current = JsonDocument.Parse("""
+            { "passes": [{ "kind": "Full", "price": 190 }], "venueName": "Admin hall", "websiteUrl": "https://old",
+              "autofill": { "fields": ["passes", "websiteUrl"] } }
+            """).RootElement;
+
+        var fields = AutofillPublisher.Missing(suggested, current);
+
+        Assert.Equal(["passes", "websiteUrl"], fields.Keys);
+    }
 }

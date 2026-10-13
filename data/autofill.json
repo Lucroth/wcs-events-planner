@@ -2777,6 +2777,37 @@
           "price": 210,
           "currency": "EUR",
           "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Event pass, first 30",
+          "price": 120,
+          "currency": "EUR",
+          "until": null,
+          "soldOut": true
+        },
+        {
+          "kind": "Party",
+          "tier": "Event pass, next 30",
+          "price": 130,
+          "currency": "EUR",
+          "until": null,
+          "soldOut": true
+        },
+        {
+          "kind": "Party",
+          "tier": "Event pass, last 40",
+          "price": 140,
+          "currency": "EUR",
+          "until": null,
+          "current": true
+        },
+        {
+          "kind": "Party",
+          "tier": "Event pass, at the venue",
+          "price": 160,
+          "currency": "EUR",
+          "until": null
         }
       ],
       "websiteUrl": "https://www.westiepinkcity.fr/"
