@@ -756,7 +756,16 @@
     "source": "https://www.danceapp.net/en/events/156/",
     "on": "2026-10-06",
     "info": {
-      "venueName": "Grand Hotel Barone di Sassj"
+      "venueName": "Grand Hotel Barone di Sassj",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Late",
+          "price": 189,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     }
   },
   "422": {
@@ -809,14 +818,74 @@
     "info": {
       "websiteUrl": "https://www.infinite-swing.com/",
       "instagramUrl": "https://www.instagram.com/infinite.swing/",
-      "venueName": "Hep Cat Club München"
+      "venueName": "Hep Cat Club München",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Standard",
+          "price": 165,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Standard",
+          "price": 120,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     }
   },
   "370": {
     "source": "https://wcs-gps.com/",
     "on": "2026-10-06",
     "info": {
-      "websiteUrl": "https://wcs-gps.com/"
+      "websiteUrl": "https://wcs-gps.com/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early bird",
+          "price": 150,
+          "currency": "EUR",
+          "until": "2026-02-28"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal bird",
+          "price": 160,
+          "currency": "EUR",
+          "until": "2026-04-30"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late bird",
+          "price": 170,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Early bird",
+          "price": 110,
+          "currency": "EUR",
+          "until": "2026-02-28"
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal bird",
+          "price": 120,
+          "currency": "EUR",
+          "until": "2026-04-30"
+        },
+        {
+          "kind": "Party",
+          "tier": "Late bird",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     }
   },
   "396": {
@@ -1042,6 +1111,36 @@
         "Fernanda Dubiel",
         "Igor Pitangui",
         "Lauren Jones"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early bird (first 100)",
+          "price": 159,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal (101-300)",
+          "price": 179,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Late bird (300+)",
+          "price": 199,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party pass",
+          "price": 139,
+          "currency": "GBP",
+          "until": null
+        }
       ]
     }
   },
@@ -1160,7 +1259,37 @@
     "info": {
       "websiteUrl": "https://uptownswing.se/",
       "facebookUrl": "https://www.facebook.com/events/1238466541507574",
-      "venueName": "Scandic Infra City"
+      "venueName": "Scandic Infra City",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "COOL (World region, dual)",
+          "price": 1250,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "SWAG (World region, dual)",
+          "price": 1450,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "STREET (World region, dual)",
+          "price": 1650,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "GHETTO (World region, dual)",
+          "price": 1850,
+          "currency": "SEK",
+          "until": null
+        }
+      ]
     }
   },
   "445": {
@@ -1542,7 +1671,37 @@
     "on": "2026-10-06",
     "info": {
       "websiteUrl": "https://norwegianopen.no/",
-      "instagramUrl": "https://www.instagram.com/norwegianopen_wcs"
+      "instagramUrl": "https://www.instagram.com/norwegianopen_wcs",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Ymir Early Bird (World, first 100)",
+          "price": 1800,
+          "currency": "NOK",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Midgard Regular (World)",
+          "price": 2000,
+          "currency": "NOK",
+          "until": "2026-05-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Ragnarok Late Bird (World)",
+          "price": 2200,
+          "currency": "NOK",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass (all regions, 50 passes)",
+          "price": 1500,
+          "currency": "NOK",
+          "until": null
+        }
+      ]
     }
   },
   "363": {
@@ -1570,14 +1729,53 @@
     "on": "2026-10-06",
     "info": {
       "websiteUrl": "https://westiespringthing.com/",
-      "instagramUrl": "https://www.instagram.com/springthingwcs/"
+      "instagramUrl": "https://www.instagram.com/springthingwcs/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Full pass",
+          "price": 185,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party pass",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     }
   },
   "338": {
     "source": "https://www.westynantes.com/",
     "on": "2026-10-06",
     "info": {
-      "websiteUrl": "https://www.westynantes.com/"
+      "websiteUrl": "https://www.westynantes.com/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "International full pass, until Feb 28",
+          "price": 200,
+          "currency": "EUR",
+          "until": "2026-02-28"
+        },
+        {
+          "kind": "Full",
+          "tier": "International full pass, after Feb 28",
+          "price": 220,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Parties pass + social dance",
+          "price": 55,
+          "currency": "EUR",
+          "until": null
+        }
+      ]
     }
   },
   "383": {
@@ -1587,7 +1785,51 @@
       "websiteUrl": "https://springtimeswing.com/",
       "instagramUrl": "https://www.instagram.com/springtimeswing",
       "venueName": "M.A.K. Studios International Dancestudio",
-      "venueAddress": "Kaiser-Joseph-Straße 268, 79098 Freiburg"
+      "venueAddress": "Kaiser-Joseph-Straße 268, 79098 Freiburg",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early bird (first 50)",
+          "price": 190,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal",
+          "price": 210,
+          "currency": "EUR",
+          "until": "2026-01-01"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late bird",
+          "price": 230,
+          "currency": "EUR",
+          "until": "2026-04-20"
+        },
+        {
+          "kind": "Party",
+          "tier": "Early bird (first 20)",
+          "price": 130,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal",
+          "price": 150,
+          "currency": "EUR",
+          "until": "2026-01-01"
+        },
+        {
+          "kind": "Party",
+          "tier": "Late bird",
+          "price": 170,
+          "currency": "EUR",
+          "until": "2026-04-20"
+        }
+      ]
     }
   },
   "409": {
@@ -4209,5 +4451,63 @@
       }
     },
     "year": 2026
+  },
+  "352": {
+    "source": "http://www.westiegala.com/register.html",
+    "on": "2026-10-13",
+    "info": {
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Global region (dual)",
+          "price": 1550,
+          "currency": "SEK",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party pass",
+          "price": 1250,
+          "currency": "SEK",
+          "until": null
+        }
+      ]
+    }
+  },
+  "398": {
+    "source": "https://web.archive.org/web/2026/https://www.fcswing.co.uk/",
+    "on": "2026-10-13",
+    "info": {
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Super Early (first 50 passes)",
+          "price": 130,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Early (passes 51-125)",
+          "price": 140,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Standard (passes 126-200)",
+          "price": 150,
+          "currency": "GBP",
+          "until": null
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird (passes 201-250)",
+          "price": 160,
+          "currency": "GBP",
+          "until": null
+        }
+      ]
+    }
   }
 }
