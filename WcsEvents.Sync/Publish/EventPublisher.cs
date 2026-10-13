@@ -153,7 +153,7 @@ public sealed partial class EventPublisher(
             }
         }
 
-        var rows = all.Select(f => Row.Listed(f) with { IsFirst = IsFirstEdition(f.Event, all) }).Concat(expected).Concat(planned.Select(p => Row.Planned(p, where[p.Id].City, p.Latest is { } l ? factsOf.GetValueOrDefault(l.Id) : null) with { IsFirst = p.Latest is null }));
+        var rows = all.Select(f => Row.Listed(f) with { IsFirst = IsFirstEdition(f.Event, all), PreviousId = Editions(f.Event, all).LastOrDefault(o => o.DateFrom < f.Event.DateFrom)?.Id.ToString() }).Concat(expected).Concat(planned.Select(p => Row.Planned(p, where[p.Id].City, p.Latest is { } l ? factsOf.GetValueOrDefault(l.Id) : null) with { IsFirst = p.Latest is null, PreviousId = p.Latest?.Id.ToString() }));
 
         foreach (var year in rows.GroupBy(r => r.From.Year))
         {
@@ -171,6 +171,7 @@ public sealed partial class EventPublisher(
                     Chips = Chips(r.Strengths),
                     Expected = r.IsExpected ? true : (bool?)null,
                     First = r.IsFirst ? true : (bool?)null,
+                    Previous = r.PreviousId,
                     Announced = r.WebsiteUrl is not null || r.IsAnnounced ? new { Venue = (string?)null, WebsiteUrl = r.WebsiteUrl, Source = WsdcCalendar.PageUrl } : null,
                 }),
             }, ct);
@@ -294,7 +295,7 @@ public sealed partial class EventPublisher(
     /// <summary>One line of a year summary: a listed event, a series' guessed next edition, or an edition only the WSDC calendar lists.</summary>
     internal sealed record Row(
         string Id, string Name, DateOnly From, DateOnly To, string? City, string? Country, bool IsWsdc,
-        IReadOnlyList<DivisionStrength> Strengths, bool IsExpected, bool IsAnnounced, string? WebsiteUrl, bool IsFirst = false)
+        IReadOnlyList<DivisionStrength> Strengths, bool IsExpected, bool IsAnnounced, string? WebsiteUrl, bool IsFirst = false, string? PreviousId = null)
     {
         public static Row Listed(EventFacts f) =>
             new(f.Event.Id.ToString(), f.Event.Name, f.Event.DateFrom!.Value, f.Event.DateTo ?? f.Event.DateFrom!.Value, f.Event.City, f.Event.Country, f.IsWsdc, f.Strengths, false, false, null);

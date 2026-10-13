@@ -71,6 +71,8 @@ export interface YearSummary {
     expected?: boolean | null;
     /** The first edition of its series. */
     first?: boolean | null;
+    /** Id of the series' previous edition, whose details can stand in for missing ones. */
+    previous?: string | null;
     /** Dates the organiser has announced for an expected edition, before scoring.dance lists it. */
     announced?: { venue: string | null; websiteUrl: string | null; source: string | null } | null;
   }[];

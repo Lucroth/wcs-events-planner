@@ -81,7 +81,15 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
   const now = today();
   const currentYear = Number(now.slice(0, 4));
   const thisYear = year === currentYear;
-  const [summary, infos, manual, stars] = await Promise.all([getYear(year), getInfosForYear(year), getManualEvents(year), favourites()]);
+  const [summary, infos, manual, stars, lastYear, yearBefore] = await Promise.all([
+    getYear(year),
+    getInfosForYear(year),
+    getManualEvents(year),
+    favourites(),
+    getInfosForYear(year - 1),
+    getInfosForYear(year - 2),
+  ]);
+  previousInfos = new Map([...yearBefore, ...lastYear]);
 
   const rows: Row[] = [
     ...(summary?.events ?? []),
@@ -199,6 +207,19 @@ function sortRows(rows: Row[], f: ListFilter, costs: Map<string, Cost>): Row[] {
   });
 }
 
+/** The details of earlier editions, whose prices stand in for an edition that has none yet; refreshed with every list render. */
+let previousInfos = new Map<string, Info>();
+
+/** What one kind of pass cost at an earlier edition, cheapest to dearest tier; null when it had no such pass. */
+function lastPrices(info: Info | undefined, kind: "Full" | "Party"): Raw | null {
+  const of = (info?.passes ?? []).filter((p) => p.kind === kind);
+  if (!of.length) return null;
+  const prices = of.map((p) => p.price);
+  const [lo, hi] = [Math.min(...prices), Math.max(...prices)];
+  const currency = of[0].currency;
+  return html`<span class="muted" title="No prices for this edition yet: what the ${info?.year ?? "previous"} edition cost, early tier to last tier">${kind} ${info?.year ?? "last"}: ${lo === hi ? money(lo, currency) : `${money(lo, currency)} – ${money(hi, currency)}`}</span>`;
+}
+
 /** What a star is stored under: an expected edition is not the event whose id its row carries, so it gets its own key. */
 const starKey = (r: Row): string => (r.expected ? `next-${r.id}-${r.dateFrom.slice(0, 4)}` : r.id);
 
@@ -209,7 +230,8 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
   if (r.expected) return expectedCard(r, f);
   const full = currentPass(info?.passes, "Full", now);
   const party = currentPass(info?.passes, "Party", now);
-  const price = html`${cost ? html`<span title="Cheapest direct return flight or train from your city">Transport ≈ <strong>${money(Math.round(cost.travel), "PLN")}</strong></span>` : ""}${full ? html`<span>Full ${money(full.price, full.currency)}</span>` : ""}${party ? html`<span>Party ${money(party.price, party.currency)}</span>` : ""}`;
+  const before = r.previous && r.dateTo >= now ? previousInfos.get(r.previous) : undefined;
+  const price = html`${cost ? html`<span title="Cheapest direct return flight or train from your city">Transport ≈ <strong>${money(Math.round(cost.travel), "PLN")}</strong></span>` : ""}${full ? html`<span>Full ${money(full.price, full.currency)}</span>` : lastPrices(before, "Full") ?? ""}${party ? html`<span>Party ${money(party.price, party.currency)}</span>` : lastPrices(before, "Party") ?? ""}`;
 
   const live = mayBeLive(r.dateFrom, r.dateTo, now) && /^\d+$/.test(r.id);
   return html`
