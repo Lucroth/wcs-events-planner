@@ -76,7 +76,26 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
             await db.SaveChangesAsync(ct);
         }
 
+        await RepairYearsAsync(existing, ct);
         LogDone(logger, applied);
+    }
+
+    /// <summary>
+    /// The event list finds an event's details by the <c>year</c> they carry. Details saved for an event
+    /// that scoring.dance does not list (a WSDC calendar edition) once went in without one and never
+    /// showed on the list; the year the published event itself has is copied over.
+    /// </summary>
+    private async Task RepairYearsAsync(IReadOnlyDictionary<string, JsonElement> existing, CancellationToken ct)
+    {
+        foreach (var id in existing.Where(i => !Has(i.Value, "year")).Select(i => i.Key))
+        {
+            var published = await firestore.Document($"events/{id}").GetSnapshotAsync(ct);
+            if (published.Exists && published.TryGetValue<long>("year", out var year))
+            {
+                await firestore.Document($"info/{id}").SetAsync(new Dictionary<string, object> { ["year"] = year }, SetOptions.MergeAll, ct);
+                LogRepaired(logger, id, year);
+            }
+        }
     }
 
     /// <summary>The suggested fields the admin's document has no value for, as Firestore values.</summary>
@@ -123,6 +142,9 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Autofilled info/{Id}: {Fields}")]
     private static partial void LogFilled(ILogger logger, string id, string fields);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Autofilled info/{Id}: year {Year} added so the event list finds it")]
+    private static partial void LogRepaired(ILogger logger, string id, long year);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Autofill: {Count} events filled")]
     private static partial void LogDone(ILogger logger, int count);

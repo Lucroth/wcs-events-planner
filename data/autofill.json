@@ -1907,76 +1907,6 @@
       "venueName": "Galaxy Hotel"
     }
   },
-  "x325": {
-    "source": "https://thedanceatlas.com/events/autumn-swing-challenge-2026-wsdc-rising-star-tour-event/131787",
-    "on": "2026-10-08",
-    "info": {
-      "venueName": "Verdi Budapest Aquincum",
-      "facebookUrl": "https://www.facebook.com/events/1312687787648965",
-      "venueAddress": "Árpád fejedelem útja 94, 1036 Budapest, Hungary",
-      "staff": [
-        "Joao Parada & Savana Barreau",
-        "Kyle Fitzgerald & Melodie Paletta",
-        "Miguel Ortega & Irina Puzanova",
-        "Ludovic Pelegrin & Coleen Man",
-        "Philipp Wolff & Ekaterina Wolff",
-        "Marina Motronenko",
-        "Attila Kobori",
-        "Ivan Katrunov",
-        "Olga Ruban (DJ)",
-        "Piotr Lenart (MC)",
-        "Marta Nita (chief judge)",
-        "Kevin Town (head DJ)",
-        "Tana Abeni (DJ)"
-      ],
-      "passes": [
-        {
-          "kind": "Full",
-          "tier": "Quick bird",
-          "price": 160,
-          "currency": "EUR",
-          "until": "2026-08-15"
-        },
-        {
-          "kind": "Full",
-          "tier": "Normal bird",
-          "price": 180,
-          "currency": "EUR",
-          "until": "2026-09-15"
-        },
-        {
-          "kind": "Full",
-          "tier": "Late bird",
-          "price": 190,
-          "currency": "EUR",
-          "until": "2026-11-01"
-        },
-        {
-          "kind": "Party",
-          "tier": "Quick bird",
-          "price": 120,
-          "currency": "EUR",
-          "until": "2026-08-15"
-        },
-        {
-          "kind": "Party",
-          "tier": "Normal bird",
-          "price": 130,
-          "currency": "EUR",
-          "until": "2026-09-15"
-        },
-        {
-          "kind": "Party",
-          "tier": "Late bird",
-          "price": 140,
-          "currency": "EUR",
-          "until": "2026-11-01"
-        }
-      ],
-      "websiteUrl": "http://www.asc-budapest.com/"
-    },
-    "year": 2026
-  },
   "x342": {
     "source": "https://danceapp.net/en/events/147/",
     "on": "2026-10-08",
@@ -3128,28 +3058,6 @@
     },
     "year": 2027
   },
-  "x314": {
-    "source": "https://www.frenchywesty.com/westiesangels",
-    "on": "2026-10-08",
-    "info": {
-      "facebookUrl": "https://www.facebook.com/profile.php?id=61557074185623",
-      "instagramUrl": "https://www.instagram.com/frenchywestyevents/",
-      "venueName": "Hotel Logis Est Beynost",
-      "staff": [
-        "Maxime & Torri Zzaoui",
-        "Maxence Martin & Virginie Grondin",
-        "Igor Pitangui & Fernanda Dubiel",
-        "Teddy Sanchez & Dianeva Poirson",
-        "Olivier Massart & Virginie Massart"
-      ],
-      "websiteUrl": "https://www.frenchywesty.com/westiesangels",
-      "override": {
-        "dateFrom": "2026-11-12",
-        "dateTo": "2026-11-15"
-      }
-    },
-    "year": 2026
-  },
   "x334": {
     "source": "https://www.avignoncityswing.com/ticket",
     "on": "2026-10-08",
@@ -4016,5 +3924,97 @@
       "venueName": "Hotell Gamla Teatern",
       "websiteUrl": "https://mooselandswing.com/"
     }
+  },
+  "455": {
+    "source": "https://thedanceatlas.com/events/autumn-swing-challenge-2026-wsdc-rising-star-tour-event/131787",
+    "on": "2026-10-08",
+    "info": {
+      "venueName": "Verdi Budapest Aquincum",
+      "facebookUrl": "https://www.facebook.com/events/1312687787648965",
+      "venueAddress": "Árpád fejedelem útja 94, 1036 Budapest, Hungary",
+      "staff": [
+        "Joao Parada & Savana Barreau",
+        "Kyle Fitzgerald & Melodie Paletta",
+        "Miguel Ortega & Irina Puzanova",
+        "Ludovic Pelegrin & Coleen Man",
+        "Philipp Wolff & Ekaterina Wolff",
+        "Marina Motronenko",
+        "Attila Kobori",
+        "Ivan Katrunov",
+        "Olga Ruban (DJ)",
+        "Piotr Lenart (MC)",
+        "Marta Nita (chief judge)",
+        "Kevin Town (head DJ)",
+        "Tana Abeni (DJ)"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Quick bird",
+          "price": 160,
+          "currency": "EUR",
+          "until": "2026-08-15"
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal bird",
+          "price": 180,
+          "currency": "EUR",
+          "until": "2026-09-15"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late bird",
+          "price": 190,
+          "currency": "EUR",
+          "until": "2026-11-01"
+        },
+        {
+          "kind": "Party",
+          "tier": "Quick bird",
+          "price": 120,
+          "currency": "EUR",
+          "until": "2026-08-15"
+        },
+        {
+          "kind": "Party",
+          "tier": "Normal bird",
+          "price": 130,
+          "currency": "EUR",
+          "until": "2026-09-15"
+        },
+        {
+          "kind": "Party",
+          "tier": "Late bird",
+          "price": 140,
+          "currency": "EUR",
+          "until": "2026-11-01"
+        }
+      ],
+      "websiteUrl": "http://www.asc-budapest.com/"
+    },
+    "year": 2026
+  },
+  "456": {
+    "source": "https://www.frenchywesty.com/westiesangels",
+    "on": "2026-10-08",
+    "info": {
+      "facebookUrl": "https://www.facebook.com/profile.php?id=61557074185623",
+      "instagramUrl": "https://www.instagram.com/frenchywestyevents/",
+      "venueName": "Hotel Logis Est Beynost",
+      "staff": [
+        "Maxime & Torri Zzaoui",
+        "Maxence Martin & Virginie Grondin",
+        "Igor Pitangui & Fernanda Dubiel",
+        "Teddy Sanchez & Dianeva Poirson",
+        "Olivier Massart & Virginie Massart"
+      ],
+      "websiteUrl": "https://www.frenchywesty.com/westiesangels",
+      "override": {
+        "dateFrom": "2026-11-12",
+        "dateTo": "2026-11-15"
+      }
+    },
+    "year": 2026
   }
 }
