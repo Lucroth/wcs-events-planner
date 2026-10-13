@@ -8,7 +8,6 @@ import { favourites, setFavourite, signIn } from "../me";
 
 type Row = YearSummary["events"][number];
 
-const firstYear = 2018;
 
 const divisions: [string, string][] = [
   ["NEW", "Newcomer"],
@@ -99,7 +98,7 @@ export async function listPage(year: number, filter: ListFilter): Promise<Raw> {
   starredIds = stars;
   const home = findCity(filter.from);
   const costs = filter.sort === "travel" ? await tripCosts(rows, filter.from) : new Map<string, Cost>();
-  const years = Array.from({ length: currentYear + 2 - firstYear + 1 }, (_, i) => currentYear + 2 - i);
+  const years = [currentYear + 1, currentYear, currentYear - 1];
   const filtered = filter.division !== null || filter.levels.length > 0;
 
   const byMonth = new Map<number, Row[]>();
