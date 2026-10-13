@@ -34,16 +34,13 @@ public sealed class AutofillTests
     }
 
     [Fact]
-    public void Missing_CorrectsFieldsTheNoteSaysWereAutofilledButNotTheAdminsOwn()
+    public void Missing_CorrectsEveryFieldWhileTheNoteIsThereAndOnlyEmptyOnesOnceTheAdminSaved()
     {
-        var suggested = JsonDocument.Parse("""{ "passes": [{ "kind": "Party", "price": 140 }], "venueName": "Hall", "websiteUrl": "https://site" }""").RootElement;
-        var current = JsonDocument.Parse("""
-            { "passes": [{ "kind": "Full", "price": 190 }], "venueName": "Admin hall", "websiteUrl": "https://old",
-              "autofill": { "fields": ["passes", "websiteUrl"] } }
-            """).RootElement;
+        var suggested = JsonDocument.Parse("""{ "passes": [{ "kind": "Party", "price": 140 }], "venueName": "Hall" }""").RootElement;
+        var untouched = JsonDocument.Parse("""{ "passes": [{ "kind": "Full", "price": 190 }], "venueName": "Old hall", "autofill": { "fields": ["venueName"] } }""").RootElement;
+        var edited = JsonDocument.Parse("""{ "passes": [{ "kind": "Full", "price": 190 }], "venueName": "My hall" }""").RootElement;
 
-        var fields = AutofillPublisher.Missing(suggested, current);
-
-        Assert.Equal(["passes", "websiteUrl"], fields.Keys);
+        Assert.Equal(["passes", "venueName"], AutofillPublisher.Missing(suggested, untouched).Keys);
+        Assert.Empty(AutofillPublisher.Missing(suggested, edited));
     }
 }

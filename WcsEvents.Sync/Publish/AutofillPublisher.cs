@@ -12,11 +12,14 @@ namespace WcsEvents.Sync.Publish;
 /// into the admin's <c>info/{id}</c> documents. Only fields the admin has left empty are filled, and
 /// each entry is applied once: an admin who clears a field afterwards does not see it come back
 /// until the entry itself changes. Filled documents carry an <c>autofill</c> note the pages show
-/// until the admin saves the event. A field the note names as autofilled, and the admin has not
-/// touched since, is corrected when its entry changes.
+/// until the admin saves the event. While that note is still there nobody has edited the document,
+/// so a changed entry corrects every field it names.
 /// </summary>
 public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreStore store, AppDbContext db, TimeProvider clock, ILogger<AutofillPublisher> logger)
 {
+    /// <summary>Part of every entry's hash: change it when the rules for applying entries change, and each entry is applied again.</summary>
+    private const string Rules = "|corrects-untouched-v1";
+
     public async Task PublishAsync(string file, CancellationToken ct)
     {
         using var json = JsonDocument.Parse(await File.ReadAllTextAsync(file, ct));
@@ -29,7 +32,7 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
         foreach (var entry in json.RootElement.EnumerateObject())
         {
             var key = $"{firestore.ProjectId}/autofill/{entry.Name}";
-            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(entry.Value.GetRawText())));
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(entry.Value.GetRawText() + Rules)));
             var known = await db.PublishedDocs.FindAsync([key], ct);
             if (known?.Hash == hash)
             {
@@ -102,7 +105,7 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
     internal static Dictionary<string, object?> Missing(JsonElement suggested, JsonElement? current)
     {
         Dictionary<string, object?> fields = [];
-        var autofilled = Autofilled(current);
+        var untouched = HasNote(current);
         foreach (var p in suggested.EnumerateObject())
         {
             if (p.Value.ValueKind is JsonValueKind.Object && current is { ValueKind: JsonValueKind.Object } doc && doc.TryGetProperty(p.Name, out var existing) && existing.ValueKind is JsonValueKind.Object)
@@ -113,7 +116,7 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
                     fields[p.Name] = missing;
                 }
             }
-            else if (!Has(current, p.Name) || autofilled.Contains(p.Name))
+            else if (!Has(current, p.Name) || untouched)
             {
                 fields[p.Name] = FirestoreStore.ToValue(p.Value);
             }
@@ -121,6 +124,9 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
 
         return fields;
     }
+
+    private static bool HasNote(JsonElement? doc) =>
+        doc is { ValueKind: JsonValueKind.Object } d && d.TryGetProperty("autofill", out var note) && note.ValueKind is JsonValueKind.Object;
 
     /// <summary>The fields the document's autofill note says were filled in by a sync, not typed by the admin.</summary>
     private static HashSet<string> Autofilled(JsonElement? doc) =>
