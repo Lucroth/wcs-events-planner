@@ -3,7 +3,6 @@ import { date, level, money, month, range, today } from "../format";
 import { html, type Raw } from "../html";
 import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, sideOf, type Chip, type DanceRole, type Difficulty, type Info, type YearSummary } from "../model";
 import { findCity, flightKey, homeCities } from "../travel";
-import { mayBeLive, nowLine, watchLive } from "../live";
 import { favourites, setFavourite, signIn } from "../me";
 
 type Row = YearSummary["events"][number];
@@ -233,13 +232,11 @@ function card(r: Row, info: Info | undefined, now: string, f: ListFilter, cost: 
   const before = r.previous && r.dateTo >= now ? previousInfos.get(r.previous) : undefined;
   const price = html`${cost ? html`<span title="Cheapest direct return flight or train from your city">Transport ≈ <strong>${money(Math.round(cost.travel), "PLN")}</strong></span>` : ""}${full ? html`<span>Full ${money(full.price, full.currency)}</span>` : lastPrices(before, "Full") ?? ""}${party ? html`<span>Party ${money(party.price, party.currency)}</span>` : lastPrices(before, "Party") ?? ""}`;
 
-  const live = mayBeLive(r.dateFrom, r.dateTo, now) && /^\d+$/.test(r.id);
   return html`
-    <li class="${r.dateTo < now && !live ? "past" : ""}" ${live ? html`data-live="${r.id}"` : ""}>
+    <li class="${r.dateTo < now ? "past" : ""}">
       <a href="#/event/${r.id}" class="event-card">
         <span class="dates">${range(r.dateFrom, r.dateTo)}</span>
-        <span class="name"><button type="button" class="card-star ${starredIds.has(r.id) ? "on" : ""}" data-star="${r.id}" data-name="${r.name}" data-date="${r.dateFrom}" title="${starredIds.has(r.id) ? "Starred: click to unstar" : "Star this event"}">${starredIds.has(r.id) ? "★" : "☆"}</button> ${r.name} ${r.first ? html`<span class="tag trial" title="First edition: a trial event">trial</span>` : ""} ${r.announced ? html`<span class="tag" title="Announced by the organiser, not on scoring.dance yet">announced</span>` : ""} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""} ${live ? html`<span class="tag live" hidden>LIVE</span>` : ""}</span>
-        ${live ? html`<span class="now" hidden></span>` : ""}
+        <span class="name"><button type="button" class="card-star ${starredIds.has(r.id) ? "on" : ""}" data-star="${r.id}" data-name="${r.name}" data-date="${r.dateFrom}" title="${starredIds.has(r.id) ? "Starred: click to unstar" : "Star this event"}">${starredIds.has(r.id) ? "★" : "☆"}</button> ${r.name} ${r.first ? html`<span class="tag trial" title="First edition: a trial event">trial</span>` : ""} ${r.announced ? html`<span class="tag" title="Announced by the organiser, not on scoring.dance yet">announced</span>` : ""} ${r.country === "Poland" ? html`<span class="tag pl">PL</span>` : ""}</span>
         <span class="where muted">${[r.city, r.country].filter(Boolean).join(", ")}</span>
         <span class="price">${price}</span>
         ${chips(r.chips, f.division, f.role)}
@@ -305,19 +302,6 @@ export function wireList(year: number): void {
       await toggle(!b.classList.contains("on"));
     });
   });
-
-  // An event shows as live once scoring.dance has its schedule; the line then follows the floor.
-  document.querySelectorAll<HTMLElement>("li[data-live]").forEach((li) =>
-    watchLive(li.dataset.live!, (live) => {
-      const line = nowLine(live);
-      const badge = li.querySelector<HTMLElement>(".tag.live")!;
-      const now = li.querySelector<HTMLElement>(".now")!;
-      badge.hidden = !line;
-      now.hidden = !line;
-      now.textContent = line;
-      badge.textContent = line === "All competitions finished" ? "FINISHED" : "LIVE";
-    }),
-  );
 
   const form = document.getElementById("list-filter") as HTMLFormElement | null;
   form?.addEventListener("change", () => {

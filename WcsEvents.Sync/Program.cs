@@ -12,7 +12,7 @@ using WcsEvents.Sync.Tickets;
 using WcsEvents.Sync.Travel;
 using WcsEvents.Sync.Wsdc;
 
-// Usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill|tickets|live|notify|calendar> [--minutes N]
+// Usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill|tickets|notify|calendar> [--minutes N]
 //   sweep / refresh  mirror the WSDC registry into the local SQLite file (resumable; stops after N minutes)
 //   scoring          mirror scoring.dance (run after the registry, or prelim roles stay unknown)
 //   publish          write events, strengths and results to Firestore
@@ -22,15 +22,14 @@ using WcsEvents.Sync.Wsdc;
 //   tickets          keep the passes of events that sell on DanceApp current (tiers, deadlines, tier on sale now)
 //   calendar         print how the WSDC calendar's European editions map onto the app's events (JSON)
 //   notify           email readers whose watched connections got cheaper (after flights and trains)
-//   live             follow today's events on scoring.dance into live/{id}, once a minute, for N minutes
 // Firestore needs FIREBASE_PROJECT_ID and GOOGLE_APPLICATION_CREDENTIALS (or FIRESTORE_EMULATOR_HOST).
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
-if (args.FirstOrDefault() is not ("sweep" or "refresh" or "scoring" or "publish" or "flights" or "trains" or "autofill" or "tickets" or "live" or "notify" or "calendar") || args.Length is not (1 or 3))
+if (args.FirstOrDefault() is not ("sweep" or "refresh" or "scoring" or "publish" or "flights" or "trains" or "autofill" or "tickets" or "notify" or "calendar") || args.Length is not (1 or 3))
 {
-    Console.Error.WriteLine("usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill|live|notify> [--minutes N]");
+    Console.Error.WriteLine("usage: wcs-sync <sweep|refresh|scoring|publish|flights|trains|autofill|notify> [--minutes N]");
     return 2;
 }
 
@@ -142,7 +141,6 @@ builder.Services.AddScoped<EventPublisher>();
 builder.Services.AddScoped<FlightPublisher>();
 builder.Services.AddScoped<TrainPublisher>();
 builder.Services.AddScoped<AutofillPublisher>();
-builder.Services.AddScoped<LivePublisher>();
 builder.Services.AddScoped<NotifyPublisher>();
 builder.Services.AddScoped<FirestoreStore>();
 builder.Services.AddSingleton(_ => new FirestoreDbBuilder
@@ -204,9 +202,6 @@ switch (command)
         break;
     case "notify":
         await services.GetRequiredService<NotifyPublisher>().PublishAsync(stop.Token);
-        break;
-    case "live":
-        await services.GetRequiredService<LivePublisher>().PublishAsync(linked.Token);
         break;
     case "autofill":
         await services.GetRequiredService<AutofillPublisher>().PublishAsync(Path.Combine("data", "autofill.json"), stop.Token);

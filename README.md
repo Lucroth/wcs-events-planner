@@ -18,7 +18,6 @@ GitHub Pages (web/, Vite + TS) ──reads──> Firestore <──writes── 
 | `events/{id}` | sync (scoring.dance ids; `x{id}` and `w-{name}-{year}` for calendar editions scoring.dance lacks), admin (`m-*` hand-made events) | dates, place, difficulty, J&J results, coordinates, airports, station |
 | `info/{id}` | admin | passes, registration time, staff, links, schedules, venue, airports, `override` (corrected name/dates/place) |
 | `flights/{eventId}_{origins}`, `trains/{eventId}_{city}` | sync, daily | Ryanair/Wizz flights from each set of Polish home airports; koleo fares for Polish events within 35 days |
-| `live/{eventId}` | sync, every minute during an event | the competition schedule and who got through each round |
 | `users/{uid}` (`favourites`, `watches`) | the reader | starred events and the flights/trains they want a price-drop email about |
 | `admins/{uid}` | you, in the console | marks a Firebase Auth user as admin |
 

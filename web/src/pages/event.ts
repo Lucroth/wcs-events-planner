@@ -3,7 +3,6 @@ import { favourites, setFavourite, setWatch, signIn, watchKey, watches, type Wat
 import { isImageDataUrl } from "../image";
 import { checkedAt, date, duration, level, localDateTime, money, range, short, today } from "../format";
 import { html, safeUrl, type Raw } from "../html";
-import { liveCard, mayBeLive, watchLive } from "../live";
 import { applyOverride, currentPass, tierFor, tiers, type Flights, type Info, type Leg, type Pass, type ScrapedEvent, type TrainLeg, type Trains } from "../model";
 import {
   polishAirports,
@@ -68,7 +67,6 @@ export async function eventPage(id: string, params: URLSearchParams, admin: bool
     </p>
     ${info?.autofill ? html`<p class="notice small">Prices and details were copied automatically from <a href="${safeUrl(info.autofill.source) ?? "#"}" target="_blank" rel="noopener">the event's website</a> on ${date(info.autofill.on)} and not yet reviewed; check there before buying.</p>` : ""}
     <section class="links">${links(scraped, info)}</section>
-    ${(mayBeLive(e.dateFrom, e.dateTo, now) || params.has("live")) && /^\d+$/.test(id) ? html`<section class="card live-card" id="live" data-id="${id}" hidden><h2><span class="tag live">LIVE</span> Competitions</h2><div id="live-body"></div></section>` : ""}
     <div class="grid">
       ${passesCard(info, now, last)}
       <section class="card">
@@ -195,7 +193,7 @@ function resultsCard(e: ScrapedEvent): Raw {
         ${e.results.map((r) => html`
           <div>
             <h3><a href="https://scoring.dance/enUS/events/${e.id}/results/${r.roundId}.html" target="_blank" rel="noopener">${r.roundName}</a></h3>
-            <ol>${r.places.map((p) => html`<li value="${p.position}">${p.dancers?.length ? couple(p.dancers) : p.names}</li>`)}</ol>
+            <ol>${r.places.map((p) => html`<li value="${p.position}">${p.dancers?.length ? couple(p.dancers) : p.names}${pointsOf(p.dancers)}</li>`)}</ol>
           </div>`)}
       </div>
     </section>`;
@@ -358,14 +356,6 @@ function tiersTable(): Raw {
 export function wireEvent(id: string): void {
   wireFlightFilters();
   void wireAlerts(id);
-  const card = document.getElementById("live");
-  if (card) {
-    watchLive(id, (live) => {
-      card.hidden = !live?.rounds.length;
-      document.getElementById("live-body")!.innerHTML = liveCard(live, id).value;
-    });
-  }
-
   document.getElementById("travel-form")?.addEventListener("submit", (ev) => {
     ev.preventDefault();
     const data = new FormData(ev.target as HTMLFormElement);
@@ -377,6 +367,14 @@ export function wireEvent(id: string): void {
 /** Each dancer's scoring.dance registry page, for those with a WSDC id (given with their first points). */
 function couple(dancers: { name: string; wscid: number | null }[]): Raw {
   return html`${dancers.map((d, i) => html`${i ? " & " : ""}${d.wscid ? html`<a href="https://scoring.dance/enUS/wsdc/registry/${d.wscid}.html" target="_blank" rel="noopener">${d.name}</a>` : d.name}`)}`;
+}
+
+/** The WSDC points a placed couple was credited, as " · 12 pts" (or "12 / 10 pts" when the two differ); nothing while the registry has none. */
+function pointsOf(dancers: { points?: number | null }[] | undefined): Raw | "" {
+  const given = (dancers ?? []).map((d) => d.points).filter((p): p is number => typeof p === "number");
+  if (!given.length) return "";
+  const text = new Set(given).size === 1 ? `${given[0]}` : given.join(" / ");
+  return html` <span class="points muted" title="WSDC points the registry credits for this placing">· ${text} pts</span>`;
 }
 
 /** Every day from `from` to `to` inclusive, at most a week. */

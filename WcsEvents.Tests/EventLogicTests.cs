@@ -67,4 +67,24 @@ public sealed class EventLogicTests
         Assert.True(EventPublisher.IsFirstEdition(all[2].Event, all));
         Assert.False(EventPublisher.IsFirstEdition(all[3].Event, all));
     }
+
+    [Fact]
+    public void PointsFor_TakesTheSameNamedResultWithinAMonthPreferringTheMatchingFinish()
+    {
+        var held = new ScoringEvent { Id = 1, Name = "Budafest 2026", DateFrom = new DateOnly(2026, 1, 28) };
+        List<RegistryResult> results =
+        [
+            new("Budafest", new DateOnly(2026, 2, 1), 10, 3),
+            new("Budafest", new DateOnly(2026, 1, 1), 20, 1),
+            new("Other Fest", new DateOnly(2026, 1, 1), 99, 1),
+            new("Budafest", new DateOnly(2025, 1, 1), 50, 1),
+        ];
+
+        Assert.Equal(20, EventPublisherPoints(results, held, 1));
+        Assert.Equal(10, EventPublisherPoints(results, held, 3));
+        Assert.Null(EventPublisherPoints(null, held, 1));
+        Assert.Null(EventPublisherPoints([new("Other Fest", new DateOnly(2026, 1, 1), 99, 1)], held, 1));
+
+        static int? EventPublisherPoints(IReadOnlyList<RegistryResult>? r, ScoringEvent e, int position) => EventCatalog.PointsFor(r, e, position);
+    }
 }

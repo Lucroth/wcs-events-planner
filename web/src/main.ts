@@ -5,7 +5,6 @@ import { setRates } from "./format";
 import { auth, isAdmin, plnRates } from "./firebase";
 import { signIn } from "./me";
 import { html, type Raw } from "./html";
-import { stopListening } from "./live";
 import { dashboardPage, editPage, loginPage, logout, wireEdit, wireLogin } from "./pages/admin";
 import { eventPage, wireEvent } from "./pages/event";
 import { listPage, readFilter, wireList } from "./pages/list";
@@ -67,7 +66,6 @@ async function route(): Promise<void> {
   const mine = ++renderId;
   countPage();
   setRates(await plnRates());
-  stopListening();
   const [path, search = ""] = location.hash.replace(/^#/, "").split("?");
   const params = new URLSearchParams(search);
   const parts = path.split("/").filter(Boolean);
