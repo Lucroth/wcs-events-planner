@@ -33,7 +33,8 @@ public sealed partial class FlightPublisher(
 
         // WIZZ=reuse (the cloud job): keep the Wizz fares a home run stored rather than ask Wizz,
         // which refuses data-centre networks.
-        var stored = Environment.GetEnvironmentVariable("WIZZ") is "reuse" ? await store.ReadAllAsync("flights", ct) : null;
+        var reuseWizz = Environment.GetEnvironmentVariable("WIZZ") is "reuse";
+        var stored = await store.ReadAllAsync("flights", ct);
 
         foreach (var (id, start, end, city, country, info, address) in upcoming)
         {
@@ -48,7 +49,8 @@ public sealed partial class FlightPublisher(
             foreach (var from in origins)
             {
                 var path = $"{id}_{HomeCities.Key(from)}";
-                var knownWizz = stored is null ? null : StoredWizz(stored.TryGetValue(path, out var doc) ? doc : null);
+                JsonElement? previous = stored.TryGetValue(path, out var doc) ? doc : null;
+                var knownWizz = reuseWizz ? StoredWizz(previous) : null;
                 var results = await search.SearchAsync(from, destinations, start, end, ct, knownWizz);
                 searched++;
 
@@ -64,12 +66,58 @@ public sealed partial class FlightPublisher(
                     Out = results.Out.Take(15).Select(Leg),
                     Back = results.Back.Take(15).Select(Leg),
                     FetchedOn = today.ToString("yyyy-MM-dd"),
+                    History = History(previous, results.Out.Concat(results.Back).Concat(results.Combos.SelectMany(c => new[] { c.Out, c.Back })), today),
                 }, ct);
             }
         }
 
         await store.StampAsync("status/flights", ct);
         LogPublished(logger, upcoming.Count, searched, store.Written, store.Skipped);
+    }
+
+    public sealed record PricePoint(string On, decimal Price);
+
+    /// <summary>The key a leg's price history is kept under: one fare per airline, route and day.</summary>
+    internal static string HistoryKey(string airline, string from, string to, string date) => $"{airline}|{from}|{to}|{date}";
+
+    /// <summary>
+    /// Each leg's fare over time, a point added only when the price changed since the last one. Legs
+    /// missing from today's search keep their history while their day is still ahead, so a search that
+    /// failed once does not wipe it.
+    /// </summary>
+    internal static Dictionary<string, List<PricePoint>> History(JsonElement? previous, IEnumerable<FlightLeg> legs, DateOnly today)
+    {
+        Dictionary<string, List<PricePoint>> history = [];
+        if (previous is { ValueKind: JsonValueKind.Object } doc && doc.TryGetProperty("history", out var old) && old.ValueKind is JsonValueKind.Object)
+        {
+            foreach (var leg in old.EnumerateObject())
+            {
+                if (leg.Value.ValueKind is JsonValueKind.Array
+                    && DateOnly.TryParseExact(leg.Name.Split('|')[^1], "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var day)
+                    && day >= today)
+                {
+                    history[leg.Name] = [.. leg.Value.EnumerateArray().Select(p => new PricePoint(p.GetProperty("on").GetString()!, p.GetProperty("price").GetDecimal()))];
+                }
+            }
+        }
+
+        var on = today.ToString("yyyy-MM-dd");
+        foreach (var fare in legs
+            .GroupBy(l => HistoryKey(l.Airline.ToString(), l.From, l.To, l.Date.ToString("yyyy-MM-dd")))
+            .Select(g => (g.Key, Price: g.Min(l => l.Price))))
+        {
+            if (!history.TryGetValue(fare.Key, out var points))
+            {
+                history[fare.Key] = points = [];
+            }
+
+            if (points.Count is 0 || points[^1].Price != fare.Price)
+            {
+                points.Add(new PricePoint(on, fare.Price));
+            }
+        }
+
+        return history;
     }
 
     /// <summary>The Wizz legs a flights document holds, from its leg lists and its combinations.</summary>

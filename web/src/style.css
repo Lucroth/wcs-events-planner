@@ -242,3 +242,10 @@ tr.mine td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 .flight-filters { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin-bottom: .75rem; }
 .legs li.mine { box-shadow: inset 3px 0 0 var(--accent); padding-left: .4rem; }
 .staff.last { opacity: .75; }
+details.hist { display: inline-block; vertical-align: middle; margin-left: .25rem; }
+details.hist summary { list-style: none; cursor: pointer; }
+details.hist summary::-webkit-details-marker { display: none; }
+details.hist[open] { display: block; margin: .25rem 0 .5rem 1rem; }
+details.hist ol { margin: .25rem 0; padding-left: 1.2rem; }
+details.hist li.down { color: #66bb6a; }
+details.hist li.up { color: #e57373; }

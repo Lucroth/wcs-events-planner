@@ -268,6 +268,13 @@ function mergeFlights(all: Flights[]): Flights | undefined {
     out: unique(all.flatMap((f) => f.out), legKey).sort((a, b) => a.price - b.price),
     back: unique(all.flatMap((f) => f.back), legKey).sort((a, b) => a.price - b.price),
     fetchedOn: all.map((f) => f.fetchedOn).sort().at(-1)!,
+    // The same leg can be in several home cities' documents; the longest record of it is the fullest.
+    history: Object.fromEntries(
+      Object.entries(Object.assign({}, ...all.map((f) => f.history ?? {})) as Record<string, unknown>).map(([key]) => [
+        key,
+        all.map((f) => f.history?.[key] ?? []).reduce((a, b) => (b.length > a.length ? b : a)),
+      ]),
+    ),
   };
 }
 
@@ -312,7 +319,22 @@ function leg(l: Leg, people: number, withPrice: boolean): Raw {
       <span class="airline ${l.airline.toLowerCase()}">${l.airline === "Ryanair" ? "Ryanair" : "Wizz"}</span>
       ${l.from}→${l.to} · ${short(l.date)} ${times} <span class="muted">· direct</span>
       ${withPrice ? html`<strong> · ${money(l.price, l.currency)}</strong>` : ""}
-    </a>`;
+    </a>${priceHistory(l)}`;
+}
+
+/** The leg's fare as the daily check saw it change, newest first, behind a small toggle. */
+function priceHistory(l: Leg): Raw | "" {
+  const points = flightView?.flights.history?.[`${l.airline}|${l.from}|${l.to}|${l.date}`];
+  if (!points?.length) return "";
+  const rows = [...points].reverse().map((p, i, all) => {
+    const before = all[i + 1]?.price;
+    const move = before == null ? "" : p.price < before ? " ▼" : " ▲";
+    return html`<li class="${move === " ▼" ? "down" : move ? "up" : ""}">${date(p.on)}: ${money(p.price, l.currency)}${move}</li>`;
+  });
+  return html`<details class="hist">
+      <summary title="Price history">📈</summary>
+      ${points.length === 1 ? html`<p class="small muted">No change since ${date(points[0].on)}.</p>` : html`<ol class="small">${rows}</ol>`}
+    </details>`;
 }
 
 function trainFares(t: Trains, people: number, city: HomeCity, stationSlug: string): Raw {

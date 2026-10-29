@@ -173,6 +173,8 @@ export interface Flights {
   out: Leg[];
   back: Leg[];
   fetchedOn: string;
+  /** Each leg's fare over time, keyed "airline|from|to|date"; a point is added only when the price changed. */
+  history?: Record<string, { on: string; price: number }[]>;
 }
 
 export interface TrainLeg {
