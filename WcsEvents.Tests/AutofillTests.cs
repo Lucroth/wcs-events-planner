@@ -43,4 +43,21 @@ public sealed class AutofillTests
         Assert.Equal(["passes", "venueName"], AutofillPublisher.Missing(suggested, untouched).Keys);
         Assert.Empty(AutofillPublisher.Missing(suggested, edited));
     }
+
+    [Fact]
+    public void Resolve_FollowsACalendarEditionToTheIdScoringDanceListsItUnder()
+    {
+        List<AutofillPublisher.ListedEvent> listed =
+        [
+            new("457", "Flowstate 2026", 2026, "330"),
+            new("x352", "Westie Gala 2026/27", 2026, "352"),
+            new("470", "Norway Westie Fest 2027", 2027, null),
+        ];
+
+        Assert.Equal("457", AutofillPublisher.Resolve("x330", listed));
+        Assert.Equal("x352", AutofillPublisher.Resolve("x352", listed));
+        Assert.Equal("x999", AutofillPublisher.Resolve("x999", listed));
+        Assert.Equal("470", AutofillPublisher.Resolve("w-norway-westie-fest-2027", listed));
+        Assert.Equal("379", AutofillPublisher.Resolve("379", listed));
+    }
 }

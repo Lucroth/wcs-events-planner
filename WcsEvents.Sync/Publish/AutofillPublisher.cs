@@ -27,19 +27,23 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
         var years = await db.ScoringEvents.AsNoTracking()
             .Where(e => e.DateFrom != null)
             .ToDictionaryAsync(e => e.Id.ToString(), e => e.DateFrom!.Value.Year, ct);
+        List<ListedEvent> listed = [.. (await store.ReadAllAsync("years", ct)).Values.SelectMany(ListedEvent.Read)];
 
         var applied = 0;
         foreach (var entry in json.RootElement.EnumerateObject())
         {
             var key = $"{firestore.ProjectId}/autofill/{entry.Name}";
-            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(entry.Value.GetRawText() + Rules)));
+            // An entry written for a calendar-only edition (x{id}, w-{name}-{year}) follows it once
+            // scoring.dance lists it under an id of its own; the hash names the target, so it applies again then.
+            var target = Resolve(entry.Name, listed);
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(entry.Value.GetRawText() + Rules + target)));
             var known = await db.PublishedDocs.FindAsync([key], ct);
             if (known?.Hash == hash)
             {
                 continue;
             }
 
-            var current = existing.GetValueOrDefault(entry.Name);
+            var current = existing.GetValueOrDefault(target);
             var fields = Missing(entry.Value.GetProperty("info"), current);
 
             if (fields.Count > 0)
@@ -47,7 +51,7 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
                 // The year the event list files the info under: the entry's own for an event only the
                 // WSDC calendar has, else the scoring.dance event's.
                 var knownYear = entry.Value.TryGetProperty("year", out var y) && y.TryGetInt32(out var given) ? given
-                    : years.TryGetValue(entry.Name, out var scored) ? scored : (int?)null;
+                    : years.TryGetValue(target, out var scored) ? scored : (int?)null;
                 if (!Has(current, "year") && knownYear is { } year)
                 {
                     fields["year"] = (long)year;
@@ -61,9 +65,9 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
                 };
                 fields["updatedAt"] = FieldValue.ServerTimestamp;
 
-                await firestore.Document($"info/{entry.Name}").SetAsync(fields, SetOptions.MergeAll, ct);
+                await firestore.Document($"info/{target}").SetAsync(fields, SetOptions.MergeAll, ct);
                 applied++;
-                LogFilled(logger, entry.Name, string.Join(", ", fields.Keys));
+                LogFilled(logger, target == entry.Name ? target : $"{target} (entry {entry.Name})", string.Join(", ", fields.Keys));
             }
 
             if (known is null)
@@ -99,6 +103,49 @@ public sealed partial class AutofillPublisher(FirestoreDb firestore, FirestoreSt
                 LogRepaired(logger, id, year);
             }
         }
+    }
+
+    /// <summary>One row of a published year summary: enough to tell which event a calendar edition became.</summary>
+    internal sealed record ListedEvent(string Id, string Name, int Year, string? Previous)
+    {
+        public static IEnumerable<ListedEvent> Read(JsonElement year) =>
+            year.TryGetProperty("events", out var events) && events.ValueKind is JsonValueKind.Array
+                ? events.EnumerateArray()
+                    .Where(e => !(e.TryGetProperty("expected", out var x) && x.ValueKind is JsonValueKind.True))
+                    .Select(e => new ListedEvent(
+                        e.GetProperty("id").GetString()!,
+                        e.GetProperty("name").GetString()!,
+                        int.Parse(e.GetProperty("dateFrom").GetString()![..4], System.Globalization.CultureInfo.InvariantCulture),
+                        e.TryGetProperty("previous", out var p) && p.ValueKind is JsonValueKind.String ? p.GetString() : null))
+                : [];
+    }
+
+    /// <summary>
+    /// The event an entry belongs to now. A key the year summaries still list is itself. "x{id}" was the
+    /// edition after scoring.dance event {id}, so it is the listed event whose previous edition that is;
+    /// "w-{name}-{year}" a new series, matched by its name and year. Anything else stays as written.
+    /// </summary>
+    internal static string Resolve(string key, IReadOnlyList<ListedEvent> listed)
+    {
+        if (listed.Any(e => e.Id == key))
+        {
+            return key;
+        }
+
+        if (key.StartsWith('x') && int.TryParse(key[1..], out _))
+        {
+            return listed.Where(e => e.Previous == key[1..] && !e.Id.StartsWith('x') && !e.Id.StartsWith("w-")).Select(e => e.Id).FirstOrDefault() ?? key;
+        }
+
+        if (key.StartsWith("w-"))
+        {
+            return listed
+                .Where(e => !e.Id.StartsWith('x') && !e.Id.StartsWith("w-")
+                    && $"w-{Calendar.CalendarPlan.Slug(Metrics.EventMatching.SeriesName(e.Name))}-{e.Year}" == key)
+                .Select(e => e.Id).FirstOrDefault() ?? key;
+        }
+
+        return key;
     }
 
     /// <summary>The suggested fields the admin's document has no value for, as Firestore values.</summary>
