@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { money, setRates } from "./format";
 import { html, safeUrl } from "./html";
 import { isImageDataUrl } from "./image";
-import { applyOverride, currentPass, isEurope, levelScore, matchesLevel, tierFor, type Pass } from "./model";
+import { applyOverride, chartPoints, currentPass, isEurope, levelScore, matchesLevel, tierFor, type Pass } from "./model";
 import { addDays, bookingUrl, flightKey, homeCities, koleoUrl } from "./travel";
 
 const pass = (kind: Pass["kind"], tier: string, until: string | null): Pass => ({ kind, tier, price: 100, currency: "EUR", until });
@@ -100,6 +100,17 @@ describe("matchesLevel", () => {
   it("without a division, any division at a chosen level matches", () => {
     expect(matchesLevel(chips, null, ["Easy"])).toBe(true);
     expect(matchesLevel(chips, null, ["Medium"])).toBe(false);
+  });
+});
+
+describe("chartPoints", () => {
+  it("gives the table's points to the top five and the finalist point down to the stated place", () => {
+    expect(chartPoints(1, 45)).toBe(15);
+    expect(chartPoints(5, 45)).toBe(6);
+    expect(chartPoints(12, 45)).toBe(1);
+    expect(chartPoints(13, 45)).toBe(0);
+    expect(chartPoints(4, 8)).toBe(0);
+    expect(chartPoints(1, 4)).toBe(0);
   });
 });
 

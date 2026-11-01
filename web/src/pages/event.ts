@@ -3,7 +3,7 @@ import { favourites, setFavourite, setWatch, signIn, watchKey, watches, type Wat
 import { isImageDataUrl } from "../image";
 import { checkedAt, date, duration, level, localDateTime, money, range, short, today } from "../format";
 import { html, safeUrl, type Raw } from "../html";
-import { applyOverride, currentPass, tierFor, tiers, type Flights, type Info, type Leg, type Pass, type ScrapedEvent, type TrainLeg, type Trains } from "../model";
+import { applyOverride, chartPoints, currentPass, tierFor, tiers, type Flights, type Info, type Leg, type Pass, type ScrapedEvent, type TrainLeg, type Trains } from "../model";
 import {
   polishAirports,
   addDays,
@@ -193,7 +193,7 @@ function resultsCard(e: ScrapedEvent): Raw {
         ${e.results.map((r) => html`
           <div>
             <h3><a href="https://scoring.dance/enUS/events/${e.id}/results/${r.roundId}.html" target="_blank" rel="noopener">${r.roundName}</a></h3>
-            <ol>${r.places.map((p) => html`<li value="${p.position}">${p.dancers?.length ? couple(p.dancers) : p.names}${pointsOf(p.dancers)}</li>`)}</ol>
+            <ol>${r.places.map((p) => html`<li value="${p.position}">${p.dancers?.length ? couple(p.dancers) : p.names}${pointsOf(e, r.division, p.position, p.dancers)}</li>`)}</ol>
           </div>`)}
       </div>
     </section>`;
@@ -391,12 +391,21 @@ function couple(dancers: { name: string; wscid: number | null }[]): Raw {
   return html`${dancers.map((d, i) => html`${i ? " & " : ""}${d.wscid ? html`<a href="https://scoring.dance/enUS/wsdc/registry/${d.wscid}.html" target="_blank" rel="noopener">${d.name}</a>` : d.name}`)}`;
 }
 
-/** The WSDC points a placed couple was credited, as " · 12 pts" (or "12 / 10 pts" when the two differ); nothing while the registry has none. */
-function pointsOf(dancers: { points?: number | null }[] | undefined): Raw | "" {
+/**
+ * The WSDC points a placed couple gets, as " · 12 pts" ("12 / 10 pts" when leader and follower differ).
+ * What the registry credited once it has the result; until then what Chart 5 gives this placing for the
+ * number of leaders and of followers who entered, marked as such.
+ */
+function pointsOf(e: ScrapedEvent, division: string, position: number, dancers: { points?: number | null }[] | undefined): Raw | "" {
   const given = (dancers ?? []).map((d) => d.points).filter((p): p is number => typeof p === "number");
-  if (!given.length) return "";
-  const text = new Set(given).size === 1 ? `${given[0]}` : given.join(" / ");
-  return html` <span class="points muted" title="WSDC points the registry credits for this placing">· ${text} pts</span>`;
+  const text = (points: number[]) => (new Set(points).size === 1 ? `${points[0]}` : points.join(" / "));
+  if (given.length) return html` <span class="points muted" title="WSDC points the registry credits for this placing">· ${text(given)} pts</span>`;
+
+  const field = (role: "Leader" | "Follower") => (e.strengthsFrom ? undefined : e.strengths.find((s) => s.division === division && s.role === role)?.fieldSize);
+  const sizes = [field("Leader"), field("Follower")].filter((n): n is number => n != null);
+  if (!sizes.length) return "";
+  const points = sizes.map((n) => chartPoints(position, n));
+  return html` <span class="points muted" title="By the WSDC points chart for this field size; the registry has not credited this result yet">· ${text(points)} pts</span>`;
 }
 
 /** Every day from `from` to `to` inclusive, at most a week. */

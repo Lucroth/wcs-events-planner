@@ -275,6 +275,15 @@ export const tiers = [
 /** The tier a field of this size competes at; null below 5, where no points are awarded. */
 export const tierFor = (competitors: number) => tiers.find((t) => competitors >= t.min && competitors <= t.max) ?? null;
 
+/** Points Chart 5 gives a placing in a field of this many competitors of one role: 1st–5th from the table, then the finalist point(s) down to the stated place. */
+export function chartPoints(position: number, competitors: number): number {
+  const t = tierFor(competitors);
+  if (!t) return 0;
+  if (position <= 5) return t.points[position - 1];
+  const extra = /^(\d+) \(up to (\d+)th\)$/.exec(t.extra);
+  return extra && position <= Number(extra[2]) ? Number(extra[1]) : 0;
+}
+
 const levelRank: Record<Difficulty, number> = { Easy: 0, Medium: 1, Hard: 2 };
 
 /**
