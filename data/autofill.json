@@ -294,7 +294,7 @@
   },
   "426": {
     "source": "https://danceapp.net/en/events/160/register",
-    "on": "2026-10-06",
+    "on": "2026-11-01",
     "info": {
       "websiteUrl": "https://danceapp.net/en/events/160/register",
       "venueName": "Hilton Airport Geneva",
@@ -334,7 +334,8 @@
         "Paul & Coleen",
         "Olivier & Virginie",
         "Ludovic & Karin"
-      ]
+      ],
+      "eventSchedule": "https://swissopenwcs.ch/#schedule"
     }
   },
   "350": {
@@ -2401,7 +2402,7 @@
   },
   "x336": {
     "source": "https://swingresolution.com/pages/hotel-travel",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "venueName": "Radisson Blu Hotel, Royal Mile",
       "venueAddress": "80 High Street, The Royal Mile, EH1 1TH Edinburgh, United Kingdom",
@@ -2415,20 +2416,23 @@
       "passes": [
         {
           "kind": "Full",
-          "tier": "",
+          "tier": "Standard",
           "price": 185,
           "currency": "GBP",
-          "until": null
+          "until": null,
+          "current": true
         },
         {
           "kind": "Party",
-          "tier": "",
+          "tier": "Standard",
           "price": 120,
           "currency": "GBP",
-          "until": null
+          "until": null,
+          "current": true
         }
       ],
-      "websiteUrl": "http://www.swingresolution.com/"
+      "websiteUrl": "http://www.swingresolution.com/",
+      "eventSchedule": "https://www.swingresolution.com/pages/schedule"
     },
     "year": 2027
   },
@@ -2485,7 +2489,7 @@
   },
   "x362": {
     "source": "https://www.trinityswing.com/",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "venueName": "Carrickdale Hotel & Spa",
       "facebookUrl": "https://www.facebook.com/trinityswing",
@@ -2528,7 +2532,8 @@
           "until": null
         }
       ],
-      "websiteUrl": "http://www.trinityswing.com/"
+      "websiteUrl": "http://www.trinityswing.com/",
+      "eventSchedule": "https://www.trinityswing.com/schedule-1"
     },
     "year": 2027
   },
@@ -2648,7 +2653,7 @@
   },
   "x366": {
     "source": "https://www.wintercoastswing.com/",
-    "on": "2026-10-13",
+    "on": "2026-11-01",
     "info": {
       "venueName": "Vesileppis - Hiihtoareena",
       "facebookUrl": "https://www.facebook.com/wintercoastswing",
@@ -2663,21 +2668,14 @@
       "passes": [
         {
           "kind": "Full",
-          "tier": "Early-Bird",
-          "price": 170,
-          "currency": "EUR",
-          "until": "2026-09-07"
-        },
-        {
-          "kind": "Full",
-          "tier": "Normal Bird",
+          "tier": "Mid Winter Pass",
           "price": 185,
           "currency": "EUR",
           "until": "2026-10-10"
         },
         {
           "kind": "Full",
-          "tier": "Late Bird",
+          "tier": "Late Winter Pass",
           "price": 190,
           "currency": "EUR",
           "until": null,
@@ -2685,7 +2683,7 @@
         },
         {
           "kind": "Party",
-          "tier": "Party Pass",
+          "tier": "Party pass",
           "price": 130,
           "currency": "EUR",
           "until": null,
@@ -2698,29 +2696,60 @@
   },
   "x381": {
     "source": "https://westiespringthing.com",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "venueName": "Verdi Budapest Aquincum",
       "facebookUrl": "https://www.facebook.com/events/1232741159037815",
       "instagramUrl": "https://www.instagram.com/springthingwcs/",
       "registrationOpens": "2026-11-17T19:00",
       "venueAddress": "Budapest, Hungary",
-      "websiteUrl": "https://westiespringthing.com/"
+      "websiteUrl": "https://westiespringthing.com/",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Full Pass",
+          "price": 195,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass",
+          "price": 140,
+          "currency": "EUR",
+          "until": null
+        }
+      ],
+      "staff": [
+        "Maxence Martin & Virginie Grondin",
+        "Semion Ovsiannikov & Maria Elizarova",
+        "Chuck Brown & Aymeline Felmy",
+        "Ludovic Pelegrin Parduo & Karin Kakun",
+        "Daniel Pavlov & Maïna Vila Cobarsi"
+      ]
     },
     "year": 2027
   },
   "x382": {
     "source": "https://danceapp.net/events/221-UK_West_Coast_Swing_Championships_2027/",
-    "on": "2026-10-06",
+    "on": "2026-11-01",
     "info": {
       "venueName": "Radisson RED Hotel",
-      "websiteUrl": "https://www.ukwcschamps.com/"
+      "websiteUrl": "https://www.ukwcschamps.com/",
+      "registrationOpens": "2026-11-04T18:00",
+      "staff": [
+        "Robert Royston",
+        "Igor Pitangui",
+        "Fernanda Dubiel",
+        "KP Rutland",
+        "Bryn Anderson"
+      ]
     },
     "year": 2027
   },
   "x291": {
     "source": "https://swingincapital.com/",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "venueName": "Hotel Capannelle",
       "facebookUrl": "https://www.facebook.com/events/roma/swing-in-capital-2027-wsdc-event/1498421311724173",
@@ -2771,15 +2800,22 @@
           "until": null
         }
       ],
-      "websiteUrl": "https://swingincapital.com/"
+      "websiteUrl": "https://swingincapital.com/",
+      "staff": [
+        "Ken & Bryn",
+        "Olivier & Virginie",
+        "Igor & Fernanda",
+        "Chuck & Stefanie",
+        "Manuel & Irina"
+      ]
     },
     "year": 2027
   },
   "x389": {
     "source": "https://detonationdance.com/",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
-      "venueName": "Hilton Hotel, Outwood Ln, Manchester M90 4WP",
+      "venueName": "Hilton Manchester Airport",
       "facebookUrl": "https://www.facebook.com/EastonSwing/",
       "instagramUrl": "https://www.instagram.com/eastonswing/",
       "venueAddress": "Outwood Ln, Manchester M90 4WP, United Kingdom",
@@ -3322,13 +3358,19 @@
   },
   "x337": {
     "source": "https://www.west-in-lyon.fr/",
-    "on": "2026-10-13",
+    "on": "2026-11-01",
     "info": {
       "facebookUrl": "https://www.facebook.com/events/216178022449007/",
       "venueName": "Complexe Moulin Carron",
       "venueAddress": "42 chemin de Parsonge, 69570 Dardilly, France",
       "staff": [
-        "Olivier Massart (MC)"
+        "Alexandra & Allan",
+        "Alexis & Christopher",
+        "Henriette & Olivier",
+        "Bryn & KP",
+        "Amandine & Lionel",
+        "Maina & Joshua",
+        "Dianéva & Teddy"
       ],
       "override": {
         "dateFrom": "2027-03-18",
@@ -3400,21 +3442,55 @@
   },
   "x356": {
     "source": "https://tanzhaus-bonn.de/swingin-festival/",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
-      "websiteUrl": "https://tanzhaus-bonn.de/swingin-festival/",
+      "websiteUrl": "https://tanzhaus-bonn.de/swingin-festival-bonn-engl/",
       "venueName": "Tanzhaus Bonn",
-      "venueAddress": "Gerhardstraße 1, 53225 Bonn, Germany"
+      "venueAddress": "Gerhardstraße 1, 53225 Bonn, Germany",
+      "override": {
+        "dateFrom": "2027-04-22",
+        "dateTo": "2027-04-26"
+      },
+      "registrationOpens": "2026-12-12T12:00"
     },
     "year": 2027
   },
   "x409": {
     "source": "https://www.swingofmusic.com/",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "instagramUrl": "https://www.instagram.com/swingofmusic.austria/",
       "venueName": "Hippmann 7 Dance School",
-      "venueAddress": "Pollheimerstraße 7, Wels, Austria"
+      "venueAddress": "Pollheimerstraße 7, Wels, Austria",
+      "staff": [
+        "Ben Morris",
+        "Jennifer DeLuca",
+        "Stella-Maria Noldin",
+        "Giulia Rusch & Luca Schnoor",
+        "Joscha Brick"
+      ],
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Regular",
+          "price": 150,
+          "currency": "EUR",
+          "until": null,
+          "current": true
+        },
+        {
+          "kind": "Party",
+          "tier": "Regular",
+          "price": 100,
+          "currency": "EUR",
+          "until": null,
+          "current": true
+        }
+      ],
+      "override": {
+        "dateFrom": "2027-05-14",
+        "dateTo": "2027-05-18"
+      }
     },
     "year": 2027
   },
@@ -3624,7 +3700,7 @@
   },
   "w-norway-westie-fest-2027": {
     "source": "https://danceapp.net/en/events/169/register",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "facebookUrl": "https://www.facebook.com/norwaywestiefest",
       "instagramUrl": "https://www.instagram.com/norwaywestiefest",
@@ -3667,7 +3743,18 @@
           "until": null
         }
       ],
-      "websiteUrl": "https://www.norwaywestiefest.com/"
+      "websiteUrl": "https://www.norwaywestiefest.com/",
+      "staff": [
+        "João & Savana",
+        "Maïna & Joshua",
+        "Vanessa",
+        "Ibirocay"
+      ],
+      "eventSchedule": "https://www.norwaywestiefest.com/schedule/",
+      "override": {
+        "dateFrom": "2027-03-04",
+        "dateTo": "2027-03-08"
+      }
     },
     "year": 2027
   },
@@ -3807,7 +3894,7 @@
   },
   "w-franconian-swing-project-2027": {
     "source": "https://franconian-swing-project.de/registration/",
-    "on": "2026-10-13",
+    "on": "2026-11-01",
     "info": {
       "facebookUrl": "https://www.facebook.com/share/14oBpRmzKNj/",
       "instagramUrl": "https://www.instagram.com/franconianswingproject",
@@ -3858,7 +3945,8 @@
         "dateFrom": "2027-04-08",
         "dateTo": "2027-04-12"
       },
-      "websiteUrl": "https://franconian-swing-project.de/"
+      "websiteUrl": "https://franconian-swing-project.de/",
+      "eventSchedule": "https://franconian-swing-project.de/stundenplan/"
     },
     "year": 2027
   },
@@ -3893,7 +3981,7 @@
   },
   "w-cosmic-connection-2027": {
     "source": "https://www.thecosmic.dance/details/pricing",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "websiteUrl": "https://www.thecosmic.dance/",
       "registrationOpens": "2026-10-06T20:00",
@@ -3930,10 +4018,11 @@
         },
         {
           "kind": "Party",
-          "tier": "Party Pass (50 passes)",
+          "tier": "Standard",
           "price": 1500,
           "currency": "NOK",
-          "until": null
+          "until": null,
+          "current": true
         }
       ]
     },
@@ -4019,14 +4108,16 @@
   },
   "x387": {
     "source": "https://www.frenchconnectionwcs.com/inscriptions-tarifs",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "registrationOpens": "2026-10-05T20:00",
       "venueName": "Imperial Palace Annecy",
       "venueAddress": "All. de l'Impérial, 74000 Annecy, France",
       "staff": [
-        "Olivier Massart (chief judge)",
-        "Aurélie Bleuse (head DJ)"
+        "Olivier & Virginie Massart",
+        "Miguel Ortega & Maïna Vila Cobarsi",
+        "Paul Warden & Coleen Man",
+        "Igor Pitangui & Fernanda Dubiel"
       ],
       "passes": [
         {
@@ -4130,10 +4221,49 @@
   },
   "x369": {
     "source": "https://yourdancebuddy.com",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "venueName": "Hotel Asteria",
-      "venueAddress": "Maasheseweg 80A, 5804 AD Venray, Netherlands"
+      "venueAddress": "Maasheseweg 80A, 5804 AD Venray, Netherlands",
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "2026 participants (first 50, loyalty)",
+          "price": 230,
+          "currency": "EUR",
+          "until": "2026-10-31"
+        },
+        {
+          "kind": "Full",
+          "tier": "Regular",
+          "price": 250,
+          "currency": "EUR",
+          "until": null,
+          "current": true
+        },
+        {
+          "kind": "Full",
+          "tier": "At the door",
+          "price": 260,
+          "currency": "EUR",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass",
+          "price": 110,
+          "currency": "EUR",
+          "until": null,
+          "current": true
+        }
+      ],
+      "staff": [
+        "Markus & Tren",
+        "Igor Pitangui & Fernanda Dubiel",
+        "Michael Kielbasa & Emilia Jaskot",
+        "Leo Nguyen & Aline Koch",
+        "Alexandre & Christelle"
+      ]
     },
     "year": 2027
   },
@@ -4297,7 +4427,7 @@
   },
   "w-moscow-westie-fest-gala-edition-2026": {
     "source": "https://westiefest.ru/prices",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "staff": [
         "Irina Puzanova & Andrey Navolotsky",
@@ -4341,7 +4471,8 @@
       ],
       "venueName": "Safmar Lesnaya",
       "venueAddress": "ul. Lesnaya 15, Moscow, Russia",
-      "websiteUrl": "https://westiefest.ru/"
+      "websiteUrl": "https://westiefest.ru/",
+      "eventSchedule": "https://westiefest.ru/schedule"
     }
   },
   "x447": {
@@ -4354,7 +4485,7 @@
   },
   "455": {
     "source": "https://thedanceatlas.com/events/autumn-swing-challenge-2026-wsdc-rising-star-tour-event/131787",
-    "on": "2026-10-13",
+    "on": "2026-11-01",
     "info": {
       "venueName": "Verdi Budapest Aquincum",
       "facebookUrl": "https://www.facebook.com/events/1312687787648965",
@@ -4426,13 +4557,14 @@
           "current": true
         }
       ],
-      "websiteUrl": "http://www.asc-budapest.com/"
+      "websiteUrl": "http://www.asc-budapest.com/",
+      "eventSchedule": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQumBdKdQStYLDE8KDwA6Zpimov__N96SLF8hxeSBRm20QEKKH-iH9cys9sDxzAHJyMGHUwMd55TVw8/pubhtml"
     },
     "year": 2026
   },
   "456": {
     "source": "https://www.frenchywesty.com/westiesangels",
-    "on": "2026-10-08",
+    "on": "2026-11-01",
     "info": {
       "facebookUrl": "https://www.facebook.com/profile.php?id=61557074185623",
       "instagramUrl": "https://www.instagram.com/frenchywestyevents/",
@@ -4448,7 +4580,8 @@
       "override": {
         "dateFrom": "2026-11-12",
         "dateTo": "2026-11-15"
-      }
+      },
+      "eventSchedule": "https://www.frenchywesty.com/_files/ugd/c4a528_dbed033d66fb4c249e4d47dfdddb3019.pdf"
     },
     "year": 2026
   },
@@ -4508,6 +4641,74 @@
           "until": null
         }
       ]
+    }
+  },
+  "462": {
+    "source": "https://kingswing.pl/index.php@option=com_content&view=article&id=77&Itemid=510&lang=en.html",
+    "on": "2026-11-01",
+    "info": {
+      "passes": [
+        {
+          "kind": "Full",
+          "tier": "Early Bird (Lancelot)",
+          "price": 790,
+          "currency": "PLN",
+          "until": "2026-11-30",
+          "current": true
+        },
+        {
+          "kind": "Full",
+          "tier": "Normal Bird (Merlin)",
+          "price": 860,
+          "currency": "PLN",
+          "until": "2026-12-15"
+        },
+        {
+          "kind": "Full",
+          "tier": "Late Bird (King Arthur)",
+          "price": 930,
+          "currency": "PLN",
+          "until": null
+        },
+        {
+          "kind": "Party",
+          "tier": "Party Pass (Dragon)",
+          "price": 500,
+          "currency": "PLN",
+          "until": null,
+          "current": true
+        }
+      ],
+      "staff": [
+        "Robert Royston",
+        "Chuck Brown & Sonya Dessureault",
+        "Sean McKeever & Alyssa Glanville",
+        "PJ Turner & Karin Kakun",
+        "Browly Adjavon & Inga Kurcisa",
+        "Marta Nita & Piotr „Badman” Lenart"
+      ],
+      "venueName": "Qubus Hotel Kraków"
+    }
+  },
+  "457": {
+    "source": "https://flowstatefest.com/schedule/",
+    "on": "2026-11-01",
+    "info": {
+      "eventSchedule": "https://flowstatefest.com/schedule/"
+    }
+  },
+  "459": {
+    "source": "https://praguealchemyswing.cz/schedule",
+    "on": "2026-11-01",
+    "info": {
+      "eventSchedule": "https://praguealchemyswing.cz/schedule"
+    }
+  },
+  "460": {
+    "source": "https://www.arousawestiefest.com/",
+    "on": "2026-11-01",
+    "info": {
+      "eventSchedule": "https://www.arousawestiefest.com/assets/doc/SCHEDULE%20AWF%202027-EN.pdf"
     }
   }
 }
